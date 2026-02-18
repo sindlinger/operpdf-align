@@ -1051,11 +1051,45 @@ namespace Obj.ValidatorModule
             PeritoCatalog? catalog,
             out string reason)
         {
+            var local = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (inputValues != null)
+            {
+                foreach (var kv in inputValues)
+                {
+                    if (string.IsNullOrWhiteSpace(kv.Key))
+                        continue;
+                    local[kv.Key] = kv.Value ?? "";
+                }
+            }
+
+            return ApplyAndValidateDocumentValues(local, outputDocType, catalog, out reason, out _);
+        }
+
+        public static bool ApplyAndValidateDocumentValues(
+            IDictionary<string, string>? values,
+            string? outputDocType,
+            PeritoCatalog? catalog,
+            out string reason,
+            out List<string> changedFields)
+        {
+            changedFields = new List<string>();
             reason = "";
             if (string.IsNullOrWhiteSpace(outputDocType))
             {
                 reason = "doc_empty";
                 return false;
+            }
+            if (values == null)
+            {
+                reason = "values_null";
+                return false;
+            }
+
+            var before = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in values)
+            {
+                if (!string.IsNullOrWhiteSpace(kv.Key))
+                    before[kv.Key] = kv.Value ?? "";
             }
 
             var patternsPath = ResolvePatternPathForOutputDocType(outputDocType);
@@ -1065,23 +1099,20 @@ namespace Obj.ValidatorModule
                 return false;
             }
 
-            var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            if (inputValues != null)
+            var local = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kv in values)
             {
-                foreach (var kv in inputValues)
-                {
-                    if (string.IsNullOrWhiteSpace(kv.Key) || string.IsNullOrWhiteSpace(kv.Value))
-                        continue;
-                    values[kv.Key] = TextUtils.NormalizeWhitespace(kv.Value);
-                }
+                if (string.IsNullOrWhiteSpace(kv.Key) || string.IsNullOrWhiteSpace(kv.Value))
+                    continue;
+                local[kv.Key] = TextUtils.NormalizeWhitespace(kv.Value);
             }
 
             if (string.Equals(outputDocType, DocumentValidationRules.OutputDocCertidaoCm, StringComparison.OrdinalIgnoreCase) &&
-                !values.ContainsKey("DATA_AUTORIZACAO_CM") &&
-                values.TryGetValue("DATA_ARBITRADO_FINAL", out var certDate) &&
+                !local.ContainsKey("DATA_AUTORIZACAO_CM") &&
+                local.TryGetValue("DATA_ARBITRADO_FINAL", out var certDate) &&
                 !string.IsNullOrWhiteSpace(certDate))
             {
-                values["DATA_AUTORIZACAO_CM"] = certDate;
+                local["DATA_AUTORIZACAO_CM"] = certDate;
             }
 
             var optional = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -1090,13 +1121,31 @@ namespace Obj.ValidatorModule
             };
 
             var reject = ShouldRejectByValidator(
-                values,
+                local,
                 optional,
                 patternsPath,
                 catalog,
                 (string field, string value, PeritoCatalog? peritoCatalog, out string why) =>
                     IsValueValidForField(field, value, peritoCatalog, null, null, out why),
                 out reason);
+
+            foreach (var kv in local)
+                values[kv.Key] = kv.Value;
+
+            var allKeys = new HashSet<string>(before.Keys, StringComparer.OrdinalIgnoreCase);
+            foreach (var k in values.Keys)
+            {
+                if (!string.IsNullOrWhiteSpace(k))
+                    allKeys.Add(k);
+            }
+
+            foreach (var key in allKeys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+            {
+                var oldValue = before.TryGetValue(key, out var old) ? old ?? "" : "";
+                var newValue = values.TryGetValue(key, out var cur) ? cur ?? "" : "";
+                if (!string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                    changedFields.Add(key);
+            }
 
             return !reject;
         }

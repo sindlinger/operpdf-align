@@ -133,7 +133,20 @@ namespace Obj.Commands
 
             if (parserHas)
             {
-                if (derivedHas && !SameNormalizedValue(parserValue, derivedValue) && SameNormalizedValue(finalValue, parserValue))
+                if (!SameNormalizedValue(finalValue, parserValue))
+                {
+                    if (derivedHas && SameNormalizedValue(finalValue, derivedValue))
+                    {
+                        applied = true;
+                        decision = "derivado_aplicado";
+                    }
+                    else
+                    {
+                        applied = true;
+                        decision = "ajustado_pos_parser";
+                    }
+                }
+                else if (derivedHas && !SameNormalizedValue(parserValue, derivedValue))
                     decision = "nao_aplicado_parser_prioritario";
                 else
                     decision = "mantido_parser";
@@ -175,6 +188,55 @@ namespace Obj.Commands
             var applied = flow.TryGetValue("applied", out var ap) && ap is bool b && b;
             var decision = flow.TryGetValue("decision", out var dec) ? dec?.ToString() ?? "" : "";
             return $"parser={ShortText(parser, 64)} derived={ShortText(derived, 64)} final={ShortText(final, 64)} applied={applied.ToString().ToLowerInvariant()} decision={decision}";
+        }
+
+        private static void MarkModuleChanges(
+            IDictionary<string, string> beforeValues,
+            IDictionary<string, string> afterValues,
+            IDictionary<string, ObjectsMapFields.CompactFieldOutput> fields,
+            string moduleTag)
+        {
+            if (beforeValues == null || afterValues == null || fields == null || string.IsNullOrWhiteSpace(moduleTag))
+                return;
+
+            var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var k in beforeValues.Keys)
+                keys.Add(k);
+            foreach (var k in afterValues.Keys)
+                keys.Add(k);
+
+            foreach (var key in keys)
+            {
+                var before = GetValueIgnoreCase(beforeValues, key);
+                var after = GetValueIgnoreCase(afterValues, key);
+                if (string.Equals(before ?? "", after ?? "", StringComparison.Ordinal))
+                    continue;
+
+                if (!fields.TryGetValue(key, out var meta) || meta == null)
+                {
+                    meta = new ObjectsMapFields.CompactFieldOutput
+                    {
+                        ValueRaw = "",
+                        Value = before ?? "",
+                        Source = "",
+                        OpRange = "",
+                        Obj = 0,
+                        Status = string.IsNullOrWhiteSpace(after) ? "NOT_FOUND" : "OK",
+                        BBox = null
+                    };
+                }
+
+                var tag = string.IsNullOrWhiteSpace(before) && !string.IsNullOrWhiteSpace(after)
+                    ? $"derived:{moduleTag}"
+                    : $"adjusted:{moduleTag}";
+                if (string.IsNullOrWhiteSpace(meta.Source))
+                    meta.Source = tag;
+                else if (!meta.Source.Contains(moduleTag, StringComparison.OrdinalIgnoreCase))
+                    meta.Source = meta.Source + "|" + tag;
+
+                meta.Status = string.IsNullOrWhiteSpace(after) ? "NOT_FOUND" : "OK";
+                fields[key] = meta;
+            }
         }
 
         // Lightweight align helper: compute only the op_range for B, no printing.
@@ -230,7 +292,7 @@ namespace Obj.Commands
         {
             Console.OutputEncoding = Encoding.UTF8;
             PrintStage("iniciando o modo de detecção");
-            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack))
+            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack, out var sideSpecified))
             {
                 ShowHelp();
                 return;
@@ -462,6 +524,77 @@ namespace Obj.Commands
                     }
                 }
 
+                ObjectsTextOpsDiff.AlignDebugReport? backReport = null;
+                var autoDualDespacho = DocumentValidationRules.IsDocMatch(docKey, "despacho") && !useBack && !sideSpecified;
+                if (autoDualDespacho)
+                {
+                    var hasBackA = TryResolveDespachoSelection(aPath, docKey, true, out var backPageA, out var backObjA, out var backSourceA);
+                    var hasBackB = TryResolveDespachoSelection(bPath, docKey, true, out var backPageB, out var backObjB, out var backSourceB);
+                    var backAResolved = hasBackA && backPageA > 0 && backObjA > 0 && backSourceA.Contains("back", StringComparison.OrdinalIgnoreCase);
+                    var backBResolved = hasBackB && backPageB > 0 && backObjB > 0 && backSourceB.Contains("back", StringComparison.OrdinalIgnoreCase);
+                    if (backAResolved && backBResolved)
+                    {
+                        if (!ReturnUtils.IsEnabled())
+                        {
+                            PrintPipelineStep(
+                                "passo 2b/4 - alinhamento da segunda página (back_tail)",
+                                "passo 3/4 - extração combinada front_head + back_tail",
+                                ("modulo", "Obj.Align.ObjectsTextOpsDiff"),
+                                ("sel_back_a", $"page={backPageA} obj={backObjA} source={backSourceA}"),
+                                ("sel_back_b", $"page={backPageB} obj={backObjB} source={backSourceB}")
+                            );
+                        }
+
+                        backReport = ObjectsTextOpsDiff.ComputeAlignDebugForSelection(
+                            aPath,
+                            bPath,
+                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageA, Obj = backObjA },
+                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageB, Obj = backObjB },
+                            opFilter,
+                            backoff,
+                            "back_tail",
+                            minSim,
+                            band,
+                            minLenRatio,
+                            lenPenalty,
+                            anchorMinSim,
+                            anchorMinLenRatio,
+                            gapPenalty);
+
+                        if (!ReturnUtils.IsEnabled())
+                        {
+                            if (backReport != null)
+                            {
+                                var backRangeA = backReport.RangeA?.HasValue == true ? $"op{backReport.RangeA.StartOp}-op{backReport.RangeA.EndOp}" : "(vazio)";
+                                var backRangeB = backReport.RangeB?.HasValue == true ? $"op{backReport.RangeB.StartOp}-op{backReport.RangeB.EndOp}" : "(vazio)";
+                                PrintPipelineStep(
+                                    "passo 2c/4 - saída do alinhamento back_tail",
+                                    "passo 3/4 - extração combinada front_head + back_tail",
+                                    ("pairs_back", backReport.Alignments.Count.ToString(CultureInfo.InvariantCulture)),
+                                    ("range_back_a", backRangeA),
+                                    ("range_back_b", backRangeB)
+                                );
+                            }
+                            else
+                            {
+                                PrintPipelineStep(
+                                    "passo 2c/4 - saída do alinhamento back_tail",
+                                    "passo 3/4 - extração apenas front_head",
+                                    ("resultado", "falhou ao alinhar back_tail")
+                                );
+                            }
+                        }
+                    }
+                    else if (!ReturnUtils.IsEnabled())
+                    {
+                        PrintPipelineStep(
+                            "passo 2b/4 - alinhamento da segunda página (back_tail)",
+                            "passo 3/4 - extração apenas front_head",
+                            ("resultado", "segunda página não resolvida para A e/ou B")
+                        );
+                    }
+                }
+
                 if (!ReturnUtils.IsEnabled())
                 {
                     var variableCount = report.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
@@ -482,8 +615,15 @@ namespace Obj.Commands
                     );
                 }
 
+                if (inputs.Count == 2 && !ReturnUtils.IsEnabled())
+                {
+                    PrintHumanSummary(report, top, outputMode);
+                    if (showAlign)
+                        PrintAlignmentList(report, alignTop, showDiff: true);
+                }
+
                 PrintStage("iniciando o modo de extração");
-                report.Extraction = BuildExtractionPayload(report, aPath, bPath, docKey, verbose: !ReturnUtils.IsEnabled());
+                report.Extraction = BuildExtractionPayload(report, backReport, aPath, bPath, docKey, verbose: !ReturnUtils.IsEnabled());
                 reports.Add(report);
 
                 if (inputs.Count == 2)
@@ -494,7 +634,7 @@ namespace Obj.Commands
                         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                     };
                     var json = JsonSerializer.Serialize(report, jsonOptions);
-                    var emitJsonToStdout = outputMode == OutputMode.All || ReturnUtils.IsEnabled();
+                    var emitJsonToStdout = ReturnUtils.IsEnabled();
                     if (emitJsonToStdout)
                         Console.WriteLine(json);
 
@@ -530,13 +670,9 @@ namespace Obj.Commands
                     }
 
                     if (!ReturnUtils.IsEnabled())
-                        PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo colorido + JSON em outputs/extract"));
-                    if (!ReturnUtils.IsEnabled())
-                        PrintHumanSummary(report, top, outputMode);
+                        PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
                     if (!ReturnUtils.IsEnabled())
                         PrintExtractionSummary(report.Extraction);
-                    if (!ReturnUtils.IsEnabled() && showAlign)
-                        PrintAlignmentList(report, alignTop, showDiff: true);
                 }
             }
 
@@ -716,10 +852,76 @@ namespace Obj.Commands
 
         private static object BuildExtractionPayload(ObjectsTextOpsDiff.AlignDebugReport report, string aPath, string bPath, string docKey, bool verbose = false)
         {
+            return BuildExtractionPayload(report, null, aPath, bPath, docKey, verbose);
+        }
+
+        private static bool TryParseBandReport(
+            ObjectsTextOpsDiff.AlignDebugReport report,
+            string mapPath,
+            string band,
+            string aPath,
+            string bPath,
+            out ObjectsMapFields.CompactExtractionOutput? parsed,
+            out string error,
+            out string opRangeA,
+            out string opRangeB,
+            out string valueFullA,
+            out string valueFullB)
+        {
+            valueFullA = BuildValueFullFromBlocks(report.BlocksA, report.RangeA);
+            valueFullB = BuildValueFullFromBlocks(report.BlocksB, report.RangeB);
+            opRangeA = BuildOpRange(report.RangeA);
+            opRangeB = BuildOpRange(report.RangeB);
+
+            return ObjectsMapFields.TryExtractFromInlineSegments(
+                mapPath,
+                band,
+                valueFullA,
+                valueFullB,
+                opRangeA,
+                opRangeB,
+                report.ObjA,
+                report.ObjB,
+                aPath,
+                bPath,
+                out parsed,
+                out error);
+        }
+
+        private static void MergeSideFrom(
+            Dictionary<string, string> baseValues,
+            Dictionary<string, ObjectsMapFields.CompactFieldOutput> baseFields,
+            ObjectsMapFields.CompactSideOutput fromSide)
+        {
+            foreach (var kv in fromSide.Values)
+            {
+                var incoming = kv.Value ?? "";
+                if (string.IsNullOrWhiteSpace(incoming))
+                    continue;
+                if (!baseValues.TryGetValue(kv.Key, out var current) || string.IsNullOrWhiteSpace(current))
+                {
+                    baseValues[kv.Key] = incoming;
+                    if (fromSide.Fields.TryGetValue(kv.Key, out var meta))
+                        baseFields[kv.Key] = meta;
+                }
+            }
+
+            foreach (var kv in fromSide.Fields)
+            {
+                if (!baseFields.ContainsKey(kv.Key))
+                    baseFields[kv.Key] = kv.Value;
+            }
+        }
+
+        private static object BuildExtractionPayload(ObjectsTextOpsDiff.AlignDebugReport report, ObjectsTextOpsDiff.AlignDebugReport? backReport, string aPath, string bPath, string docKey, bool verbose = false)
+        {
             var resolvedDoc = DocumentValidationRules.ResolveDocKeyForDetection(docKey);
             var outputDocType = DocumentValidationRules.MapDocKeyToOutputType(resolvedDoc);
-            var band = string.IsNullOrWhiteSpace(report.Label) ? "front_head" : report.Label.Trim();
+            var bandFront = string.IsNullOrWhiteSpace(report.Label) ? "front_head" : report.Label.Trim();
+            var bandBack = string.IsNullOrWhiteSpace(backReport?.Label) ? "back_tail" : backReport!.Label.Trim();
             var mapPath = ResolveAlignRangeMapPath(resolvedDoc);
+            var dualBand = backReport != null;
+
             if (verbose)
             {
                 PrintPipelineStep(
@@ -728,7 +930,7 @@ namespace Obj.Commands
                     ("modulo", "ObjectsTextOpsAlign + DocumentValidationRules"),
                     ("doc_key", resolvedDoc),
                     ("doc_type", outputDocType),
-                    ("band", band),
+                    ("band", dualBand ? $"{bandFront}+{bandBack}" : bandFront),
                     ("map_path", string.IsNullOrWhiteSpace(mapPath) ? "(não encontrado)" : mapPath)
                 );
             }
@@ -739,43 +941,12 @@ namespace Obj.Commands
                     ["status"] = "map_not_found",
                     ["doc_key"] = resolvedDoc,
                     ["doc_type"] = outputDocType,
-                    ["band"] = band,
+                    ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
                     ["map_path"] = ""
                 };
             }
 
-            var valueFullA = BuildValueFullFromBlocks(report.BlocksA, report.RangeA);
-            var valueFullB = BuildValueFullFromBlocks(report.BlocksB, report.RangeB);
-            var opRangeA = BuildOpRange(report.RangeA);
-            var opRangeB = BuildOpRange(report.RangeB);
-            if (verbose)
-            {
-                PrintPipelineStep(
-                    "passo 3.2/4 - resultado do recorte para parser",
-                    "passo 3.3/4 - parser do mapa YAML",
-                    ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
-                    ("op_range_a", string.IsNullOrWhiteSpace(opRangeA) ? "(vazio)" : opRangeA),
-                    ("op_range_b", string.IsNullOrWhiteSpace(opRangeB) ? "(vazio)" : opRangeB),
-                    ("len_value_full_a", valueFullA.Length.ToString(CultureInfo.InvariantCulture)),
-                    ("len_value_full_b", valueFullB.Length.ToString(CultureInfo.InvariantCulture)),
-                    ("sample_a", ShortText(valueFullA)),
-                    ("sample_b", ShortText(valueFullB))
-                );
-            }
-
-            if (!ObjectsMapFields.TryExtractFromInlineSegments(
-                    mapPath,
-                    band,
-                    valueFullA,
-                    valueFullB,
-                    opRangeA,
-                    opRangeB,
-                    report.ObjA,
-                    report.ObjB,
-                    aPath,
-                    bPath,
-                    out var parsed,
-                    out var extractError) || parsed == null)
+            if (!TryParseBandReport(report, mapPath, bandFront, aPath, bPath, out var parsedFront, out var frontError, out var opRangeAFront, out var opRangeBFront, out var valueFullAFront, out var valueFullBFront) || parsedFront == null)
             {
                 if (verbose)
                 {
@@ -783,7 +954,7 @@ namespace Obj.Commands
                         "passo 3.3/4 - parser do mapa YAML (falhou)",
                         "encerrado com erro de extração",
                         ("modulo", "Obj.Commands.ObjectsMapFields"),
-                        ("erro", string.IsNullOrWhiteSpace(extractError) ? "(sem detalhe)" : extractError!)
+                        ("erro", string.IsNullOrWhiteSpace(frontError) ? "(sem detalhe)" : frontError)
                     );
                 }
                 return new Dictionary<string, object>
@@ -791,14 +962,71 @@ namespace Obj.Commands
                     ["status"] = "extract_failed",
                     ["doc_key"] = resolvedDoc,
                     ["doc_type"] = outputDocType,
-                    ["band"] = band,
+                    ["band"] = bandFront,
                     ["map_path"] = mapPath,
-                    ["error"] = extractError ?? ""
+                    ["error"] = frontError ?? ""
                 };
             }
 
-            var valuesA = new Dictionary<string, string>(parsed.PdfA.Values, StringComparer.OrdinalIgnoreCase);
-            var valuesB = new Dictionary<string, string>(parsed.PdfB.Values, StringComparer.OrdinalIgnoreCase);
+            if (verbose)
+            {
+                PrintPipelineStep(
+                    "passo 3.2/4 - resultado do recorte para parser (front_head)",
+                    dualBand ? "passo 3.2b/4 - recorte back_tail" : "passo 3.3/4 - parser do mapa YAML",
+                    ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
+                    ("op_range_a", string.IsNullOrWhiteSpace(opRangeAFront) ? "(vazio)" : opRangeAFront),
+                    ("op_range_b", string.IsNullOrWhiteSpace(opRangeBFront) ? "(vazio)" : opRangeBFront),
+                    ("len_value_full_a", valueFullAFront.Length.ToString(CultureInfo.InvariantCulture)),
+                    ("len_value_full_b", valueFullBFront.Length.ToString(CultureInfo.InvariantCulture)),
+                    ("sample_a", ShortText(valueFullAFront)),
+                    ("sample_b", ShortText(valueFullBFront))
+                );
+            }
+
+            ObjectsMapFields.CompactExtractionOutput? parsedBack = null;
+            if (dualBand)
+            {
+                if (!TryParseBandReport(backReport!, mapPath, bandBack, aPath, bPath, out parsedBack, out var backError, out var opRangeABack, out var opRangeBBack, out var valueFullABack, out var valueFullBBack) || parsedBack == null)
+                {
+                    if (verbose)
+                    {
+                        PrintPipelineStep(
+                            "passo 3.2b/4 - recorte back_tail",
+                            "passo 3.3/4 - parser do mapa YAML",
+                            ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
+                            ("resultado", "falhou para back_tail; mantendo front_head"),
+                            ("erro", string.IsNullOrWhiteSpace(backError) ? "(sem detalhe)" : backError)
+                        );
+                    }
+                    dualBand = false;
+                }
+                else if (verbose)
+                {
+                    PrintPipelineStep(
+                        "passo 3.2b/4 - resultado do recorte para parser (back_tail)",
+                        "passo 3.3/4 - parser do mapa YAML",
+                        ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
+                        ("op_range_a_back", string.IsNullOrWhiteSpace(opRangeABack) ? "(vazio)" : opRangeABack),
+                        ("op_range_b_back", string.IsNullOrWhiteSpace(opRangeBBack) ? "(vazio)" : opRangeBBack),
+                        ("len_value_full_a_back", valueFullABack.Length.ToString(CultureInfo.InvariantCulture)),
+                        ("len_value_full_b_back", valueFullBBack.Length.ToString(CultureInfo.InvariantCulture)),
+                        ("sample_a_back", ShortText(valueFullABack)),
+                        ("sample_b_back", ShortText(valueFullBBack))
+                    );
+                }
+            }
+
+            var valuesA = new Dictionary<string, string>(parsedFront.PdfA.Values, StringComparer.OrdinalIgnoreCase);
+            var valuesB = new Dictionary<string, string>(parsedFront.PdfB.Values, StringComparer.OrdinalIgnoreCase);
+            var fieldsA = new Dictionary<string, ObjectsMapFields.CompactFieldOutput>(parsedFront.PdfA.Fields, StringComparer.OrdinalIgnoreCase);
+            var fieldsB = new Dictionary<string, ObjectsMapFields.CompactFieldOutput>(parsedFront.PdfB.Fields, StringComparer.OrdinalIgnoreCase);
+
+            if (dualBand && parsedBack != null)
+            {
+                MergeSideFrom(valuesA, fieldsA, parsedBack.PdfA);
+                MergeSideFrom(valuesB, fieldsB, parsedBack.PdfB);
+            }
+
             if (verbose)
             {
                 PrintPipelineStep(
@@ -807,8 +1035,8 @@ namespace Obj.Commands
                     ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
                     ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
                     ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
-                    ("origem_values_a", "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
-                    ("origem_values_b", "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
+                    ("origem_values_a", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
+                    ("origem_values_b", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
                 );
             }
 
@@ -818,6 +1046,9 @@ namespace Obj.Commands
             HonorariosFacade.ApplyProfissaoAsEspecialidade(valuesB);
             var honorariosA = HonorariosFacade.ApplyBackfill(valuesA, outputDocType);
             var honorariosB = HonorariosFacade.ApplyBackfill(valuesB, outputDocType);
+            MarkModuleChanges(beforeHonorariosA, valuesA, fieldsA, "honorarios");
+            MarkModuleChanges(beforeHonorariosB, valuesB, fieldsB, "honorarios");
+
             if (verbose)
             {
                 PrintPipelineStep(
@@ -839,12 +1070,10 @@ namespace Obj.Commands
                 );
             }
 
-            parsed.PdfA.Values = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
-            parsed.PdfB.Values = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
-
             var catalog = ValidatorFacade.GetPeritoCatalog(null);
-            var okB = ValidatorFacade.PassesDocumentValidator(valuesB, outputDocType, catalog, out var reasonB);
-            // No fluxo do align, o alvo real de extração é o PDF B.
+            var beforeValidatorB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
+            var okB = ValidatorFacade.ApplyAndValidateDocumentValues(valuesB, outputDocType, catalog, out var reasonB, out var validatorChangedB);
+            MarkModuleChanges(beforeValidatorB, valuesB, fieldsB, "validator");
             var ok = okB;
             var reason = reasonB ?? "";
             if (verbose)
@@ -853,6 +1082,9 @@ namespace Obj.Commands
                     "passo 3.5/4 - validação",
                     "passo 4/4 - resumo colorido e persistência",
                     ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
+                    ("changed_keys_validator_b", validatorChangedB == null || validatorChangedB.Count == 0
+                        ? "(nenhum)"
+                        : string.Join(", ", validatorChangedB)),
                     ("validator_ok_b", okB.ToString().ToLowerInvariant()),
                     ("validator_reason_b", string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB!)
                 );
@@ -875,7 +1107,6 @@ namespace Obj.Commands
                 "FATOR",
                 "VALOR_TABELADO_ANEXO_I"
             };
-
             var flowA = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             var flowB = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             foreach (var field in trackedFields)
@@ -889,19 +1120,19 @@ namespace Obj.Commands
                 ["status"] = "ok",
                 ["doc_key"] = resolvedDoc,
                 ["doc_type"] = outputDocType,
-                ["map_path"] = parsed.MapPath,
-                ["band"] = parsed.Band,
+                ["map_path"] = parsedFront.MapPath,
+                ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
                 ["parsed"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["pdf_a"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                     {
-                        ["values"] = parsed.PdfA.Values,
-                        ["fields"] = parsed.PdfA.Fields
+                        ["values"] = valuesA,
+                        ["fields"] = fieldsA
                     },
                     ["pdf_b"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                     {
-                        ["values"] = parsed.PdfB.Values,
-                        ["fields"] = parsed.PdfB.Fields
+                        ["values"] = valuesB,
+                        ["fields"] = fieldsB
                     }
                 },
                 ["pipeline"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
@@ -917,6 +1148,7 @@ namespace Obj.Commands
                         ["3_5_validator"] = "Obj.ValidatorModule.ValidatorFacade",
                         ["4_output"] = "ObjectsTextOpsAlign + JsonSerializer"
                     },
+                    ["merge_policy"] = dualBand ? "front_head prioridade; back_tail preenche apenas campos vazios" : "single_band",
                     ["values_origin_note"] = "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento do módulo de honorários."
                 },
                 ["value_flow"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
@@ -1021,10 +1253,20 @@ namespace Obj.Commands
 
                 Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} \"{value}\"");
                 Console.WriteLine($"    origem={source} op={opRange} obj={obj} status={status} modulo=Obj.Commands.ObjectsMapFields");
-                if (string.IsNullOrWhiteSpace(parserValue) && !string.IsNullOrWhiteSpace(value))
-                    Console.WriteLine("    ajuste=Obj.Honorarios.HonorariosFacade parser=\"\" (valor preenchido por derivação/backfill)");
-                else if (!string.IsNullOrWhiteSpace(parserValue) && !SameNormalizedValue(parserValue, value))
-                    Console.WriteLine($"    ajuste=Obj.Honorarios.HonorariosFacade parser={ShortText(parserValue, 72)}");
+                var sourceNorm = source ?? "";
+                var adjustModule = "";
+                if (sourceNorm.Contains("validator", StringComparison.OrdinalIgnoreCase))
+                    adjustModule = "Obj.ValidatorModule.ValidatorFacade";
+                else if (sourceNorm.Contains("honorarios", StringComparison.OrdinalIgnoreCase))
+                    adjustModule = "Obj.Honorarios.HonorariosFacade";
+
+                if (!string.IsNullOrWhiteSpace(adjustModule))
+                {
+                    if (string.IsNullOrWhiteSpace(parserValue) && !string.IsNullOrWhiteSpace(value))
+                        Console.WriteLine($"    ajuste={adjustModule} parser=\"\" (valor preenchido por módulo autorizado)");
+                    else if (!string.IsNullOrWhiteSpace(parserValue) && !SameNormalizedValue(parserValue, value))
+                        Console.WriteLine($"    ajuste={adjustModule} parser={ShortText(parserValue, 72)}");
+                }
             }
         }
 
@@ -1068,7 +1310,8 @@ namespace Obj.Commands
             out bool objAUser,
             out bool objBUser,
             out string docKey,
-            out bool useBack)
+            out bool useBack,
+            out bool sideSpecified)
         {
             inputs = new List<string>();
             pageA = 0;
@@ -1095,6 +1338,7 @@ namespace Obj.Commands
             objBUser = false;
             docKey = "";
             useBack = false;
+            sideSpecified = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -1119,16 +1363,19 @@ namespace Obj.Commands
                 if (string.Equals(arg, "--back", StringComparison.OrdinalIgnoreCase))
                 {
                     useBack = true;
+                    sideSpecified = true;
                     continue;
                 }
                 if (string.Equals(arg, "--front", StringComparison.OrdinalIgnoreCase))
                 {
                     useBack = false;
+                    sideSpecified = true;
                     continue;
                 }
                 if (string.Equals(arg, "--side", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var side = (args[++i] ?? "").Trim().ToLowerInvariant();
+                    sideSpecified = true;
                     if (side == "back" || side == "p2" || side == "verso")
                         useBack = true;
                     else if (side == "front" || side == "p1" || side == "anverso")

@@ -52,5 +52,15 @@ namespace Obj.ValidatorModule
         {
             return ValidatorRules.PassesDocumentValidator(inputValues, outputDocType, catalog, out reason);
         }
+
+        public static bool ApplyAndValidateDocumentValues(
+            IDictionary<string, string>? values,
+            string? outputDocType,
+            PeritoCatalog? catalog,
+            out string reason,
+            out List<string> changedFields)
+        {
+            return ValidatorRules.ApplyAndValidateDocumentValues(values, outputDocType, catalog, out reason, out changedFields);
+        }
     }
 }
