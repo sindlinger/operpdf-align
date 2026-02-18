@@ -1,0 +1,11 @@
+version: 1
+doc: tjpb_despacho
+draft: true
+notes:
+- Regex centralizado para percentual (usado no extractor).
+regex_catalog:
+  percentual:
+  - "\\b\\d{1,2}%\\b"
+fields:
+  PERCENTUAL:
+    candidates: []

@@ -1,0 +1,46 @@
+version: 1
+
+# Arquivos/áreas centrais que registram o que existe no projeto.
+# Ideia: qualquer coisa nova passa por aqui (sem mexer em código).
+
+roots:
+  - name: src_code
+    include:
+      - "src/**/*.cs"
+      - "CLI/**/*.cs"
+    exclude:
+      - "bin"
+      - "obj"
+  - name: submodule_code
+    include:
+      - "submodule/src/**/*.cs"
+      - "submodule/tools/**/*.py"
+    exclude:
+      - "bin"
+      - "obj"
+      - "AnchorTemplateExtractor.Demo"
+  - name: configs
+    include:
+      - "configs/**/*.yml"
+      - "configs/**/*.yaml"
+      - "configs/**/*.txt"
+
+modules:
+  - name: cli
+    paths:
+      - "CLI"
+  - name: core
+    paths:
+      - "src/TjpdfPipeline.Core"
+  - name: pipeline_reference
+    paths:
+      - "reference"
+  - name: configs
+    paths:
+      - "configs"
+  - name: submodule_regex
+    paths:
+      - "submodule/src/AnchorTemplateExtractor"
+  - name: submodule_nlp
+    paths:
+      - "submodule/tools"

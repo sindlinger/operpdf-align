@@ -1,0 +1,77 @@
+fields: ["PERITO", "CPF/CNPJ", "PROFISSÃO"]
+priority: 1.3
+sources:
+  - bucket: principal
+    name_matches: ["*Despacho*.html", "*Despacho*.pdf", "*Autorizacao*", "*Autorização*"]
+  - bucket: principal
+  - bucket: laudo
+patterns:
+  - type: regex
+    label: perito_cpf_mesma_linha
+    pattern: 'perit[oa][^\n]{0,40}?([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-ZÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{5,})\s+cpf[:\s]*([0-9\.\-]{11,14})'
+    field: "PERITO"
+    weight: 1.35
+    compose:
+      second_field: "CPF/CNPJ"
+  - type: regex
+    label: perito_linha
+    pattern: 'perit[oa]\s*[:\-]?\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{5,})'
+    field: "PERITO"
+    weight: 0.9
+  - type: regex
+    label: profissao_nome_cpf
+    pattern: '(?:engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{5,}?)(?=\s*\(?(?:CPF|CNPJ))'
+    field: "PERITO"
+    weight: 1.15
+  - type: regex
+    label: perito_dash
+    pattern: 'senhor\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][^\n\-–—]{5,}?)\s*[-–—]\s*perit[oa]'
+    field: "PERITO"
+    weight: 1.1
+  - type: regex
+    label: interessado_dash
+    pattern: 'interessad[oa]\s*[:\-]?\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][^\n\-–—]{5,}?)\s*[-–—]'
+    field: "PERITO"
+    weight: 1.05
+  - type: regex
+    label: interessado
+    pattern: 'interessad[oa]\s*[:\-]?\s*([^\n\-–—]{5,})'
+    field: "PERITO"
+    weight: 1.05
+  - type: regex
+    label: interessado_spaced
+    pattern: 'i\s*n\s*t\s*e\s*r\s*e\s*s\s*s\s*a\s*d\s*[oa]\s*[:\-]?\s*([^\n;]+)'
+    field: "PERITO"
+    weight: 1.0
+  - type: regex
+    label: perito_spaced
+    pattern: 'p\s*e\s*r\s*i\s*t\s*[oa]\s*[:\-]?\s*([^\n;]+)'
+    field: "PERITO"
+    weight: 0.95
+  - type: regex
+    label: em_favor_profissao
+    pattern: 'em\s+favor\s+d[ao]\s+(?:a\s+|o\s+)?(?:perit[oa]|engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])(?:\s+[a-zçãéíóú]+){0,2}\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÉÊÍÓÔÕÚÇ\s.-]{5,}?)(?=\s*(?:\(|,|\bCPF|$))'
+    field: "PERITO"
+    weight: 1.2
+  - type: regex
+    label: cpf
+    pattern: '(\d{3}\.\d{3}\.\d{3}-\d{2})'
+    field: "CPF/CNPJ"
+    weight: 1.1
+  - type: regex
+    label: cpf_em_favor
+    pattern: 'em\s+favor\s+d[ao]\s+(?:a\s+|o\s+)?(?:perit[oa]|engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])[^\n]{0,200}?\bCPF[:\s]*([0-9\.\-]{11,14})'
+    field: "CPF/CNPJ"
+    weight: 1.25
+  - type: regex
+    label: cpf_profissao
+    pattern: '(?:perit[oa]|engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])[^\n]{0,200}?\bCPF[:\s]*([0-9\.\-]{11,14})'
+    field: "CPF/CNPJ"
+    weight: 1.2
+  - type: regex
+    label: cpf_spaced
+    pattern: 'c\s*p\s*f\s*[:\-]?\s*(\d{3}\.?\d{3}\.?\d{3}-?\d{2})'
+    field: "CPF/CNPJ"
+    weight: 1.0
+clean: [clean_perito, clean_profissao]
+validate: [validate_perito]

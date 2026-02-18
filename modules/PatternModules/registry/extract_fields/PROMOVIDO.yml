@@ -1,0 +1,70 @@
+version: 1
+doc: tjpb_despacho
+obj: 6
+ops:
+- Tj
+- TJ
+source_anchors: modules/PatternModules/registry/textops_anchors/tjpb_despacho_obj6_concept.yml
+draft: true
+notes:
+- Mapa preliminar (esboco). Serve apenas para validacao em mais PDFs.
+- Extracao final por campo ainda NAO implementada (apenas localizacao).
+- Op_code removido; candidatos agora usam op_range (start/end) com prev/next reais.
+- Extracao prevista: usar somente op_range real (bytes -> ToUnicode), sem heuristica.
+regex_catalog:
+  promovido_label:
+  - "(?i)(promovido|reu|requerido)\\s*[:\\-]?\\s*([^\\n;]+)"
+  em_face:
+  - "(?i)em\\s+face\\s+de\\s+(.+?)(?:,|\\n|\\s+perante|\\s+ju[ií]zo|$)"
+fields:
+  PROMOVIDO:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op667-914[Tj]
+      hint: 'movido por ... em face de ...'
+      match_regex: '(?i)em\s+face\s+(?:do|da|de)\s*([^,\n]+)'
+      match_group: 1
+    - source_file: 0013996__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op617-810[Tj]
+      hint: 'movido por ... em face de ...'
+      match_regex: '(?i)em\s+face\s+(?:do|da|de)\s*([^,\n]+)'
+      match_group: 1
+    - source_file: 00117101__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op640-739[Tj]
+      hint: 'movida por ... em face de ...'
+      match_regex: '(?i)em\s+face\s+(?:do|da|de)\s*([^,\n]+)'
+      match_group: 1
+    - source_file: 0011710__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op640-739[Tj]
+      hint: 'movida por ... em face de ...'
+      match_regex: '(?i)em\s+face\s+(?:do|da|de)\s*([^,\n]+)'
+      match_group: 1
+    - source_file: 0027858__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op616-789[Tj]
+      hint: 'movida por ... em face de ...'
+      match_regex: '(?i)em\s+face\s+(?:do|da|de)\s*([^,\n]+)'
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op622-799[Tj]
+      hint: 'movida por ... em face de ...'
+      match_regex: '(?i)em\s+face\s+(?:do|da|de)\s*([^,\n]+)'
+      match_group: 1
+    - source_file: 0028287__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op613-820[Tj]
+      hint: 'movida por ... em face de ...'
+      match_regex: '(?i)em\s+face\s+(?:do|da|de)\s*([^,\n]+)'
+      match_group: 1

@@ -1,0 +1,12 @@
+version: 1
+patterns:
+  assinante_main: "(?i)(?:documento\\s*)?assinad[oa]\\s*eletronicamente\\s*por\\s*:?\\s*(?<name>[\\p{L}][\\p{L}'\\-\\.\\s]{3,60}?)(?=\\s*(?:-|–|—|,|;|\\.|\\bem\\b|\\d{1,2}/\\d{1,2}/\\d{2,4}|$))"
+  assinante_collapsed: "(?i)(?:documento)?assinad[oa]eletronicamentepor:?(?<name>[\\p{L}]{5,})"
+  assinante_pje: "(?i)por\\s*:?\\s*(?<name>[\\p{L}][\\p{L}'\\-\\.]{2,}(?:\\s+[\\p{L}][\\p{L}'\\-\\.]{2,}){0,8})(?=\\s*(?:-|–|—|\\d{1,2}/\\d{1,2}/\\d{2,4}|$))"
+  signer_name: "\\b[A-ZÁÂÃÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÉÊÍÓÔÕÚÇàáâãéêíóôõúç'\\-]{2,}(?:\\s+[A-ZÁÂÃÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÉÊÍÓÔÕÚÇàáâãéêíóôõúç'\\-]{2,})+\\b"
+  signer_pje: "(?i)por\\s*:?\\s*([A-ZÁÂÃÉÊÍÓÔÕÚÇ]{5,})"
+  diretor: "(?i)(?<name>[\\p{L}][\\p{L}'\\-\\.]+(?:\\s+[\\p{L}][\\p{L}'\\-\\.]+){1,6})\\s*(?:[–-]|,)\\s*Diretor(?:a)?\\s+Especial(?:\\s+em\\s+exerc[ií]cio)?"
+  diretor_alt: "(?i)(?<name>[\\p{L}][\\p{L}'\\-\\.]+(?:\\s+[\\p{L}][\\p{L}'\\-\\.]+){1,6})\\s*(?:[–-]|,)\\s*Diretor\\(a\\)\\s+Especial"
+  cn: "(?i)\\bCN\\s*=\\s*([^,;/]+)"
+  date_pt: "\\b(\\d{1,2}\\s+de\\s+[A-Za-z]+\\s+de\\s+\\d{4})\\b"
+  date_slash: "\\b(\\d{1,2}/\\d{1,2}/\\d{2,4})\\b"

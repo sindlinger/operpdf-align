@@ -1,0 +1,259 @@
+version: 1
+doc: tjpb_despacho
+ops:
+- Tj
+- TJ
+fields:
+  PROCESSO_ADMINISTRATIVO:
+    band: front_head
+    regex:
+    - pattern: (?i)processo\s*n[ºo]?\s*([0-9]{10})\s*\(PA-?TJ\)
+      group: 1
+    - pattern: (?i)\bSEI\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}(?:\.[0-9]{4})?)
+      group: 1
+    - pattern: (?i)pro\s*c\s*esso\s*n[ºo]?\s*([0-9]{4}\.[0-9]{3}\.[0-9]{3})
+      group: 1
+    - pattern: (?i)pro\s*c\s*esso\s*(?:administrativo|adme|ci|sei)\s*(?:n[ºo]?|nº)?\s*[:\-]?\s*([0-9\./\-\s]{6,30})
+      group: 1
+    - pattern: (?i)pro\s*c\s*esso\s*(?:administrativo|adme|ci|sei)\s*(?:n[ºo]?|nº)?\s*[:\-]?\s*([0-9]{6,12})
+      group: 1
+    - pattern: (?i)pro\s*c\s*esso\s*n[ºo]?\s*([0-9]{6,7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2})(?!\.[0-9]{4})
+      group: 1
+  PROCESSO_JUDICIAL:
+    band: front
+    y_range: 0.20-0.85
+    regex:
+    - pattern: (?i)per[ií]cia\s+realizada\s+nos\s+autos\s+do\s+processo\s*n[ºo]?\s*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)realiza[cç][aã]o\s+de\s+per[ií]cia\s+nos\s+autos\s+do\s+processo\s*n[ºo]?\s*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)procedimento\s+ordin[aá]rio\s*n[ºo]?\s*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]{3}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)processo\s*(?:judicial|n[ºo]?|proc\.?)[\s:,-]*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)a[cç][aã]o\s*n[ºo]?\s*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)autos\s+do\s+processo\s*n[ºo]?\s*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)processo\s+de\s*n[ºo]?\s*º?\s*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)processo\s+de\s*n[ºo]?\s*º?\s*([0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]{3}\.[0-9]{4})
+      group: 1
+    - pattern: (?i)processo\s*(?:judicial|n[ºo]?|proc\.?)[\s:,-]*([0-9\.\-\/\s]{12,30})
+      group: 1
+    - pattern: (?i)n[ºo]?\s*[:\-]?\s*([0-9]{7}-?[0-9]{2}\.?[0-9]{4}\.?[0-9]{1}\.?[0-9]{2}\.?[0-9]{4})
+      group: 1
+  REQUERENTE:
+    band: front_head
+    regex:
+    - pattern: (?i)requerente\s*:\s*(.+?)(?=\s+interessad[oa]\s*:|\s+interessad[oa]\b|\s+interessado\b|\s+interessada\b)
+      group: 1
+    - pattern: (?i)requerente\s*:\s*(.+?)(?:\s*[-–—]|\s+interessad[oa]|$)
+      group: 1
+  PERITO:
+    band: front
+    y_range: 0.10-0.95
+    regex:
+    - pattern: (?is)interessad[oa]\s*:\s*([^\n–—-]+)
+      group: 1
+    - pattern: (?i)interessad[oa]\s*:\s*([\p{L}][\p{L}\s.-]{5,}?)(?=\s+(?:perit[oa]\b|Os\s+presentes|Trata|Tratam|Processo|$))
+      group: 1
+    - pattern: (?is)(?:senhor(?:a)?|sr\.?|sra\.?)\s+([\p{L}][\p{L}\s.-]{5,})\s*[–—-]\s*perit[oa]\b
+      group: 1
+    - pattern: (?is)perit[oa][^\n]{0,80}?nomead[oa],?\s*([\p{L}][\p{L}\s.-]{5,})
+      group: 1
+    - pattern: (?is)em\s+favor\s+d[ao]\s+perit[oa][^\n]{0,80}?,\s*([\p{L}][\p{L}\s.-]{5,})
+      group: 1
+    - pattern: (?i)interessad[oa]\s*:\s*([\p{L}][\p{L}\s.-]{5,}?)\s*[–\-]\s*perit[oa]\b
+      group: 1
+    - pattern: (?i)em\s+favor\s+d[ao]\s+(?:a\s+|o\s+)?(?:perit[oa]|engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])(?:\s+[a-zçãéíóú]+){0,2}\s+([\p{L}][\p{L}\s.-]{5,}?)(?=\s*(?:\\(|,|\\bCPF|$))
+      group: 1
+    - pattern: (?is)perit[oa]\s+do\s+ju[ií]zo\s+(?:a|o)\s+(?:[\p{L}]+\s+){0,3}(?:dra\.?|dr\.?)?\s*([\p{L}][\p{L}\s.-]{5,}?)(?=\s*(?:,|\s+que\s+atende|\s+CPF|\s+CRM|\s+CREA|$))
+      group: 1
+    - pattern: (?is)perit[oa]\s*(m[eé]dic[oa]|engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])(?:\s+[a-zçãéíóú]+)?\s*,?\s*([\p{L}][\p{L}\s.-]{5,})(?=\s*(?:,|\s+CRM|\s+CREA|\s+CPF|\s+PIS|$))
+      group: 2
+    - pattern: (?i)(?:engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])\s+([\p{L}][\p{L}\s.-]{5,}?)(?=\s*\(?(?:CPF|CNPJ))
+      group: 1
+    - pattern: (?is)perit[oa][\s\S]{0,80}?([\p{L}][\p{L}\s.-]{5,})\s*(?=,?\s*(?:CRM|CREA|CPF|PIS))
+      group: 1
+    - pattern: (?is)perit[oa][\s\S]{0,80}?([\p{L}][\p{L}\s.-]{5,})\s*(?:,|-)?\s*CPF
+      group: 1
+    - pattern: (?i)perit[oa]\s*[:\-]?\s*([\p{L}][\p{L}\s.-]{5,}?)(?=\s*(?:,|\s+CPF|\s+PIS|\s+CRM|\s+CREA|$))
+      group: 1
+    - pattern: (?i)interessad[oa]\s*:\s*([\p{L}][\p{L}\s.-]{5,})
+      group: 1
+    - pattern: (?i)interessad[oa]\s*:\s*([^\n]+?)(?=$|\s{2,}|\s+A\s+MM\.|\s+Trata[-\s]se|\s+Tratam\b|\s+Trata\b|\s+Processo\b)
+      group: 1
+  CPF_PERITO:
+    regex:
+    - pattern: (?i)parte\s*:\s*[^\n]{0,80}?\bCPF\s*:\s*([0-9]{3}\s*\.?\s*[0-9]{3}\s*\.?\s*[0-9]{3}\s*-?\s*[0-9]{2})
+      group: 1
+    - pattern: (?i)perit[oa][\s\S]{0,200}?CPF\s*([0-9]{3}\s*\.?\s*[0-9]{3}\s*\.?\s*[0-9]{3}\s*-?\s*[0-9]{2})
+      group: 1
+    - pattern: (?i)perit[oa][^\n]{0,120}?([0-9]{3}\s*\.?\s*[0-9]{3}\s*\.?\s*[0-9]{3}\s*-?\s*[0-9]{2})
+      group: 1
+    - pattern: (?i)interessad[oa][^\n]{0,120}?CPF\s*([0-9]{3}\s*\.?\s*[0-9]{3}\s*\.?\s*[0-9]{3}\s*-?\s*[0-9]{2})
+      group: 1
+    - pattern: (?i)em\s+favor\s+d[ao]\s+(?:a\s+|o\s+)?(?:perit[oa]|engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])[^\n]{0,200}?CPF\s*([0-9]{3}\s*\.?\s*[0-9]{3}\s*\.?\s*[0-9]{3}\s*-?\s*[0-9]{2})
+      group: 1
+    - pattern: (?i)(?:perit[oa]|engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])[^\n]{0,200}?CPF\s*([0-9]{3}\s*\.?\s*[0-9]{3}\s*\.?\s*[0-9]{3}\s*-?\s*[0-9]{2})
+      group: 1
+    - pattern: (?i)\b([0-9]{3}\s*\.?\s*[0-9]{3}\s*\.?\s*[0-9]{3}\s*-?\s*[0-9]{2})\b
+      group: 1
+  ESPECIALIDADE:
+    band: front
+    y_range: 0.10-0.95
+    regex:
+    - pattern: (?is)interessad[oa]\s*:[^\n–—-]+[–—-]\s*(?:perit[oa]\s+)?([^\n,]+)
+      group: 1
+    - pattern: (?i)perit[oa]\s*(?:-|–|—)?\s*(engenheir[oa]|grafot[eê]cnic[oa]|arquitet[oa]|contador[a]?|psic[oó]log[oa]|m[eé]dic[oa]|odont[oó]log[oa]|assistente\s+social|fonoaudi[oó]log[oa]|fisioterapeut[oa]|economist[a]|administrador[a]|b[ií]olog[oa]|qu[ií]mic[oa]|farmac[eê]utic[oa])\b
+      group: 1
+    - pattern: (?i)em\s+favor\s+d[ao]\s+perit[oa]\s+([^,\n]{3,60})
+      group: 1
+    - pattern: (?i)em\s+favor\s+d[ao]\s+([a-zçãéíóú]{3,}(?:\s+[a-zçãéíóú]{3,})?)(?=\s+[A-ZÁÂÃÀÉÊÍÓÔÕÚÇ]{2,})
+      group: 1
+    - pattern: (?i)perit[oa]\s+[^,\n]+?,\s*([^,\n]+?)(?:\s*,\s*CPF|$)
+      group: 1
+    - pattern: (?i)interessad[oa]\s*:\s*[^\n–\-]+[–\-]\s*([^\n]{3,80}?)(?=\s+(?:Os|Trata|Tratam|Processo|CPF|PIS|$))
+      group: 1
+    - pattern: (?i)perit[oa]\s+([^\n\-–—]{3,60}?)(?=\s+[\w.+-]+@|\s+CPF|\s+PIS|\s+Trata[m]?[-\s]se|\s+Trata[m]?|\s*[-–—])
+      group: 1
+    - pattern: (?i)especialidad[eé]\s*[:\-]?\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{3,})
+      group: 1
+    - pattern: (?i)perit[oa]\s*(?:-\s*|em\s+)?([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{3,})
+      group: 1
+  ESPECIE_DA_PERICIA:
+    band: front_head
+    regex:
+    - pattern: (?i)per[ií]cia\s+(m[eé]dic[oa]|grafot[eê]cnic[oa]|cont[aá]bil|odontol[oó]gic[oa]|psicol[oó]gic[oa]|psiqui[aá]tric[ao]|engenheir[oa]|engenharia|informatica|ambiental|arquitet[oô]nic[ao]|fonoaudiol[oó]gic[oa]|fisioter[aá]pic[oa])
+      group: 1
+    - pattern: (?i)esp[ée]cie\s+da?\s*per[ií]cia\s*[:\-]?\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{3,})
+      group: 1
+  COMARCA:
+    band: front_head
+    regex:
+    - pattern: (?i)comarca\s+da\s+capital
+      group: 0
+    - pattern: (?i)comarca\s*(?:da|de)\s+([\p{L}\s]+?)(?=\s*(?:\d|ª|º|-|,|\.|\(|$|\s+interessad|\s+requerente|\s+ju[ií]zo|\s+vara))
+      group: 1
+  VARA:
+    band: front_head
+    regex:
+    - pattern: (?i)ju[ií]zo\s+da\s+([^\n]+?)(?=,\s*comarca|\s+da\s+comarca|\s+comarca|\s+interessad|\s*$)
+      group: 1
+    - pattern: (?i)ju[ií]zo\s+do\s+([^\n]+?)(?=,\s*comarca|\s+da\s+comarca|\s+comarca|\s+interessad|\s*$)
+      group: 1
+    - pattern: (?i)(\d+\s*(?:a|ª)?\s*vara[^\n]{0,80}?)\s+da\s+comarca\s+de\s+([\p{L}\s]+)
+      group: 1
+  PROMOVENTE:
+    band: front
+    y_range: 0.20-0.95
+    regex:
+    - pattern: (?is)\bpor\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ0-9][A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ0-9\s\.,/&\-–']{3,120})(?=,?\s+(?:em\s+face\s+(?:de|do|da)|perante\s+o|perante\s+a|ju[ií]zo|$))
+      group: 1
+    - pattern: (?is)promovente\s*:\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}(?:\s+[A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}){1,})\b
+      group: 1
+    - pattern: (?is)movid[oa][\\s\\S]{0,120}?\\b(?:PELO|PELA|PELOS|PELAS|POR)\\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}(?:\\s+[A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}){1,})\\b(?=,?\\s+(?:em\\s+face\\s+(?:de|do|da)|perante\\s+o|perante\\s+a|CPF|CNPJ|$))
+      group: 1
+    - pattern: (?is)\bpor\s+([\p{L}][\p{L}\s\.\-–']{3,200}?)(?=,?\s+(?:em\s+face\s+(?:de|do|da)|perante\s+o|perante\s+a|CPF|CNPJ|$))
+      group: 1
+    - pattern: (?is)\bmovid[oa]\b[\s\S]{0,80}?\b([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-ZÁÂÃÀÉÊÍÓÔÕÚÇ\s\.\-–']{5,})\b(?=,?\s+(?:em\s+face\s+(?:de|do|da)|perante\s+o|perante\s+a|CPF|CNPJ|$))
+      group: 1
+    - pattern: (?is)movid[oa]\s+([\p{L}\s\.\-–']{3,200}?)(?=,?\s+(?:em\s+face\s+(?:de|do|da)|perante\s+o|perante\s+a|CPF|CNPJ|$))
+      group: 1
+    - pattern: (?is)movid[oa]\s+por\s+([\p{L}\s\.\-–']{3,200}?)(?=,?\s+(?:em\s+face\s+(?:de|do|da)|perante\s+o|perante\s+a|CPF|CNPJ|$))
+      group: 1
+    - pattern: (?is)movid[oa]\s+pel(?:o|a|os|as)\s+([\p{L}\s\.\-–']{3,200}?)(?=,?\s+(?:em\s+face\s+(?:de|do|da)|perante\s+o|perante\s+a|CPF|CNPJ|$))
+      group: 1
+    - pattern: (?is)autor\s*[:\-]?\s*([\p{L}\s\.\-]{3,200}?)\s*r[eé]u\s*[:\-]?\s*([\p{L}\s\.\-]{3,200}?)
+      group: 1
+    - pattern: (?is)requerente\s*:\s*(.+?)(?=\s+interessad[oa]\b|$)
+      group: 1
+  PROMOVIDO:
+    band: front
+    y_range: 0.20-0.95
+    regex:
+    - pattern: (?is)(?:em\s+face\s+(?:de|do|da)?)\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ0-9][A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ0-9\s\.,/&\-–']{3,120}?)(?=,|\.|\n|$)
+      group: 1
+    - pattern: (?is)promovido\s*:\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}(?:\s+[A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}){1,})\b
+      group: 1
+    - pattern: (?is)(?:em\\s+face\\s+(?:de|do|da)?)\\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}(?:\\s+[A-ZÁÂÃÀÉÊÍÓÔÕÚÇÑÜ]{2,}){1,})(?=,?\\s+(?:CPF|CNPJ|perante\\s+o|perante\\s+a|$|\\.|,))
+      group: 1
+    - pattern: (?is)\bem\s+face\s+d(?:e|o|a)\s+([\p{L}][\p{L}\s\.\-–']{3,200}?)(?=,?\s+(?:CPF|CNPJ|perante\s+o|perante\s+a|$))
+      group: 1
+    - pattern: (?is)\bem\s+face\s+d(?:e|o|a)?\s+([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-ZÁÂÃÀÉÊÍÓÔÕÚÇ\s\.\-–']{5,})(?=,?\s+(?:CPF|CNPJ|perante\s+o|perante\s+a|$))
+      group: 1
+    - pattern: (?is)(?:em\s+face\s+(?:de|do|da)?)\s+([\p{L}\s\.\-–']{3,200}?)(?=,?\s+(?:CPF|CNPJ|perante\s+o|perante\s+a|$))
+      group: 1
+    - pattern: (?is)autor\s*[:\-]?\s*([\p{L}\s\.\-]{3,200}?)\s*r[eé]u\s*[:\-]?\s*([\p{L}\s\.\-]{3,200}?)
+      group: 2
+    - pattern: (?is)interessad[oa]\s*:\s*(.+?)(?=\s*[-–—]?\s*perit[oa]\b|$)
+      group: 1
+  VALOR_ARBITRADO_JZ:
+    band: front
+    y_range: 0.20-0.85
+    regex:
+    - pattern: (?i)em\s*penh\w*?\s*(?:o\s*)?valor\s+de\s*R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: (?is)no\s+valor\s+de\s*([0-9]{1,2}\s*[,\.]\s*[0-9])\s*\([^)]{0,40}?vez[^)]{0,40}?\)
+      group: 1
+    - pattern: ([0-9]{1,2}(?:[\\.,]\\s*[0-9]{1,2})?)\\s*(?:\\([^)]+\\)\\s*)?(?:sal[aá]rio-?m[ií]nimo|sal[aá]rio\\s*m[ií]nimo)
+      group: 1
+    - pattern: valor\s+arbitrad[oa][^\n]{0,40}?(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: importe[^\n]{0,60}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: (?:fix[ao]s?|arbitro)\s+os?\s+honor[aá]rios[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: arbitrad[oa]s?[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: honor[aá]rios\s+periciais[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: (?is)valor\s+dos\s+honor[aá]rios[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: honor[aá]rios[^\n]{0,80}?fixad[oa]s?[^\n]{0,40}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: (?is)honor[aá]rios[^\n]{0,80}?no\s+valor\s+de\s*R\s*\$?\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})[^\n]{0,60}?valor\s+arbitrad
+      group: 1
+  ADIANTAMENTO:
+    band: front
+    y_range: 0.20-0.85
+    regex:
+    - pattern: (?i)adiantamento\s+de\s+([0-9]{1,3}%?)
+      group: 1
+    - pattern: (?i)adiantamento[^\n]{0,120}?([0-9]{1,3})\s*%
+      group: 1
+    - pattern: (?i)adiantamento[^\n]{0,80}?correspondente\s+a\s*([0-9]{1,3}%?)
+      group: 1
+    - pattern: (?i)correspondente\s+a\s*([0-9]{1,3}%?)\s*(?:\([^)]+\))?\s*,?\s*do\s+valor\s+dos?\s+honor[aá]rios
+      group: 1
+    - pattern: (?i)antecip[aã]ç[aã]o\s+de\s+([0-9]{1,3}%?)
+      group: 1
+  VALOR_ARBITRADO_DE:
+    band: back_tail
+    y_range: 0.00-0.90
+    regex:
+    - pattern: autorizo\s+o\s+pagamento[^\n]{0,120}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: reserva\s+orçament[aá]ria[^\n]{0,120}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: reserva[\s\S]{0,120}?no\s+valor(?:\s+solicitado)?\s+de\s*R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: valor\s+arbitrado[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: no\s+valor(?:\s+solicitado)?\s+de\s*R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+    - pattern: (?i)valor\s+total\s+de\s+seus\s+pagamentos[^\n]{0,60}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\s*\d{2})
+      group: 1
+  DATA_ARBITRADO_FINAL:
+    band: back_tail
+    y_range: 0.00-0.90
+    regex:
+    - pattern: (?i)\bem\s+(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4})
+      group: 1
+    - pattern: (?i)jo[aã]o\s+pessoa[,\s]+(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4})
+      group: 1
+    - pattern: (\d{1,2}/\d{1,2}/\d{2,4})
+      group: 1

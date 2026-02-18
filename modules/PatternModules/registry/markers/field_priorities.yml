@@ -1,0 +1,33 @@
+processo_admin_labels:
+  - "processo administrativo"
+  - "processo adme"
+  - "processo adm"
+  - "proc. adm"
+  - "sei"
+  - "pedido de providencias"
+  - "pedido de providências"
+perito_labels:
+  - "perito"
+  - "perita"
+  - "interessado"
+  - "interessada"
+  - "dados do perito"
+vara_labels:
+  - "vara"
+  - "juízo"
+  - "juizo"
+comarca_labels:
+  - "comarca"
+promovente_labels:
+  - "promovente"
+  - "autor"
+  - "autora"
+  - "requerente"
+  - "movido por"
+promovido_labels:
+  - "promovido"
+  - "réu"
+  - "reu"
+  - "requerido"
+  - "requerida"
+  - "em face"

@@ -1,0 +1,289 @@
+version: 1
+doc: tjpb_despacho
+obj: 6
+ops:
+- Tj
+- TJ
+source_anchors: modules/PatternModules/registry/textops_anchors/tjpb_despacho_obj6_concept.yml
+draft: true
+notes:
+- Mapa preliminar (esboco). Serve apenas para validacao em mais PDFs.
+- Extracao final por campo ainda NAO implementada (apenas localizacao).
+- Op_code removido; candidatos agora usam op_range (start/end) com prev/next reais.
+- Extracao prevista: usar somente op_range real (bytes -> ToUnicode), sem heuristica.
+fields:
+  PROCESSO_JUDICIAL:
+    candidates:
+    - source_file: 0027858__p1.pdf
+      op: Tj
+      start_op: 119
+      end_op: 150
+      op_range: op119-150[Tj]
+      prev: Diretoria Especial - Tribunal de Justiça
+      next: reais e oitenta e seis centavos), arbitrados em favor do Perito Engenheiro
+        Civil e de Segurança do
+      hint: var contem 'Processo nº ...'
+      prev_op: Tj
+      prev_start_op: 47
+      prev_end_op: 86
+      prev_op_range:
+      - op47-86[Tj]
+      next_op: Tj
+      next_start_op: 430
+      next_end_op: 527
+      next_op_range:
+      - op430-527[Tj]
+      match_regex: (?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?)
+      match_group: 1
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 119
+      end_op: 149
+      op_range: op119-149[Tj]
+      prev: Diretoria Especial - Tribunal de Justiça
+      next: reais e sessenta e três centavos), arbitrados em favor da Perita Engenheira
+        Civil e Avaliador de Bens
+      hint: var contem 'Processo nº ...'
+      prev_op: Tj
+      prev_start_op: 47
+      prev_end_op: 86
+      prev_op_range:
+      - op47-86[Tj]
+      next_op: Tj
+      next_start_op: 459
+      next_end_op: 559
+      next_op_range:
+      - op459-559[Tj]
+      match_regex: (?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?)
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      op: Tj
+      start_op: 119
+      end_op: 149
+      op_range: op119-149[Tj]
+      hint: auto:textopsvar_p1
+      match_regex: (?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?)
+      match_group: 1
+    - source_file: 0011710__p1.pdf
+      op: Tj
+      start_op: 122
+      end_op: 152
+      op_range: op122-152[Tj]
+      hint: auto:textopsvar_p1
+      match_regex: (?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?)
+      match_group: 1
+    - source_file: 0013996__p1.pdf
+      op: Tj
+      start_op: 118
+      end_op: 148
+      op_range: op118-148[Tj]
+      hint: auto:textopsvar_p1
+      match_regex: (?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?)
+      match_group: 1
+    - source_file: 0028287__p1.pdf
+      op: Tj
+      start_op: 119
+      end_op: 150
+      op_range: op119-150[Tj]
+      hint: auto:textopsvar_p1
+      match_regex: (?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?)
+      match_group: 1
+    - source_file: 00117101__p1.pdf
+      op: Tj
+      start_op: 122
+      end_op: 152
+      op_range: op122-152[Tj]
+      hint: auto:textopsvar_p1
+      match_regex: (?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?)
+      match_group: 1
+  PERITO:
+    candidates:
+    - source_file: 0028287__p1.pdf
+      op: Tj
+      start_op: 525
+      end_op: 612
+      op_range: op525-612[Tj]
+      prev: reais e oitenta e seis centavos), arbitrados em favor do Perito Engenheiro
+        Civil e de Segurança do
+      next: disciplinou no âmbito da Justiça Estadual da Paraíba de primeiro e segundo
+        graus, os procedimentos
+      hint: var contem nome + CPF + PIS/PASEP (perito)
+      prev_op: Tj
+      prev_start_op: 427
+      prev_end_op: 524
+      prev_op_range:
+      - op427-524[Tj]
+      next_op: Tj
+      next_start_op: 1081
+      next_end_op: 1178
+      next_op_range:
+      - op1081-1178[Tj]
+      match_regex: (?i)(?:Interessad[oa]\s*:\s*|Trabalho,\s*|Perito\s+)([^,–\-]+?)(?=\s*(?:-|,\s*CPF))
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      op: Tj
+      start_op: 526
+      end_op: 621
+      op_range: op526-621[Tj]
+      prev: reais e oitenta e seis centavos), em favor do Perito Engenheiro Civil
+        e de Segurança do Trabalho, Clóvis
+      next: março de 2021, publicada no Diário da Justiça Eletrônico deste Estado,
+        do dia 11 imediato, disciplinou no
+      hint: var contem nome + CPF + PIS/PASEP (perito)
+      prev_op: Tj
+      prev_start_op: 422
+      prev_end_op: 525
+      prev_op_range:
+      - op422-525[Tj]
+      next_op: Tj
+      next_start_op: 972
+      next_end_op: 1076
+      next_op_range:
+      - op972-1076[Tj]
+      match_regex: (?i)(?:Interessad[oa]\s*:\s*|Trabalho,\s*|Perito\s+)([^,–\-]+?)(?=\s*(?:-|,\s*CPF))
+      match_group: 1
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 227
+      end_op: 328
+      op_range: op227-328[Tj]
+      hint: 'linha "Interessada: ... Perita Engenheira Civil e Avaliador de Bens Móveis
+        e Imóveis"'
+      match_regex: (?i)(?:Interessad[oa]\s*:\s*|Trabalho,\s*|Perito\s+)([^,–\-]+?)(?=\s*(?:-|,\s*CPF))
+      match_group: 1
+  CPF_PERITO:
+    candidates:
+    - source_file: 0028287__p1.pdf
+      op: Tj
+      start_op: 525
+      end_op: 612
+      op_range: op525-612[Tj]
+      prev: reais e oitenta e seis centavos), arbitrados em favor do Perito Engenheiro
+        Civil e de Segurança do
+      next: disciplinou no âmbito da Justiça Estadual da Paraíba de primeiro e segundo
+        graus, os procedimentos
+      hint: var contem 'CPF ...' do perito
+      prev_op: Tj
+      prev_start_op: 427
+      prev_end_op: 524
+      prev_op_range:
+      - op427-524[Tj]
+      next_op: Tj
+      next_start_op: 1081
+      next_end_op: 1178
+      next_op_range:
+      - op1081-1178[Tj]
+      match_regex: (\d{3}\.\d{3}\.\d{3}-\d{2})
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      op: Tj
+      start_op: 526
+      end_op: 621
+      op_range: op526-621[Tj]
+      prev: reais e oitenta e seis centavos), em favor do Perito Engenheiro Civil
+        e de Segurança do Trabalho, Clóvis
+      next: março de 2021, publicada no Diário da Justiça Eletrônico deste Estado,
+        do dia 11 imediato, disciplinou no
+      hint: var contem 'CPF ...' do perito
+      prev_op: Tj
+      prev_start_op: 422
+      prev_end_op: 525
+      prev_op_range:
+      - op422-525[Tj]
+      next_op: Tj
+      next_start_op: 972
+      next_end_op: 1076
+      next_op_range:
+      - op972-1076[Tj]
+      match_regex: (\d{3}\.\d{3}\.\d{3}-\d{2})
+      match_group: 1
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 560
+      end_op: 654
+      op_range: op560-654[Tj]
+      prev: reais e sessenta e três centavos), arbitrados em favor da Perita Engenheira
+        Civil e Avaliador de Bens
+      next: março de 2021, publicada no Diário da Justiça Eletrônico deste Estado,
+        do dia 11 imediato, disciplinou no
+      hint: var contem 'CPF ...' da perita
+      prev_op: Tj
+      prev_start_op: 459
+      prev_end_op: 559
+      prev_op_range:
+      - op459-559[Tj]
+      next_op: Tj
+      next_start_op: 1069
+      next_end_op: 1173
+      next_op_range:
+      - op1069-1173[Tj]
+      match_regex: (\d{3}\.\d{3}\.\d{3}-\d{2})
+      match_group: 1
+  ESPECIALIDADE:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 227
+      end_op: 328
+      op_range: op227-328[Tj]
+      hint: 'especialidade/perita na linha de "Interessada: ... Perita ..."'
+      match_regex: (?i)Perit[oa]\s+([^,\n]+)
+      match_group: 1
+    - source_file: 0028287__p1.pdf
+      op: Tj
+      start_op: 427
+      end_op: 577
+      op_range: op427-577[Tj]
+      hint: 'Perito Engenheiro Civil e de Segurança do Trabalho, Nome...'
+      match_regex: (?i)Perit[oa]\s+([^,]+?)(?=\s*,\s*(?:CPF|PIS|RG|[A-ZÁÉÍÓÚÃÕÇ]))
+      match_group: 1
+  VALOR_ARBITRADO_JZ:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 423
+      end_op: 431
+      op_range: op423-431[Tj]
+      hint: apenas "R$ 571,63" (primeira pagina)
+      match_regex: (?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})
+      match_group: 1
+  VARA:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 150
+      end_op: 226
+      op_range: op150-226[Tj]
+      hint: 'linha "Requerente: Juízo da ... Vara ... Comarca ..."'
+      match_regex: (?i)ju[ií]zo\s+da\s+([^,\n]+)
+      match_group: 1
+  COMARCA:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 150
+      end_op: 226
+      op_range: op150-226[Tj]
+      hint: 'linha "Requerente: Juízo da ... Comarca ..."'
+      match_regex: (?i)comarca\s+(?:da|de)\s+([^,\n]+)
+      match_group: 1
+  PROMOVENTE:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 667
+      end_op: 914
+      op_range: op667-914[Tj]
+      hint: trecho com "movido por ... em face de ..."
+      match_regex: (?i)movid[oa]\s+por\s*([^,\n]+)
+      match_group: 1
+  PROMOVIDO:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      op: Tj
+      start_op: 667
+      end_op: 914
+      op_range: op667-914[Tj]
+      hint: trecho com "movido por ... em face de ..."
+      match_regex: (?i)em\s+face\s+de\s*([^,\n]+)
+      match_group: 1

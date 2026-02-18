@@ -1,0 +1,24 @@
+{
+  "legend": {
+    "U": "MAIUSCULO (ex.: JOAO, MUNICIPIO)",
+    "L": "minusculo (ex.: movido, por)",
+    "T": "Title Case (ex.: Joao, Cajazeiras)",
+    "P": "particula (da/de/do/em/no/na/por/pelo/pela/...)",
+    "N": "numero (so digitos ou digitos com pontuacao)",
+    "R": "marcador de numero (nº, n°, n.)",
+    "F": "CPF (11 digitos)",
+    "J": "CNPJ (14 digitos)",
+    "Q": "CNJ (16 ou 20 digitos)",
+    "V": "valor monetario (ex.: R$, 300,00)",
+    "A": "data",
+    "E": "email",
+    "M": "misto letra+digito",
+    "S": "simbolo/pontuacao",
+    "1": "tamanho 1",
+    "2": "tamanho 2 ou mais",
+    "N1a/N2a": "ordinal feminino (5ª)",
+    "N1o/N2o": "ordinal masculino (2º)",
+    ":": "dois-pontos (token literal)"
+  },
+  "fields": {}
+}

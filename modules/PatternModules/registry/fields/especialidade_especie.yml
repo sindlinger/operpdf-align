@@ -1,0 +1,39 @@
+fields: ["ESPECIALIDADE", "ESPÉCIE DE PERÍCIA"]
+priority: 1.15
+sources:
+  - bucket: principal
+    name_matches: ["*Despacho*.html", "*Despacho*.pdf", "*Autorizacao*", "*Autorização*"]
+  - bucket: principal
+  - bucket: laudo
+patterns:
+  - type: regex
+    label: perito_especialidade
+    pattern: 'perit[oa]\s*(?:-\s*|em\s+)?([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{3,})'
+    field: "ESPECIALIDADE"
+    weight: 1.0
+  - type: regex
+    label: especialidade
+    pattern: 'especialidad[eé]\s*[:\-]?\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{3,})'
+    field: "ESPECIALIDADE"
+    weight: 1.1
+  - type: regex
+    label: especie_pericia_kw
+    pattern: 'per[ií]cia\s+(m[eé]dic[oa]|grafot[eê]cnic[oa]|cont[aá]bil|odontol[oó]gic[oa]|psicol[oó]gic[oa]|psiqui[aá]tric[ao]|engenheir[oa]|engenharia|informatica|ambiental|arquitet[oô]nic[ao]|fonoaudiol[oó]gic[oa]|fisioter[aá]pic[oa])'
+    field: "ESPÉCIE DE PERÍCIA"
+    weight: 1.05
+  - type: regex
+    label: especie_explicit
+    pattern: 'esp[ée]cie\s+da?\s*per[ií]cia\s*[:\-]?\s*([A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ\s.-]{3,})'
+    field: "ESPÉCIE DE PERÍCIA"
+    weight: 1.05
+  - type: keyword
+    label: laudo_kw
+    pattern: 'quesitos'
+    field: "ESPÉCIE DE PERÍCIA"
+    value: "LAUDO"
+    weight: 0.75
+clean: []
+validate: []
+fallback:
+  - honorarios_alias
+  - laudo_keywords

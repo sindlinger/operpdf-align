@@ -1,0 +1,140 @@
+{
+  "doc": "tjpb_requerimento",
+  "legend_raw": {
+    "W": "token 2+ caracteres (texto bruto)",
+    "1": "token 1 caractere (texto bruto)"
+  },
+  "legend_typed": {
+    "U": "MAIUSCULO (ex.: JOAO, MUNICIPIO)",
+    "L": "minusculo (ex.: movido, por)",
+    "T": "Title Case (ex.: Joao, Cajazeiras)",
+    "P": "particula (da/de/do/em/no/na/por/pelo/pela/...)",
+    "N": "numero (so digitos ou digitos com pontuacao)",
+    "R": "marcador de numero (nº, n°, n.)",
+    "F": "CPF (11 digitos)",
+    "J": "CNPJ (14 digitos)",
+    "Q": "CNJ (16 ou 20 digitos)",
+    "V": "valor monetario (ex.: R$, 300,00)",
+    "A": "data",
+    "E": "email",
+    "M": "misto letra+digito",
+    "S": "simbolo/pontuacao",
+    ":": "dois-pontos (token literal)",
+    "1": "tamanho 1",
+    "2": "tamanho 2 ou mais",
+    "N1a/N2a": "ordinal feminino (5ª)",
+    "N1o/N2o": "ordinal masculino (2º)"
+  },
+  "notes": [
+    "Trios (prev/value/next) para requerimento de honorarios.",
+    "DATA_REQUISICAO vem da assinatura (linha com \"em dd/mm/aaaa hh:mm\")."
+  ],
+  "fields": {
+    "PROCESSO_ADMINISTRATIVO": [
+      {
+        "prev_raw_pat": "W W",
+        "prev_typed": "T2R2",
+        "prev_text": "Processo nº",
+        "value_raw_pat": "W",
+        "value_typed": "N2",
+        "value": "",
+        "next_raw_pat": "W",
+        "next_typed": "U2",
+        "next_text": "PA-TJ",
+        "x_range": "0.05-0.95",
+        "y_range": "0.70-0.95",
+        "band": "front"
+      },
+      {
+        "prev_raw_pat": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1",
+        "prev_typed": "T2R2",
+        "prev_text": "Processo nº",
+        "value_raw_pat": "W",
+        "value_typed": "N2",
+        "value": "",
+        "next_raw_pat": "1 1 1 1 1 1 1 1 1",
+        "next_typed": "U2",
+        "next_text": "PA-TJ",
+        "x_range": "0.05-0.95",
+        "y_range": "0.70-0.95",
+        "band": "front"
+      },
+      {
+        "prev_raw_pat": "11111111 11",
+        "prev_typed": "T2R2",
+        "prev_text": "Processo nº",
+        "value_raw_pat": "W",
+        "value_typed": "N2",
+        "value": "",
+        "next_raw_pat": "11111",
+        "next_typed": "U2",
+        "next_text": "PA-TJ",
+        "x_range": "0.05-0.95",
+        "y_range": "0.70-0.95",
+        "band": "front",
+        "_variant": "raw_letters"
+      }
+    ],
+    "PROCESSO_JUDICIAL": [
+      {
+        "prev_raw_pat": "W W",
+        "prev_typed": "L2R2",
+        "prev_text": "processo nº",
+        "value_raw_pat": "W",
+        "value_typed": "Q2",
+        "value": "",
+        "next_raw_pat": "W W W",
+        "next_typed": "T2P2T2",
+        "next_text": "Data da Autuação",
+        "x_range": "0.05-0.95",
+        "y_range": "0.35-0.70",
+        "band": "middle"
+      },
+      {
+        "prev_raw_pat": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1",
+        "prev_typed": "L2R2",
+        "prev_text": "processo nº",
+        "value_raw_pat": "W",
+        "value_typed": "Q2",
+        "value": "",
+        "next_raw_pat": "1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1",
+        "next_typed": "T2P2T2",
+        "next_text": "Data da Autuação",
+        "x_range": "0.05-0.95",
+        "y_range": "0.35-0.70",
+        "band": "middle"
+      },
+      {
+        "prev_raw_pat": "11111111 11",
+        "prev_typed": "L2R2",
+        "prev_text": "processo nº",
+        "value_raw_pat": "W",
+        "value_typed": "Q2",
+        "value": "",
+        "next_raw_pat": "1111 11 11111111",
+        "next_typed": "T2P2T2",
+        "next_text": "Data da Autuação",
+        "x_range": "0.05-0.95",
+        "y_range": "0.35-0.70",
+        "band": "middle",
+        "_variant": "raw_letters"
+      }
+    ],
+    "DATA_REQUISICAO": [
+      {
+        "prev_raw_pat": "",
+        "prev_typed": "F2P2",
+        "prev_text": "",
+        "value_raw_pat": "",
+        "value_typed": "A2",
+        "value": "",
+        "next_raw_pat": "",
+        "next_typed": "N2:",
+        "next_text": "",
+        "x_range": "0.05-0.95",
+        "y_range": "0.00-0.35",
+        "band": "back"
+      }
+    ]
+  }
+}

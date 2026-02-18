@@ -1,0 +1,316 @@
+{
+  "doc": "tjpb_despacho",
+  "legend": {
+    "U": "MAIUSCULO (ex.: JOAO, MUNICIPIO)",
+    "L": "minusculo (ex.: movido, por)",
+    "T": "Title Case (ex.: Joao, Cajazeiras)",
+    "P": "particula (da/de/do/em/no/na/por/pelo/pela/...)",
+    "N": "numero (so digitos ou digitos com pontuacao)",
+    "R": "marcador de numero (nº, n°, n.)",
+    "F": "CPF (11 digitos)",
+    "J": "CNPJ (14 digitos)",
+    "Q": "CNJ (16 ou 20 digitos)",
+    "V": "valor monetario (ex.: R$, 300,00)",
+    "A": "data",
+    "E": "email",
+    "M": "misto letra+digito",
+    "S": "simbolo/pontuacao",
+    ":": "dois-pontos (token literal)",
+    "1": "tamanho 1",
+    "2": "tamanho 2 ou mais",
+    "N1a/N2a": "ordinal feminino (5ª)",
+    "N1o/N2o": "ordinal masculino (2º)"
+  },
+  "notes": [
+    "Trios (prev/value/next) para despacho.",
+    "Campos ESPECIE_DA_PERICIA, VALOR_ARBITRADO_DE e FATOR ficam no pipeline de honorarios."
+  ],
+  "fields": {
+    "PROCESSO_ADMINISTRATIVO": [
+      {
+        "prev": "PROCESSO ADMINISTRATIVO Nº",
+        "prev_pat": "U2U2R2",
+        "value_pat": "N2",
+        "next": "REQUERENTE:",
+        "next_pat": "U2:",
+        "band": "front",
+        "y_range": "0.70-0.95",
+        "prev_raw_pat": "W W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "PROCESSO Nº",
+        "prev_pat": "U2R2",
+        "value_pat": "N2",
+        "next": "Requerente:",
+        "next_pat": "T2:",
+        "band": "front",
+        "y_range": "0.70-0.95",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W"
+      }
+    ],
+    "PROCESSO_JUDICIAL": [
+      {
+        "prev": "perícia nos autos do processo nº",
+        "prev_pat": "L2P2L2P2L2R2",
+        "value_pat": "Q2",
+        "next": "movido por",
+        "next_pat": "L2L2",
+        "prev_raw_pat": "W W W W W W",
+        "next_raw_pat": "W W"
+      },
+      {
+        "prev": "nos autos do processo nº",
+        "prev_pat": "P2L2P2L2R2",
+        "value_pat": "Q2",
+        "next": "movido por",
+        "next_pat": "L2L2",
+        "prev_raw_pat": "W W W W W",
+        "next_raw_pat": "W W"
+      }
+    ],
+    "VARA": [
+      {
+        "prev": "Juízo da",
+        "prev_pat": "T2P2",
+        "value_pat": "N2aT2P2T2P2T2T2",
+        "next": "Interessado:",
+        "next_pat": "T2:",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "Juízo da",
+        "prev_pat": "T2P2",
+        "value_pat": "N2aT2P2T2P2T2",
+        "next": "Interessado:",
+        "next_pat": "T2:",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "JUÍZO DA",
+        "prev_pat": "U2U2",
+        "value_pat": "N2aT2P2T2P2T2T2",
+        "next": "INTERESSADO:",
+        "next_pat": "U2:",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W"
+      }
+    ],
+    "COMARCA": [
+      {
+        "prev": "Comarca de",
+        "prev_pat": "T2P2",
+        "value_pat": "T2",
+        "next": "Interessado:",
+        "next_pat": "T2:",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "Comarca de",
+        "prev_pat": "T2P2",
+        "value_pat": "T2T2",
+        "next": "INTERESSADO:",
+        "next_pat": "U2:",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W"
+      }
+    ],
+    "PROMOVENTE": [
+      {
+        "prev": "movido por",
+        "prev_pat": "L2L2",
+        "value_pat": "U2",
+        "next": "em face de",
+        "next_pat": "P2L2P2",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W W W"
+      },
+      {
+        "prev": "movido pelo",
+        "prev_pat": "L2L2",
+        "value_pat": "U2",
+        "next": "em face de",
+        "next_pat": "P2L2P2",
+        "prev_raw_pat": "W W",
+        "next_raw_pat": "W W W"
+      }
+    ],
+    "PROMOVIDO": [
+      {
+        "prev": "em face de",
+        "prev_pat": "P2L2P2",
+        "value_pat": "U2",
+        "next": "perante o",
+        "next_pat": "P2L2",
+        "prev_raw_pat": "W W W",
+        "next_raw_pat": "W 1"
+      },
+      {
+        "prev": "EM FACE DE",
+        "prev_pat": "U2U2U2",
+        "value_pat": "U2",
+        "next": "PERANTE O",
+        "next_pat": "U2U2",
+        "prev_raw_pat": "W W W",
+        "next_raw_pat": "W 1"
+      }
+    ],
+    "PERITO": [
+      {
+        "prev": "em favor do Perito",
+        "prev_pat": "P2L2P2T2",
+        "next": "com inscrição",
+        "next_pat": "L2L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W W"
+      },
+      {
+        "prev": "em favor da Perita",
+        "prev_pat": "P2L2P2T2",
+        "next": "com inscrição",
+        "next_pat": "L2L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W W"
+      },
+      {
+        "prev": "em favor do Perito",
+        "prev_pat": "P2L2P2T2",
+        "next": "PIS/PASEP",
+        "next_pat": "U2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "em favor da Perita",
+        "prev_pat": "P2L2P2T2",
+        "next": "PIS/PASEP",
+        "next_pat": "U2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "em favor do Perito",
+        "prev_pat": "P2L2P2T2",
+        "next": "nascido",
+        "next_pat": "L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "em favor da Perita",
+        "prev_pat": "P2L2P2T2",
+        "next": "nascida",
+        "next_pat": "L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      }
+    ],
+    "CPF_PERITO": [
+      {
+        "prev": "em favor do Perito",
+        "prev_pat": "P2L2P2T2",
+        "next": "com inscrição",
+        "next_pat": "L2L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W W"
+      },
+      {
+        "prev": "em favor da Perita",
+        "prev_pat": "P2L2P2T2",
+        "next": "com inscrição",
+        "next_pat": "L2L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W W"
+      },
+      {
+        "prev": "em favor do Perito",
+        "prev_pat": "P2L2P2T2",
+        "next": "PIS/PASEP",
+        "next_pat": "U2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "em favor da Perita",
+        "prev_pat": "P2L2P2T2",
+        "next": "PIS/PASEP",
+        "next_pat": "U2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "em favor do Perito",
+        "prev_pat": "P2L2P2T2",
+        "next": "nascido",
+        "next_pat": "L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "em favor da Perita",
+        "prev_pat": "P2L2P2T2",
+        "next": "nascida",
+        "next_pat": "L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W"
+      }
+    ],
+    "ESPECIALIDADE": [
+      {
+        "prev": "Perito",
+        "prev_pat": "T2",
+        "value_pat": "T2",
+        "next": "nomeado",
+        "next_pat": "L2",
+        "prev_raw_pat": "W",
+        "next_raw_pat": "W"
+      },
+      {
+        "prev": "Perita",
+        "prev_pat": "T2",
+        "value_pat": "T2",
+        "next": "nomeada",
+        "next_pat": "L2",
+        "prev_raw_pat": "W",
+        "next_raw_pat": "W"
+      }
+    ],
+    "VALOR_ARBITRADO_JZ": [
+      {
+        "prev": "no valor de R$",
+        "prev_pat": "P2L2P2V",
+        "value_pat": "V2N2",
+        "next": "(",
+        "next_pat": "S",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "1"
+      }
+    ],
+    "VALOR_ARBITRADO_FINAL": [
+      {
+        "prev": "no valor de R$",
+        "prev_pat": "P2L2P2V",
+        "value_pat": "V2N2",
+        "next": "em favor",
+        "next_pat": "P2L2",
+        "prev_raw_pat": "W W W W",
+        "next_raw_pat": "W W"
+      }
+    ],
+    "DATA_ARBITRADO_FINAL": [
+      {
+        "prev": "em João Pessoa,",
+        "prev_pat": "P2T2T2",
+        "value_pat": "N2P2L2P2N2",
+        "next": "Diretor Especial",
+        "next_pat": "T2T2",
+        "prev_raw_pat": "W W W",
+        "next_raw_pat": "W W"
+      }
+    ]
+  }
+}

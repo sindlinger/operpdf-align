@@ -1,0 +1,237 @@
+doc_types:
+  - key: despacho
+    keywords_any:
+      - despacho
+      - diretoria especial
+      - diesp
+  - key: requerimento_honorarios
+    keywords_any:
+      - requerimento
+      - reserva orcamentaria
+      - deposito judicial
+      - oficio
+      - dados do perito
+  - key: certidao_conselho
+    keywords_any:
+      - certidao
+      - conselho da magistratura
+      - pauta de julgamento
+      - autorizou-se o pagamento
+
+fields:
+  - key: PROCESSO_ADMINISTRATIVO
+    labels: [CNJ]
+    doc_types: [despacho, requerimento_honorarios, certidao_conselho]
+    before_any:
+      - processo n
+      - processo n\u00ba
+      - processo n\u00b0
+      - processo administrativo
+      - proc. adm
+      - proc adm
+      - pedido de providencias
+      - pedido de provid\u00eancias
+      - sei
+    exclude_any:
+      - acao
+      - a\u00e7ao
+      - autos
+      - processo judicial
+    window: 200
+    priority: 5
+    regex:
+      pattern: "(?i)proc\\.?\\s*adm\\.?\\s*n\\s*[\\u00ba\\u00b0]?\\s*([0-9\\.-]+)"
+      group: 1
+
+  - key: PROCESSO_JUDICIAL
+    labels: [CNJ]
+    doc_types: [despacho, requerimento_honorarios, certidao_conselho]
+    before_any:
+      - acao
+      - a\u00e7ao
+      - autos da acao
+      - autos da a\u00e7ao
+      - autos do processo
+      - processo judicial
+      - pericia realizada no processo
+    exclude_any:
+      - processo administrativo
+      - proc. adm
+      - pedido de providencias
+      - pedido de provid\u00eancias
+    window: 220
+    priority: 6
+
+  - key: COMARCA
+    labels: [LOCAL, ORGANIZACAO]
+    doc_types: [despacho, requerimento_honorarios, certidao_conselho]
+    before_any:
+      - comarca
+      - comarca de
+    regex:
+      pattern: "(?i)comarca\\s+de\\s+([^\\n,]+)"
+      group: 1
+
+  - key: VARA
+    labels: [ORGANIZACAO, LOCAL]
+    doc_types: [despacho, requerimento_honorarios, certidao_conselho]
+    before_any:
+      - vara
+      - juizo
+      - juízo
+    regex:
+      pattern: "(?i)(vara\\s+[^\\n,]+|ju[i\\u00ed]zo\\s+do\\s+[^\\n,]+)"
+      group: 1
+
+  - key: PROMOVENTE
+    labels: [PESSOA, ORGANIZACAO]
+    doc_types: [despacho, requerimento_honorarios]
+    before_any:
+      - movida por
+      - movido por
+      - autor
+      - autora
+      - autor(es)
+      - requerente
+      - promovente
+    exclude_any:
+      - perito
+      - perita
+    window: 200
+    priority: 4
+    regex:
+      pattern: "(?i)(?:movida por|movido por|autor\\(es\\)|autor|autora|requerente)\\s*[:\\-]?\\s*([^\\n]+)"
+      group: 1
+
+  - key: PROMOVIDO
+    labels: [PESSOA, ORGANIZACAO]
+    doc_types: [despacho, requerimento_honorarios]
+    before_any:
+      - em face do
+      - em face da
+      - reu
+      - r\u00e9u
+      - reu(s)
+      - requerid
+      - promovido
+    exclude_any:
+      - perito
+      - perita
+    window: 200
+    priority: 4
+    regex:
+      pattern: "(?i)(?:em face do|em face da|reu\\(s\\)|reu|r\\u00e9u|requerid[oa])\\s*[:\\-]?\\s*([^\\n]+)"
+      group: 1
+
+  - key: PERITO
+    labels: [PESSOA]
+    doc_types: [despacho, requerimento_honorarios]
+    before_any:
+      - perito
+      - perita
+      - dados do perito
+      - 1.2.1 nome
+    exclude_any:
+      - autor
+      - autora
+      - reu
+      - r\u00e9u
+      - requerente
+      - interessado
+    window: 200
+    priority: 6
+    regex:
+      pattern: "(?i)(?:perit[oa][^\\n,]*,\\s*|1\\.2\\.1\\s*nome\\s*:\\s*)([^\\n]+)"
+      group: 1
+
+  - key: CPF_PERITO
+    labels: [CPF]
+    doc_types: [despacho, requerimento_honorarios]
+    before_any:
+      - perito
+      - perita
+      - 1.2.4 cpf
+      - "cpf:"
+    exclude_any:
+      - autor
+      - autora
+      - reu
+      - r\u00e9u
+    window: 120
+    priority: 7
+
+  - key: ESPECIALIDADE
+    labels: [ORGANIZACAO]
+    doc_types: [despacho]
+    before_any:
+      - especialidade
+      - perito
+      - perita
+    exclude_any:
+      - conselho da magistratura
+      - tribunal de justica
+      - diretoria especial
+    regex:
+      pattern: "(?i)perit[oa]\\s+([^,\\n]+)"
+      group: 1
+
+  - key: ESPECIE_DA_PERICIA
+    labels: [ORGANIZACAO]
+    doc_types: [requerimento_honorarios]
+    regex:
+      pattern: "(?i)natureza\\s+do\\s+servi\\u00e7o[^\\n]*?(per[i\\u00ed]cia|tradu\\u00e7\\u00e3o|interpreta\\u00e7\\u00e3o)"
+      group: 1
+
+  - key: VALOR_ARBITRADO_JZ
+    labels: [MONEY]
+    doc_types: [despacho, requerimento_honorarios]
+    before_any:
+      - valor arbitrado
+      - no valor de
+    exclude_any:
+      - autorizou-se
+      - conselho da magistratura
+      - pauta de julgamento
+      - reserva orcamentaria
+      - georc
+    window: 180
+    priority: 6
+
+  - key: VALOR_ARBITRADO_DE
+    labels: [MONEY]
+    doc_types: [despacho]
+    before_any:
+      - reserva orcamentaria
+      - georc
+      - despesa
+    window: 220
+    priority: 5
+
+  - key: VALOR_ARBITRADO_CM
+    labels: [MONEY]
+    doc_types: [certidao_conselho]
+    before_any:
+      - autorizou-se o pagamento
+      - conselho da magistratura
+    window: 220
+    priority: 8
+
+  - key: DATA_REQUISICAO
+    labels: [DATE]
+    doc_types: [requerimento_honorarios]
+    before_any:
+      - documento assinado eletronicamente
+      - datado e assinado
+    window: 220
+    priority: 8
+
+  - key: DATA_ARBITRADO_FINAL
+    labels: [DATE]
+    doc_types: [despacho, certidao_conselho]
+    before_any:
+      - joao pessoa
+      - sala de sessoes
+      - conselho da magistratura
+      - no dia
+    window: 220
+    priority: 7

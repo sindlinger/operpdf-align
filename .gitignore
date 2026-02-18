@@ -1,0 +1,36 @@
+# outputs & tmp
+outputs/
+tmp/
+tools/outputs/
+tools/runs/
+tools/tooling/
+modules/DocDetector/outputs/
+
+# build artifacts
+bin/
+!/bin/operpdf
+**/bin/
+**/obj/
+cli/operpdf.deps.json
+cli/operpdf.runtimeconfig.json
+.venv*/
+.vscode/
+**/__pycache__/
+
+# root/cli runtime spillover from local publish
+/*.dll
+/*.deps.json
+/*.runtimeconfig.json
+/cli/*.dll
+/cli/*.deps.json
+/cli/*.runtimeconfig.json
+
+# local build/publish artifacts (do not version)
+.dotnet/
+publish/
+linux-x64/
+win-x64/
+runtimes/
+lixeira/
+DocDetector/
+*.pdb

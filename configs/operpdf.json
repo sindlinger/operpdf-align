@@ -1,0 +1,64 @@
+{
+  "pattern_find": {
+    "patterns": "tjpb_despacho",
+    "min_score": 0,
+    "top": 3,
+    "pair": true,
+    "clean": true,
+    "explain": false,
+    "raw": false,
+    "max_pairs": 10,
+    "max_candidates": 10
+  },
+  "pattern_match": {
+    "patterns": "despacho",
+    "log": false,
+    "min_score": 0.5,
+    "min_stream_ratio": 0.4,
+    "max_pairs": 200000,
+    "max_candidates": 50
+  },
+  "docs": {
+    "out_dir": "outputs/pairs",
+    "pairs_out": "outputs/docs_pairs.json",
+    "print": true,
+    "min_hits": 2,
+    "min_page_score": 0.7
+  },
+  "progress": {
+    "enabled": true,
+    "every": 1
+  },
+  "exec": {
+    "jobs": 8
+  },
+  "preview_inputs": {
+    "enabled": true,
+    "max_list": 200
+  },
+  "preview_code": {
+    "enabled": true
+  },
+  "preflight": {
+    "enabled": true,
+    "jobs": 8,
+    "timeout_sec": 20,
+    "log": true
+  },
+  "objdiff": {
+    "jobs": 8,
+    "timeout_sec": 180,
+    "debug": false,
+    "report_file": "outputs/objdiff_report.json",
+    "log": false,
+    "force_gc": true
+  },
+  "patterns": {
+    "despacho": "tjpb_despacho",
+    "certidao_cm": "tjpb_certidao_cm",
+    "requerimento": "tjpb_requerimento",
+    "tjpb_despacho": "tjpb_despacho",
+    "tjpb_certidao_cm": "tjpb_certidao_cm",
+    "tjpb_requerimento": "tjpb_requerimento"
+  }
+}

@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>operpdf</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishDir Condition="'$(OPERPDF_PUBLISH_DIR)'=='' and '$(OS)'=='Windows_NT'">C:\Users\pichau\AppData\Local\Microsoft\WindowsApps\</PublishDir>
+    <PublishDir Condition="'$(OPERPDF_PUBLISH_DIR)'=='' and '$(OS)'!='Windows_NT'">/mnt/c/Users/pichau/AppData/Local/Microsoft/WindowsApps/</PublishDir>
+    <PublishDir Condition="'$(OPERPDF_PUBLISH_DIR)'!=''">$(OPERPDF_PUBLISH_DIR)</PublishDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="itext7" Version="7.2.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="YamlDotNet" Version="13.3.1" />
+    <PackageReference Include="DiffMatchPatch" Version="1.0.2" />
+    <PackageReference Include="DiffPlex" Version="1.7.2" />
+    <PackageReference Include="Npgsql" Version="8.0.4" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="../../modules/Align/**/*.cs;../../modules/Core/**/*.cs;../../modules/DocDetector/**/*.cs;../../modules/ExtractionModule/**/*.cs;../../modules/HonorariosModule/**/*.cs;../../modules/Logger/**/*.cs;../../modules/TextOpsRanges/**/*.cs;../../modules/ValidatorModule/**/*.cs;../../src/AssemblyInfo.cs;../../src/Commands/Inspect/PdfTextExtraction.cs;../../src/Commands/Inspect/ObjectsTextOpsAlign.cs;../../src/Commands/Inspect/ObjectsMapFields.cs"
+             Exclude="**/bin/**;**/obj/**;../../cli/OperCli/**;../../tools/**;../../modules/DocDetector/**/*Runner*.cs;../../modules/DocDetector/Detectors/WeightedDespachoDetector.cs;../../modules/ExtractionModule/TypedFieldExtractor.cs;../../modules/ExtractionModule/TjpbDespachoExtractor/Commands/**/*.cs" />
+  </ItemGroup>
+
+  <Target Name="CopyOperPdfToRoot" AfterTargets="Build">
+    <PropertyGroup>
+      <OperPdfRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</OperPdfRootDir>
+    </PropertyGroup>
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).exe"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).exe"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).exe')" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).dll"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).dll')" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).deps.json"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).deps.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).deps.json')" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).runtimeconfig.json"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).runtimeconfig.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).runtimeconfig.json')" />
+  </Target>
+
+  <Target Name="CopyOperPdfPublishToRoot" AfterTargets="Publish">
+    <PropertyGroup>
+      <OperPdfRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</OperPdfRootDir>
+      <PublishExe>$(PublishDir)$(AssemblyName).exe</PublishExe>
+      <PublishDll>$(PublishDir)$(AssemblyName).dll</PublishDll>
+      <PublishDeps>$(PublishDir)$(AssemblyName).deps.json</PublishDeps>
+      <PublishRuntime>$(PublishDir)$(AssemblyName).runtimeconfig.json</PublishRuntime>
+    </PropertyGroup>
+    <Copy SourceFiles="$(PublishExe)"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).exe"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishExe)')" />
+    <Copy SourceFiles="$(PublishDll)"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).dll"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishDll)')" />
+    <Copy SourceFiles="$(PublishDeps)"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).deps.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishDeps)')" />
+    <Copy SourceFiles="$(PublishRuntime)"
+          DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).runtimeconfig.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishRuntime)')" />
+  </Target>
+
+</Project>

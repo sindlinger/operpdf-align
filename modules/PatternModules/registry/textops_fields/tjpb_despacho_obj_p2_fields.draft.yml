@@ -1,0 +1,25 @@
+version: 1
+doc: tjpb_despacho
+notes:
+- 'Mapa P2/P3 (autorizacao): datas e valores de empenho'
+fields:
+  VALOR_ARBITRADO_DE:
+    candidates:
+    - source_file: 0012999__p2.pdf
+      obj: 14
+      op: Tj
+      start_op: 1066
+      end_op: 1071
+      op_range: op1066-1071[Tj]
+      hint: valor numerico (571,63)
+  DATA_ARBITRADO_FINAL:
+    candidates:
+    - source_file: 0012999__p2.pdf
+      obj: 14
+      op: Tj
+      start_op: 2430
+      end_op: 2468
+      op_range: op2430-2468[Tj]
+      hint: linha "João Pessoa – PB, dd de mês de aaaa"
+      match_regex: (?i)(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4})
+      match_group: 1

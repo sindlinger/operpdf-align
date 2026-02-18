@@ -1,0 +1,46 @@
+fields: ["ADIANTAMENTO", "PERCENTUAL", "PARCELA", "NUM_PERITO"]
+priority: 1.0
+sources:
+  - bucket: principal
+    name_matches: ["*Despacho*.pdf", "*Despacho*.html", "*Decisao*", "*Decisão*"]
+patterns:
+  - type: regex
+    label: adiantamento_percentual
+    pattern: '(?i)adiantamento[^\n]{0,120}?([0-9]{1,3})\s*%'
+    field: "ADIANTAMENTO"
+    weight: 0.9
+  - type: regex
+    label: adiantamento_money
+    pattern: '(?i)adiantamento[^\n]{0,120}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "ADIANTAMENTO"
+    weight: 0.85
+  - type: regex
+    label: adiantamento_percentual_curto
+    pattern: '(?i)adiantamento\s+de\s+([0-9]{1,3}%?)'
+    field: "ADIANTAMENTO"
+    weight: 0.85
+  - type: regex
+    label: percentual
+    pattern: '\b\d{1,2}%\b'
+    field: "PERCENTUAL"
+    weight: 0.8
+  - type: regex
+    label: parcela
+    pattern: '(?i)(\d+ª\s*parcela|primeira\s*parcela|segunda\s*parcela|terceira\s*parcela)'
+    field: "PARCELA"
+    weight: 0.8
+  - type: regex
+    label: num_perito_matricula
+    pattern: '(?i)(?:matricula|cadastro|numero\s+do\s+perito|num\.\s*perito)\s*[:\-]?\s*(\d{3,})'
+    field: "NUM_PERITO"
+    weight: 0.9
+  - type: regex
+    label: num_perito_inss
+    pattern: '(?i)inscri[cç][aã]o\s*no\s*inss.*?n[ºo]\s*(\d{6,})'
+    field: "NUM_PERITO"
+    weight: 0.85
+  - type: regex
+    label: num_perito_pis
+    pattern: '(?i)pis\s*/?\s*pasep.*?n[ºo]\s*(\d{6,})'
+    field: "NUM_PERITO"
+    weight: 0.85

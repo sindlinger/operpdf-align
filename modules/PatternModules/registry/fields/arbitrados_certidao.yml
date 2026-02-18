@@ -1,0 +1,13 @@
+fields: ["VALOR ARBITRADO - CM"]
+priority: 1.25
+sources:
+  - bucket: principal
+    name_matches: ["*Certidao*", "*Certidão*"]
+patterns:
+  - type: regex
+    label: certidao_cm
+    pattern: '(?:autorizad[oa]|reserva\s+or[cç]ament[aá]ria|aprovamos)[^\n]{0,160}?pagamento[^\n]{0,120}?honor[aá]rios[^\n]{0,120}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "VALOR ARBITRADO - CM"
+    weight: 1.25
+clean: [clean_money]
+validate: [validate_money]

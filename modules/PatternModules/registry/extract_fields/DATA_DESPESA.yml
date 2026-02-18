@@ -1,0 +1,47 @@
+version: 1
+doc: tjpb_despacho
+notes:
+- 'Mapa P2/P3 (autorizacao): datas e valores de empenho'
+fields:
+  DATA_DESPESA:
+    candidates:
+    - source_file: 0012999__p2.pdf
+      obj: 14
+      op: Tj
+      op_range: op2430-2468[Tj]
+      hint: 'linha "João Pessoa – PB, dd de mês de aaaa"'
+      match_regex: '(?i)(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4})'
+      match_group: 1
+    - source_file: 0027858__p2.pdf
+      obj: 14
+      op: Tj
+      op_range: op2347-2387[Tj]
+      hint: 'linha "João Pessoa – PB, dd de mês de aaaa"'
+      match_regex: '(?i)(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4})'
+      match_group: 1
+    - source_file: 00117101__p2.pdf
+      obj: 14
+      op: Tj
+      op_range: op2684-2783[Tj]
+      hint: 'linha "João Pessoa, dd de mês de aaaa"'
+      match_regex: '(?i)(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4})'
+      match_group: 1
+    - source_file: 0011710__p2.pdf
+      obj: 14
+      op: Tj
+      op_range: op2684-2783[Tj]
+      hint: 'linha "João Pessoa, dd de mês de aaaa"'
+      match_regex: '(?i)(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4})'
+      match_group: 1
+    - obj: 14
+      op: Tj
+      op_range: op2300-2400[Tj]
+      hint: 'data da autorização (fallback p2)'
+      match_regex: '(?i)(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4})'
+      match_group: 1
+    - obj: 14
+      op: Tj
+      op_range: op2680-2790[Tj]
+      hint: 'data da autorização (fallback p2)'
+      match_regex: '(?i)(\d{1,2}\s+de\s+[a-zçã]+\s+de\s+\d{4}|\d{1,2}/\d{1,2}/\d{2,4})'
+      match_group: 1

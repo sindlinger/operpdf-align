@@ -1,0 +1,42 @@
+pipeline:
+  nlp_enabled: false
+  fields_enabled: false
+  honorarios_enabled: true
+
+pairscore:
+  source: ":D"
+  target: ":Q"
+  stats_mode: "largest"
+  top: 2
+  limit_source: 0
+  limit_target: 0
+  target_offset: 0
+  max_rel: 0
+  max_rel_p1: 0
+  max_rel_p2: 0
+  require_top: ""
+  require_any_top: ""
+  reject_top: ""
+  top_band: 0.55
+  top_paragraph: false
+  report: true
+  report_out: "outputs/pairscore_report.jsonl"
+  save_dir: ""
+
+field_strategies:
+  enabled: true
+  dir: "../modules/PatternModules/registry/fields"
+
+reference:
+  peritos_catalog_paths:
+    - "../reference/peritos/peritos_catalogo_sighop.csv"
+    - "../reference/peritos/peritos_catalogo_relatorio.csv"
+    - "../reference/peritos/peritos_catalogo_final.csv"
+    - "../reference/peritos/peritos_catalogo.csv"
+    - "../reference/peritos/peritos_catalogo_parquet.csv"
+  honorarios:
+    table_path: "../reference/valores/tabela_honorarios.csv"
+    aliases_path: "../reference/valores/honorarios_aliases.json"
+    value_tolerance_pct: 0.15
+    prefer_valor_de: true
+    allow_valor_jz: true

@@ -1,0 +1,49 @@
+fields: ["JUÍZO", "COMARCA"]
+priority: 1.15
+sources:
+  - bucket: principal
+    name_matches: ["*Despacho*.html", "*Despacho*.pdf", "*Decisao*", "*Decisão*", "*Senten*"]
+  - bucket: principal
+  - bucket: apoio
+    name_matches: ["*Senten*", "*Decis*"]
+patterns:
+  - type: regex
+    label: juizo_linha
+    pattern: 'ju[ií]zo\s*[:\-]?\s*([^\n]+)'
+    field: "JUÍZO"
+    weight: 1.15
+  - type: regex
+    label: vara_linha
+    pattern: '\bvara\b\s*[:\-]?\s*([^\n;]+)'
+    field: "JUÍZO"
+    weight: 1.05
+  - type: regex
+    label: orgao_julgador
+    pattern: '[óo]rg[aã]o julgador\s*[:\-]?\s*([^\n]+)'
+    field: "JUÍZO"
+    weight: 1.0
+  - type: regex
+    label: vara_comarca_dupla
+    pattern: '(\d+\s*a?\s*vara[^\n]{0,80}?)\s+da\s+comarca\s*(?:da|de)\s+([\p{L}\s]+?)(?=\s*(?:\d|ª|º|-|/|,|\.|\(|$))'
+    field: "JUÍZO"
+    weight: 1.1
+    compose:
+      second_field: "COMARCA"
+  - type: keyword
+    label: comarca_capital
+    pattern: 'comarca da capital'
+    field: "COMARCA"
+    value: "João Pessoa"
+    weight: 1.05
+  - type: regex
+    label: comarca_de
+    pattern: 'comarca\s*(?:da|de)\s+([\p{L}\s]+?)(?=\s*(?:\d|ª|º|-|/|,|\.|\(|$|\binteressad|\brequerente|\bju[ií]zo|\bvara))'
+    field: "COMARCA"
+    weight: 0.95
+  - type: regex
+    label: comarca_linha
+    pattern: '\bcomarca\b\s*[:\-]?\s*([^\n;]+)'
+    field: "COMARCA"
+    weight: 0.9
+clean: [clean_comarca]
+validate: [validate_comarca]

@@ -1,0 +1,26 @@
+header_hints:
+  - "TRIBUNAL DE JUSTICA"
+  - "TRIBUNAL DE JUSTIÇA"
+  - "CONSELHO DA MAGISTRATURA"
+  - "DIRETORIA ESPECIAL"
+  - "DIESP"
+
+title_hints:
+  - "CERTIDAO"
+  - "CERTIDÃO"
+  - "CERTIFICO"
+  - "CERTIFICA"
+
+body_hints:
+  - "CERTIFICO"
+  - "CONSELHO DA MAGISTRATURA"
+  - "AUTORIZOU"
+  - "AUTORIZOU-SE"
+  - "PAGAMENTO"
+
+date_hints:
+  - "JOAO PESSOA"
+  - "JOÃO PESSOA"
+  - "SALA DE SESSOES"
+  - "SALA DE SESSÕES"
+  - "NO DIA"

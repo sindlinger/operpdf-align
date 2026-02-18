@@ -1,0 +1,15 @@
+version: 1
+doc: tjpb_despacho
+draft: true
+notes:
+- Regex centralizado para identificadores do perito (matricula/INSS/PIS).
+regex_catalog:
+  perito_num:
+  - "(?i)(matricula|cadastro|numero do perito|num\\.\\s*perito)\\s*[:\\-]?\\s*(\\d{3,})"
+  perito_inss:
+  - "(?i)inscri[cç][aã]o\\s*no\\s*inss.*?n[ºo]\\s*(\\d{6,})"
+  perito_pis:
+  - "(?i)pis\\s*/?\\s*pasep.*?n[ºo]\\s*(\\d{6,})"
+fields:
+  NUM_PERITO:
+    candidates: []

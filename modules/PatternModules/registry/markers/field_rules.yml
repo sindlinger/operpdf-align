@@ -1,0 +1,26 @@
+processo_administrativo:
+  templates:
+    - "Processo Administrativo: {{value}}"
+    - "Processo SEI: {{value}}"
+    - "SEI: {{value}}"
+    - "Processo: {{value}}"
+processo_judicial:
+  templates:
+    - "Processo Judicial: {{value}}"
+    - "Processo: {{value}}"
+    - "Processo nº {{value}}"
+perito:
+  templates:
+    - "Interessado: {{value}}"
+    - "Perito: {{value}}"
+    - "Perita: {{value}}"
+cpf_perito:
+  templates:
+    - "CPF: {{value}}"
+especialidade:
+  templates:
+    - "Perito em {{value}}"
+    - "Perito - {{value}}"
+data:
+  templates:
+    - "Documento assinado eletronicamente em {{value}}"

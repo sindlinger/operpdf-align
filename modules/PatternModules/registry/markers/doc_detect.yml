@@ -1,0 +1,117 @@
+default_doc: despacho
+
+generic_header_labels:
+  - "diretoria especial"
+  - "tribunal de justica"
+  - "tribunal de justiça"
+  - "poder judiciario"
+  - "poder judiciário"
+
+oficio:
+  markers:
+    - "oficio"
+    - "ofic"
+  context:
+    - "senhoria"
+    - "diesp"
+    - "tjp"
+  phrases:
+    - "a sua senhoria"
+    - "comunico a vossa senhoria"
+    - "senhor perito"
+  compact:
+    - "asuasenhoria"
+    - "comunicoavossasenhoria"
+    - "senhorperito"
+
+docs:
+  despacho:
+    aliases:
+      - "tjpb_despacho"
+      - "despacho"
+    title_keywords:
+      - "despacho"
+      - "diretoria especial"
+      - "diesp"
+    bookmark_keywords:
+      - "despacho"
+      - "diretoria especial"
+      - "diesp"
+    header_fallbacks:
+      - "diretoria especial"
+    contents_title_keywords:
+      - "despacho"
+      - "diretoria especial"
+      - "diesp"
+    blocked_any:
+      - "malote digital"
+      - "codigo de rastreabilidade"
+      - "consultadocumento"
+      - "pje.tjpb"
+      - "pje "
+    blocked_all:
+      - [ "documento", "pagina", "assinado" ]
+
+  certidao_conselho:
+    aliases:
+      - "certidao"
+      - "certidao_conselho"
+      - "tjpb_certidao"
+      - "tjpb_certidao_cm"
+      - "certidao_cm"
+    title_keywords:
+      - "certidao"
+      - "certidão"
+      - "certifico"
+      - "certifica"
+    guard:
+      require:
+        - "certidao"
+        - "conselho da magistratura"
+      any:
+        - "honorarios"
+        - "honorários"
+        - "adiantamento"
+        - "autorizado o pagamento"
+        - "reserva orcamentaria"
+        - "reserva orçamentária"
+        - "valor arbitrado"
+        - "pagamento"
+    strong_any:
+      - "certifico"
+      - "sessao ordinaria"
+      - "sessão ordinária"
+      - "sala de sessoes"
+      - "sala de sessões"
+      - "presidiu a sessao"
+      - "presidiu a sessão"
+
+  requerimento_honorarios:
+    aliases:
+      - "requerimento"
+      - "requerimento_honorarios"
+      - "tjpb_requerimento"
+    title_keywords:
+      - "requerimento"
+    guard:
+      require:
+        - "requerimento"
+      any:
+        - "honorarios"
+        - "honorários"
+        - "periciais"
+        - "pagamento"
+    weak_pairs:
+      - [ "requisicao", "reserva orcamentaria" ]
+    strong_any:
+      - "excelentissimo presidente"
+      - "venho requerer"
+      - "requisicao de pagamento de honorarios periciais"
+    strong_pairs:
+      - [ "oficio", "reserva orcamentaria" ]
+      - [ "reserva orcamentaria", "honorarios" ]
+      - [ "solicita pagamento", "honorarios" ]
+      - [ "oficio", "honorarios" ]
+      - [ "requisitando pagamento", "honorarios" ]
+      - [ "requisicao de pagamento", "honorarios" ]
+      - [ "expediente do juizo", "honorarios" ]

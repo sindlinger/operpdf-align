@@ -1,0 +1,5 @@
+version: 1
+models:
+  despacho: reference/models/tjpb_despacho_model.pdf
+  requerimento_honorarios: reference/models/tjpb_requerimento_model.pdf
+  certidao_conselho: reference/models/tjpb_certidao_conselho_model.pdf

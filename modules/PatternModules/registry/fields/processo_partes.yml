@@ -1,0 +1,77 @@
+fields: ["PROCESSO JUDICIAL", "PROCESSO ADMINISTRATIVO", "PROMOVENTE", "PROMOVIDO"]
+priority: 1.3
+sources:
+  - bucket: principal
+    name_matches: ["*Despacho*.html", "*Despacho*.pdf", "*Decisao*", "*Decisão*", "*Senten*"]
+  - bucket: principal
+  - bucket: apoio
+    name_matches: ["*Despacho*", "*Senten*", "*Decis*"]
+patterns:
+  - type: regex
+    label: sei_header
+    pattern: '\\bSEI\\s*(?:n[ºo]?\\s*)?([0-9]{6,7}-[0-9]{2}\\.[0-9]{4}\\.[0-9]\\.[0-9]{2}(?:\\.[0-9]{4})?)'
+    field: "PROCESSO ADMINISTRATIVO"
+    weight: 1.15
+  - type: regex
+    label: processo_adm_label
+    pattern: 'processo\\s*(?:administrativo|adme|ci|sei)\\s*(?:n[ºo]?|nº)?\\s*[:\\-]?\\s*([0-9\\./\\-]{6,25})'
+    field: "PROCESSO ADMINISTRATIVO"
+    weight: 1.05
+  - type: regex
+    label: cnj
+    pattern: 'processo\s*(?:judicial|n[ºo]?|proc\.?)[\s:,-]*([0-9\.\-\/]{15,25})'
+    field: "PROCESSO JUDICIAL"
+    weight: 1.2
+  - type: regex
+    label: cnj_parcial
+    pattern: 'processo\s*(?:judicial|n[ºo]?|proc\.?)[\s:,-]*([0-9]{6,7}-?[0-9]{2}\.?[0-9]{4}\.?[0-9]{1}\.?[0-9]{2})'
+    field: "PROCESSO JUDICIAL"
+    weight: 1.1
+  - type: regex
+    label: cnj_curto
+    pattern: 'n[ºo]?\s*[:\-]?\s*([0-9]{7}-?[0-9]{2}\.?[0-9]{4}\.?[0-9]{1}\.?[0-9]{2}\.?[0-9]{4})'
+    field: "PROCESSO JUDICIAL"
+    weight: 1.1
+  - type: regex
+    label: cnj_spaced
+    pattern: '\\d{7}\\s*-\\s*\\d{2}\\s*\\.\\s*\\d{4}\\s*\\.\\s*\\d\\s*\\.\\s*\\d{2}\\s*\\.\\s*\\d{4}'
+    field: "PROCESSO JUDICIAL"
+    weight: 1.0
+  - type: regex
+    label: autor_reu
+    pattern: 'autor\s*[:\-]?\s*(.+?)\s+r[eé]u\s*[:\-]?\s*(.+)'
+    field: "PROMOVENTE"
+    weight: 1.1
+    compose:
+      second_field: "PROMOVIDO"
+  - type: regex
+    label: movido_por
+    pattern: 'movid[oa]\s+por\s*(.+?)\s+em\s+face\s+de\s*(.+)'
+    field: "PROMOVENTE"
+    weight: 1.25
+    compose:
+      second_field: "PROMOVIDO"
+  - type: regex
+    label: promovente_label
+    pattern: '(?i)(?:promovente|autor|requerente)\s*[:\-]?\s*([^\n;]+)'
+    field: "PROMOVENTE"
+    weight: 0.9
+  - type: regex
+    label: promovido_label
+    pattern: '(?i)(?:promovido|r[eé]u|requerid[oa])\s*[:\-]?\s*([^\n;]+)'
+    field: "PROMOVIDO"
+    weight: 0.9
+  - type: regex
+    label: em_face_label
+    pattern: '(?i)em\\s+face\\s+(?:de|do|da)\\s+(.+?)(?=(?:,|\\n|\\.|;|\\s+perante|\\s+ju[ií]zo|$))'
+    field: "PROMOVIDO"
+    weight: 0.95
+  - type: regex
+    label: movido_por_spaced
+    pattern: '(?is)m\s*o\s*v\s*i\s*d\s*[oa]\s+p\s*o\s*r\s+(.+?)\s+e\s*m\s+f\s*a\s*c\s*e\s+(?:d\s*e|d\s*o|d\s*a)\s+(.+?)(?=(?:,|\n|\.|;|\s+p\s*e\s*r\s*a\s*n\s*t\s*e|\s+j\s*u\s*(?:i|í)\s*z\s*o|$))'
+    field: "PROMOVENTE"
+    weight: 1.2
+    compose:
+      second_field: "PROMOVIDO"
+clean: [clean_parte]
+validate: [validate_parte]

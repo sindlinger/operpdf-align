@@ -1,0 +1,24 @@
+autorizacao_hints:
+  - "AUTORIZACAO"
+  - "ENCAMINHEM-SE OS PRESENTES AUTOS"
+  - "ENCAMINHE-SE"
+  - "ENCAMINHEM OS PRESENTES AUTOS"
+  - "ENCAMINHEM-SE OS AUTOS"
+  - "GERENCIA DE PROGRAMACAO ORCAMENTARIA"
+  - "RESERVA ORCAMENTARIA"
+
+georc_hints:
+  - "GEORC"
+  - "GERENCIA DE PROGRAMACAO ORCAMENTARIA"
+  - "RESERVA ORCAMENTARIA"
+  - "NOTA DE EMPENHO"
+
+conselho_hints:
+  - "CONSELHO DA MAGISTRATURA"
+  - "CONSELHO DE MAGISTRATURA"
+
+de_value_patterns:
+  - "(?i)proceder\\s*(?:\\u00e0|a)?\\s*reserva\\s+or\\u00e7ament[a\\u00e1]ria[^\\d]{0,120}?(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})"
+  - "(?i)proceder\\s*.*?reserva\\s+or\\u00e7ament[a\\u00e1]ria[^\\d]{0,120}?(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})"
+  - "(?i)reserva\\s+or\\u00e7ament[a\\u00e1]ria[^\\d]{0,120}?(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})"
+  - "(?i)nota\\s+de\\s+empenho[^\\d]{0,120}?(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})"

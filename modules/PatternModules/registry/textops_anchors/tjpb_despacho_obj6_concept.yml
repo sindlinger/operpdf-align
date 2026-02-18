@@ -1,0 +1,446 @@
+version: 1
+doc: tjpb_despacho
+obj: 6
+sources:
+- 00117101__p1.pdf
+- 0011710__p1.pdf
+- 0012999__p1.pdf
+- 0013996__p1.pdf
+- 0027858__p1.pdf
+- 0027945__p1.pdf
+- 0028287__p1.pdf
+anchors:
+- prev: 'Interessado: Felipe Queiroga Gadelha – Perito Grafocopista'
+  next: que teve os valores do
+  count: 26
+  examples:
+  - var: Trata-se de requisição de pagamento de honorários, no valor de R$ 398,81 (trezentos e noventa e oito reais e
+    source_file: 00117101__p1.pdf
+    block: 8
+    start_op: 270
+    end_op: 377
+  - var: 'oitenta e um centavos), '
+    source_file: 00117101__p1.pdf
+    block: 9
+    start_op: 378
+    end_op: 401
+  - var: 'arbitrados em favor do Perito '
+    source_file: 00117101__p1.pdf
+    block: 10
+    start_op: 402
+    end_op: 431
+- prev: que teve os valores do
+  next: Nacional de Justiça.
+  count: 16
+  examples:
+  - var: anexo I atualizados pelo Ato da Presidência nº 43/2022, publicado no Diário da Justiça Eletrônico deste Estado, do
+    source_file: 00117101__p1.pdf
+    block: 22
+    start_op: 1077
+    end_op: 1190
+  - var: 'dia 21 de Setembro de 2022, '
+    source_file: 00117101__p1.pdf
+    block: 23
+    start_op: 1191
+    end_op: 1218
+  - var: disciplinou, no âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus, os
+    source_file: 00117101__p1.pdf
+    block: 24
+    start_op: 1219
+    end_op: 1303
+- prev: Diretoria Especial - Tribunal de Justiça
+  next: reais e oitenta e seis centavos), arbitrados em favor do Perito Engenheiro Civil e de Segurança do
+  count: 14
+  examples:
+  - var: Despacho DIESP
+    source_file: 0027858__p1.pdf
+    block: 4
+    start_op: 87
+    end_op: 100
+  - var: ' nº 0027858/2024'
+    source_file: 0027858__p1.pdf
+    block: 5
+    start_op: 101
+    end_op: 116
+  - var: Processo nº 003380-12.2024.8.15.
+    source_file: 0027858__p1.pdf
+    block: 6
+    start_op: 119
+    end_op: 150
+- prev: Diretoria Especial - Tribunal de Justiça
+  next: março de 2021, publicada no Diário da Justiça Eletrônico deste Estado, do dia 11 imediato, disciplinou no
+  count: 12
+  examples:
+  - var: Despacho nº 0013996/2024/DIESP
+    source_file: 0013996__p1.pdf
+    block: 4
+    start_op: 87
+    end_op: 116
+  - var: Processo nº 002003-76.2024.8.15
+    source_file: 0013996__p1.pdf
+    block: 5
+    start_op: 118
+    end_op: 148
+  - var: 'Requerente: Juízo da 2º Vara Mista da Comarca de Santa Rita'
+    source_file: 0013996__p1.pdf
+    block: 6
+    start_op: 149
+    end_op: 207
+- prev: ''
+  next: Diretoria Especial - Tribunal de Justiça
+  count: 10
+  examples:
+  - var: PODER JUDICIÁRIO
+    source_file: 0012999__p1.pdf
+    block: 1
+    start_op: 1
+    end_op: 16
+  - var: TRIBUNAL DE JUSTIÇA DA PARAÍBA
+    source_file: 0012999__p1.pdf
+    block: 2
+    start_op: 17
+    end_op: 46
+  - var: PODER JUDICIÁRIO
+    source_file: 0013996__p1.pdf
+    block: 1
+    start_op: 1
+    end_op: 16
+- prev: ''
+  next: 'Requerente: Juízo da Vara Única da Comarca de Alagoa Nova'
+  count: 10
+  examples:
+  - var: PODER JUDICIÁRIO
+    source_file: 00117101__p1.pdf
+    block: 1
+    start_op: 1
+    end_op: 16
+  - var: TRIBUNAL DE JUSTIÇA DA PARAÍBA
+    source_file: 00117101__p1.pdf
+    block: 2
+    start_op: 17
+    end_op: 46
+  - var: Diretoria Especial - Tribunal de Justiça
+    source_file: 00117101__p1.pdf
+    block: 3
+    start_op: 47
+    end_op: 86
+- prev: reais e sessenta e três centavos), arbitrados em favor da Perita Engenheira Civil e Avaliador de Bens
+  next: março de 2021, publicada no Diário da Justiça Eletrônico deste Estado, do dia 11 imediato, disciplinou no
+  count: 8
+  examples:
+  - var: Imóveis, Joellen Zanardine Cordeiro, CPF 089.695.184-79, INSS/PIS/PASEP 21276441721, nascida em
+    source_file: 0012999__p1.pdf
+    block: 11
+    start_op: 560
+    end_op: 654
+  - var: 12/06/1995
+    source_file: 0012999__p1.pdf
+    block: 12
+    start_op: 655
+    end_op: 664
+  - var: ', '
+    source_file: 0012999__p1.pdf
+    block: 13
+    start_op: 665
+    end_op: 666
+- prev: Diretoria Especial - Tribunal de Justiça
+  next: reais e sessenta e três centavos), arbitrados em favor da Perita Engenheira Civil e Avaliador de Bens
+  count: 6
+  examples:
+  - var: Despacho nº 0012999/2024/DIESP
+    source_file: 0012999__p1.pdf
+    block: 4
+    start_op: 87
+    end_op: 116
+  - var: Processo nº 001897-91.2024.8.15
+    source_file: 0012999__p1.pdf
+    block: 5
+    start_op: 119
+    end_op: 149
+  - var: 'Requerente: Juízo da 1ª Vara Regional Cível de Mangabeira, Comarca da Capital'
+    source_file: 0012999__p1.pdf
+    block: 6
+    start_op: 150
+    end_op: 226
+- prev: pagamento de honorários de peritos, oriundas de processos judiciais em tramitação sob o pálio da justiça
+  next: Consultando o sistema de cadastro de peritos deste Tribunal - SIGHOP, foi possível constatar que o
+  count: 6
+  examples:
+  - var: gratuita, no âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus.
+    source_file: 0012999__p1.pdf
+    block: 32
+    start_op: 2328
+    end_op: 2406
+  - var: Laudo pericial anexado às fls. 23/48, dos presentes autos.
+    source_file: 0012999__p1.pdf
+    block: 33
+    start_op: 2408
+    end_op: 2465
+  - var: gratuita, no âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus.
+    source_file: 0013996__p1.pdf
+    block: 29
+    start_op: 2232
+    end_op: 2310
+- prev: reais e oitenta e seis centavos), arbitrados em favor do Perito Engenheiro Civil e de Segurança do
+  next: disciplinou no âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus, os procedimentos
+  count: 6
+  examples:
+  - var: Trabalho, Felipe Queiroga Gadelha, CPF 021.205.144-02, PIS/PASEP 12617929444, nascido em
+    source_file: 0028287__p1.pdf
+    block: 12
+    start_op: 525
+    end_op: 612
+  - var: 25/08/1975, pela realização de perícia nos autos da Ação nº 0808414-45.2022.8.15.0371, movida por
+    source_file: 0028287__p1.pdf
+    block: 13
+    start_op: 613
+    end_op: 709
+  - var: MARINA GOMES DO NASCIMENTO, CPF 094.000.034-20, em face do MUNICIPIO DE SANTA
+    source_file: 0028287__p1.pdf
+    block: 14
+    start_op: 710
+    end_op: 786
+- prev: Resolução, em até 05 (cinco) vezes, desde que de forma fundamentada e atendendo ao grau de especialização do
+  next: ''
+  count: 6
+  examples:
+  - var: perito, à complexidade da matéria, o lugar e o tempo exigidos para a prestação do serviço, ficando, nesse caso, o
+    source_file: 00117101__p1.pdf
+    block: 33
+    start_op: 2002
+    end_op: 2114
+  - var: pagamento condicionado à aprovação pelo Conselho da Magistratura.
+    source_file: 00117101__p1.pdf
+    block: 34
+    start_op: 2115
+    end_op: 2179
+  - var: O Ato 99/2017, da Presidência deste Tribunal, à sua vez, dispôs sobre o procedimento das requisições de
+    source_file: 00117101__p1.pdf
+    block: 35
+    start_op: 2181
+    end_op: 2283
+- prev: reais e oitenta e seis centavos), em favor do Perito Engenheiro Civil e de Segurança do Trabalho, Clóvis
+  next: março de 2021, publicada no Diário da Justiça Eletrônico deste Estado, do dia 11 imediato, disciplinou no
+  count: 5
+  examples:
+  - var: de Medeiro Dantas Junior, CPF 060.624.334-88, PIS/PASEP 20930224277, nascido em 23/07/1986, pela
+    source_file: 0027945__p1.pdf
+    block: 12
+    start_op: 526
+    end_op: 621
+  - var: realização de perícia nos autos da Ação nº 0803385-93.2016.8.15.0251, movida por MARIA RAMALHO
+    source_file: 0027945__p1.pdf
+    block: 13
+    start_op: 622
+    end_op: 715
+  - var: FELIPE DE OLIVEIRA MELO, CPF 038.141.064-15, em face de RIVANIO DE LUCENA SOUSA, CPF
+    source_file: 0027945__p1.pdf
+    block: 14
+    start_op: 716
+    end_op: 799
+- prev: Consultando o cadastro de peritos deste Tribunal - SIGHOP, é possível constatar que o cadastro do Perito
+  next: ''
+  count: 4
+  examples:
+  - var: Engenheiro Civil e de Segurança do Trabalho, Felipe Queiroga Gadelha, CPF 021.205.144-02, encontra-se
+    source_file: 0027858__p1.pdf
+    block: 33
+    start_op: 2498
+    end_op: 2598
+  - var: na situação de ativo.
+    source_file: 0027858__p1.pdf
+    block: 34
+    start_op: 2599
+    end_op: 2619
+  - var: Engenheiro Civil e de Segurança do Trabalho, Felipe Queiroga Gadelha, CPF 021.205.144-02, encontra-se
+    source_file: 0028287__p1.pdf
+    block: 33
+    start_op: 2490
+    end_op: 2590
+- prev: Diretoria Especial - Tribunal de Justiça
+  next: 'Interessado: Clóvis de Medeiro Dantas Junior – Perito Engenheiro Civil e de Segurança do Trabalho -'
+  count: 4
+  examples:
+  - var: Despacho DIESP
+    source_file: 0027945__p1.pdf
+    block: 4
+    start_op: 87
+    end_op: 100
+  - var: ' nº 0027945/2024'
+    source_file: 0027945__p1.pdf
+    block: 5
+    start_op: 101
+    end_op: 116
+  - var: Processo nº 002919-69.2024.8.15
+    source_file: 0027945__p1.pdf
+    block: 6
+    start_op: 119
+    end_op: 149
+- prev: serviço, ficando, nesse caso, o pagamento condicionado à aprovação pelo Conselho da Magistratura.
+  next: pagamento de honorários de peritos, oriundas de processos judiciais em tramitação sob o pálio da justiça
+  count: 4
+  examples:
+  - var: O Ato 99/2017, da Presidência deste Tribunal, à sua vez, dispôs sobre o procedimento das requisições de
+    source_file: 0012999__p1.pdf
+    block: 30
+    start_op: 2121
+    end_op: 2223
+  - var: O Ato 99/2017, da Presidência deste Tribunal, à sua vez, dispôs sobre o procedimento das requisições de
+    source_file: 0013996__p1.pdf
+    block: 27
+    start_op: 2025
+    end_op: 2127
+  - var: O Ato 99/2017, da Presidência deste Tribunal, à sua vez, dispôs sobre o procedimento das requisições de
+    source_file: 0027858__p1.pdf
+    block: 28
+    start_op: 2048
+    end_op: 2150
+- prev: reais e oitenta e seis centavos), arbitrados em favor do Perito Engenheiro Civil e de Segurança do
+  next: SOUSA, CNPJ 08.999.674/0001-53, perante o Juízo do 1º Juizado Especial Misto da Comarca de Sousa.
+  count: 3
+  examples:
+  - var: Trabalho, Felipe Queiroga Gadelha, CPF 021.205.144-02, PIS/PASEP 12617929444, nascido em
+    source_file: 0027858__p1.pdf
+    block: 12
+    start_op: 528
+    end_op: 615
+  - var: 25/08/1975, pela realização de perícia nos autos da Ação nº 0806816-22.2023.8.15.0371, movida por
+    source_file: 0027858__p1.pdf
+    block: 13
+    start_op: 616
+    end_op: 712
+  - var: ULISSES AURÉLIO ANTUNES OLIVEIRA, CPF 051.881.094-17, em face do MUNICÍPIO DE
+    source_file: 0027858__p1.pdf
+    block: 14
+    start_op: 713
+    end_op: 789
+- prev: âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus, os procedimentos relativos ao
+  next: Código de Processo Civil, são os fixados na tabela constante no Anexo da Resolução 232, de 13 de julho
+  count: 3
+  examples:
+  - var: pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da justiça.
+    source_file: 0027945__p1.pdf
+    block: 19
+    start_op: 1173
+    end_op: 1263
+  - var: No § 1º, do art. 4º, da mencionada resolução, restou anotado que os valores a serem pagos pelos serviços
+    source_file: 0027945__p1.pdf
+    block: 20
+    start_op: 1265
+    end_op: 1368
+  - var: de perícia de responsabilidade de beneficiário da gratuidade da justiça, na hipótese do art. 95, § 3º, II, do
+    source_file: 0027945__p1.pdf
+    block: 21
+    start_op: 1369
+    end_op: 1477
+- prev: 'Interessado: Clóvis de Medeiro Dantas Junior – Perito Engenheiro Civil e de Segurança do Trabalho -'
+  next: reais e oitenta e seis centavos), em favor do Perito Engenheiro Civil e de Segurança do Trabalho, Clóvis
+  count: 2
+  examples:
+  - var: cjcivil@gmail.com
+    source_file: 0027945__p1.pdf
+    block: 9
+    start_op: 303
+    end_op: 319
+  - var: Trata-se de requisição de pagamento de honorários, no valor de R$ 491,86 (quatrocentos e noventa e um
+    source_file: 0027945__p1.pdf
+    block: 10
+    start_op: 321
+    end_op: 421
+- prev: Nacional de Justiça.
+  next: Resolução, em até 05 (cinco) vezes, desde que de forma fundamentada e atendendo ao grau de especialização do
+  count: 2
+  examples:
+  - var: Em seu art. 5º, ressalvou que o juiz, ao fixar os honorários, poderá ultrapassar o limite fixado na tabela, anexo da
+    source_file: 00117101__p1.pdf
+    block: 31
+    start_op: 1778
+    end_op: 1893
+  - var: Em seu art. 5º, ressalvou que o juiz, ao fixar os honorários, poderá ultrapassar o limite fixado na tabela, anexo da
+    source_file: 0011710__p1.pdf
+    block: 31
+    start_op: 1778
+    end_op: 1893
+- prev: No § 1º, do art. 4º, da mencionada resolução, restou anotado que os valores a serem pagos pelos serviços
+  next: Código de Processo Civil, são os fixados na tabela constante no Anexo da Resolução 232, de 13 de julho
+  count: 2
+  examples:
+  - var: de perícia de responsabilidade de beneficiário da gratuidade da justiça, na hipótese do art. 95, § 3º, II, do
+    source_file: 0012999__p1.pdf
+    block: 23
+    start_op: 1465
+    end_op: 1573
+  - var: de perícia de responsabilidade de beneficiário da gratuidade da justiça, na hipótese do art. 95, § 3º, II, do
+    source_file: 0013996__p1.pdf
+    block: 20
+    start_op: 1369
+    end_op: 1477
+- prev: pagamento de honorários de peritos, oriundas de processos judiciais em tramitação sob o pálio da justiça
+  next: Consultando o cadastro de peritos deste Tribunal - SIGHOP, é possível constatar que o cadastro do Perito
+  count: 2
+  examples:
+  - var: gratuita, no âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus.
+    source_file: 0028287__p1.pdf
+    block: 30
+    start_op: 2247
+    end_op: 2325
+  - var: Laudo pericial anexado às fls. 16/20, dos presentes autos.
+    source_file: 0028287__p1.pdf
+    block: 31
+    start_op: 2327
+    end_op: 2384
+- prev: relativos ao pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da justiça.
+  next: de perícia de responsabilidade de beneficiário da gratuidade da justiça, na hipótese do art. 95, 3, II, do
+  count: 2
+  examples:
+  - var: No § 1º, do art. 4º, da mencionada resolução, restou anotado que os valores a serem pagos pelos serviços
+    source_file: 0027858__p1.pdf
+    block: 20
+    start_op: 1291
+    end_op: 1394
+  - var: No § 1º, do art. 4º, da mencionada resolução, restou anotado que os valores a serem pagos pelos serviços
+    source_file: 0028287__p1.pdf
+    block: 20
+    start_op: 1284
+    end_op: 1387
+- prev: SOUSA, CNPJ 08.999.674/0001-53, perante o Juízo do 1º Juizado Especial Misto da Comarca de Sousa.
+  next: disciplinou no âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus, os procedimentos
+  count: 2
+  examples:
+  - var: A Resolução 09/2017, deste Tribunal, de 21 de junho de 2017, modificada pela Resolução nº 12, de 10 de
+    source_file: 0027858__p1.pdf
+    block: 16
+    start_op: 888
+    end_op: 989
+  - var: março de 2021, publicada no Diário da Justiça Eletrônico deste Estado, do dia 11 de março de 2021,
+    source_file: 0027858__p1.pdf
+    block: 17
+    start_op: 990
+    end_op: 1087
+- prev: anexo da Resolução, em até 05 (cinco) vezes, desde que de forma fundamentada e atendendo ao grau de
+  next: serviço, ficando, nesse caso, o pagamento condicionado à aprovação pelo Conselho da Magistratura.
+  count: 1
+  examples:
+  - var: especialização do perito, à complexidade da matéria, o lugar e o tempo exigidos para a prestação do
+    source_file: 0028287__p1.pdf
+    block: 26
+    start_op: 1843
+    end_op: 1941
+- prev: gratuita, no âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus.
+  next: Consultando o cadastro de peritos deste Tribunal - SIGHOP, é possível constatar que o cadastro do Perito
+  count: 1
+  examples:
+  - var: Laudo pericial anexado às fls. 11/15, dos presentes autos.
+    source_file: 0027858__p1.pdf
+    block: 31
+    start_op: 2335
+    end_op: 2392
+- prev: âmbito da Justiça Estadual da Paraíba de primeiro e segundo graus, os procedimentos relativos ao
+  next: No § 1º, do art. 4º, da mencionada resolução, restou anotado que os valores a serem pagos pelos serviços
+  count: 1
+  examples:
+  - var: pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da justiça.
+    source_file: 0013996__p1.pdf
+    block: 18
+    start_op: 1173
+    end_op: 1263

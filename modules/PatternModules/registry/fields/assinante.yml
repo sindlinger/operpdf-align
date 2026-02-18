@@ -1,0 +1,31 @@
+fields: ["ASSINANTE", "ASSINATURA", "SIGNATARIO"]
+priority: 1.1
+sources:
+  - bucket: principal
+    name_matches: ["*Despacho*.pdf", "*Despacho*.html", "*Decisao*", "*Decisão*"]
+patterns:
+  - type: regex
+    label: assinatura_eletronica
+    pattern: '(?i)(?:documento\s*)?assinad[oa]\s*eletronicamente\s*por\s*:?\s*([\p{L}][\p{L}\'\-\.\s]{3,60}?)(?=\s*(?:-|–|—|,|;|\.|\bem\b|\d{1,2}/\d{1,2}/\d{2,4}|$))'
+    field: "ASSINANTE"
+    weight: 1.2
+  - type: regex
+    label: assinatura_eletronica_colapsada
+    pattern: '(?i)(?:documento)?assinad[oa]eletronicamentepor:?([\p{L}]{5,})'
+    field: "ASSINANTE"
+    weight: 1.0
+  - type: regex
+    label: assinatura_pje
+    pattern: '(?i)por\s*:?\s*([\p{L}][\p{L}\'\-\.]{2,}(?:\s+[\p{L}][\p{L}\'\-\.]{2,}){0,8})(?=\s*(?:-|–|—|\d{1,2}/\d{1,2}/\d{2,4}|$))'
+    field: "ASSINANTE"
+    weight: 1.05
+  - type: regex
+    label: diretor_especial
+    pattern: '(?i)([\p{L}][\p{L}\'\-\.]+(?:\s+[\p{L}][\p{L}\'\-\.]+){1,6})\s*(?:[–-]|,)\s*Diretor(?:a)?\s+Especial(?:\s+em\s+exerc[ií]cio)?'
+    field: "ASSINANTE"
+    weight: 1.1
+  - type: regex
+    label: diretor_especial_alt
+    pattern: '(?i)([\p{L}][\p{L}\'\-\.]+(?:\s+[\p{L}][\p{L}\'\-\.]+){1,6})\s*(?:[–-]|,)\s*Diretor\(a\)\s+Especial'
+    field: "ASSINANTE"
+    weight: 1.05

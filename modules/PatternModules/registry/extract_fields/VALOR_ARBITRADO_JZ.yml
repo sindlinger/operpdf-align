@@ -1,0 +1,65 @@
+version: 1
+doc: tjpb_despacho
+obj: 6
+ops:
+- Tj
+- TJ
+source_anchors: modules/PatternModules/registry/textops_anchors/tjpb_despacho_obj6_concept.yml
+draft: true
+notes:
+- Mapa preliminar (esboco). Serve apenas para validacao em mais PDFs.
+- Extracao final por campo ainda NAO implementada (apenas localizacao).
+- Op_code removido; candidatos agora usam op_range (start/end) com prev/next reais.
+- Extracao prevista: usar somente op_range real (bytes -> ToUnicode), sem heuristica.
+fields:
+  VALOR_ARBITRADO_JZ:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op360-458[Tj]
+      hint: 'valor arbitrado (linha "no valor de R$")'
+      match_regex: '(?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+      match_group: 1
+    - source_file: 0013996__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op320-420[Tj]
+      hint: 'valor arbitrado (linha "no valor de R$")'
+      match_regex: '(?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+      match_group: 1
+    - source_file: 00117101__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op270-377[Tj]
+      hint: 'valor arbitrado (linha "no valor de R$")'
+      match_regex: '(?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+      match_group: 1
+    - source_file: 0011710__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op270-377[Tj]
+      hint: 'valor arbitrado (linha "no valor de R$")'
+      match_regex: '(?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+      match_group: 1
+    - source_file: 0027858__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op329-429[Tj]
+      hint: 'valor arbitrado (linha "no valor de R$")'
+      match_regex: '(?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op321-421[Tj]
+      hint: 'valor arbitrado (linha "no valor de R$")'
+      match_regex: '(?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+      match_group: 1
+    - source_file: 0028287__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op326-426[Tj]
+      hint: 'valor arbitrado (linha "no valor de R$")'
+      match_regex: '(?i)(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+      match_group: 1

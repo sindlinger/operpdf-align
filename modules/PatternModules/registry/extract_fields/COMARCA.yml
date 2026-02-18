@@ -1,0 +1,68 @@
+version: 1
+doc: tjpb_despacho
+obj: 6
+ops:
+- Tj
+- TJ
+source_anchors: modules/PatternModules/registry/textops_anchors/tjpb_despacho_obj6_concept.yml
+draft: true
+notes:
+- Mapa preliminar (esboco). Serve apenas para validacao em mais PDFs.
+- Extracao final por campo ainda NAO implementada (apenas localizacao).
+- Op_code removido; candidatos agora usam op_range (start/end) com prev/next reais.
+- Extracao prevista: usar somente op_range real (bytes -> ToUnicode), sem heuristica.
+regex_catalog:
+  comarca_line:
+  - "(?i)\\bcomarca\\b\\s*[:\\-]?\\s*([^\\n;]+)"
+fields:
+  COMARCA:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op150-226[Tj]
+      hint: 'Requerente: Juízo da ... Comarca ...'
+      match_regex: '(?i)comarca\s+(?:da|de)\s+([^,\n]+)'
+      match_group: 1
+    - source_file: 0013996__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op149-207[Tj]
+      hint: 'Requerente: Juízo da ... Comarca ...'
+      match_regex: '(?i)comarca\s+(?:da|de)\s+([^,\n]+)'
+      match_group: 1
+    - source_file: 00117101__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op153-209[Tj]
+      hint: 'Requerente: Juízo da ... Comarca ...'
+      match_regex: '(?i)comarca\s+(?:da|de)\s+([^,\n]+)'
+      match_group: 1
+    - source_file: 0011710__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op153-209[Tj]
+      hint: 'Requerente: Juízo da ... Comarca ...'
+      match_regex: '(?i)comarca\s+(?:da|de)\s+([^,\n]+)'
+      match_group: 1
+    - source_file: 0027858__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op151-216[Tj]
+      hint: 'Requerente: Juízo da ... Comarca ...'
+      match_regex: '(?i)comarca\s+(?:da|de)\s+([^,\n]+)'
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op150-203[Tj]
+      hint: 'Requerente: Juízo da ... Comarca ...'
+      match_regex: '(?i)comarca\s+(?:da|de)\s+([^,\n]+)'
+      match_group: 1
+    - source_file: 0028287__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op151-213[Tj]
+      hint: 'Requerente: Juízo da ... Comarca ...'
+      match_regex: '(?i)comarca\s+(?:da|de)\s+([^,\n]+)'
+      match_group: 1

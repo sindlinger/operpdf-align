@@ -1,0 +1,66 @@
+{
+  "doc": "tjpb_certidao_cm",
+  "legend": {
+    "U": "MAIUSCULO (ex.: JOAO, MUNICIPIO)",
+    "L": "minusculo (ex.: movido, por)",
+    "T": "Title Case (ex.: Joao, Cajazeiras)",
+    "P": "particula (da/de/do/em/no/na/por/pelo/pela/...)",
+    "N": "numero (so digitos ou digitos com pontuacao)",
+    "R": "marcador de numero (nº, n°, n.)",
+    "F": "CPF (11 digitos)",
+    "J": "CNPJ (14 digitos)",
+    "Q": "CNJ (16 ou 20 digitos)",
+    "V": "valor monetario (ex.: R$, 300,00)",
+    "A": "data",
+    "E": "email",
+    "M": "misto letra+digito",
+    "S": "simbolo/pontuacao",
+    ":": "dois-pontos (token literal)",
+    "1": "tamanho 1",
+    "2": "tamanho 2 ou mais",
+    "N1a/N2a": "ordinal feminino (5ª)",
+    "N1o/N2o": "ordinal masculino (2º)"
+  },
+  "notes": [
+    "Trios (prev/value/next) para certidao CM.",
+    "Campos PARCELA e FATOR ficam no pipeline de honorarios."
+  ],
+  "fields": {
+    "ADIANTAMENTO": [
+      {
+        "prev": "AUTORIZADO O",
+        "prev_pat": "U2P1",
+        "value_pat": "U2",
+        "next": "DE",
+        "next_pat": "P2"
+      }
+    ],
+    "PERCENTUAL": [
+      {
+        "prev": "ADIANTAMENTO DE",
+        "prev_pat": "U2P2",
+        "value_pat": "N2S",
+        "next": "(",
+        "next_pat": "S"
+      }
+    ],
+    "VALOR_ARBITRADO_CM": [
+      {
+        "prev": "NO VALOR DE",
+        "prev_pat": "P2U2P2",
+        "value_pat": "VV2N2",
+        "next": "UNÂNIME",
+        "next_pat": "U2"
+      }
+    ],
+    "DATA_AUTORIZACAO_CM": [
+      {
+        "prev": "em João Pessoa, no dia",
+        "prev_pat": "P2T2T2P2L2",
+        "value_pat": "N2P2L2P2N2",
+        "next": "Diretor Especial",
+        "next_pat": "T2T2"
+      }
+    ]
+  }
+}

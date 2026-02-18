@@ -1,0 +1,11 @@
+version: 1
+doc: tjpb_despacho
+draft: true
+notes:
+- Regex centralizado para parcela (usado no extractor).
+regex_catalog:
+  parcela:
+  - "(?i)(\\d+ª\\s*parcela|primeira\\s*parcela|segunda\\s*parcela|terceira\\s*parcela)"
+fields:
+  PARCELA:
+    candidates: []

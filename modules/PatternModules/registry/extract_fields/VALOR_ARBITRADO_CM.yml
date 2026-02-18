@@ -1,0 +1,8 @@
+version: 1
+doc: tjpb_despacho
+draft: true
+notes:
+- Campo do Conselho da Magistratura (certidao CM). No despacho pode nao existir.
+fields:
+  VALOR_ARBITRADO_CM:
+    candidates: []

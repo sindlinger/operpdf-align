@@ -1,0 +1,64 @@
+version: 1
+doc: tjpb_despacho
+obj: 6
+ops:
+- Tj
+- TJ
+draft: true
+notes:
+- Mapa preliminar para especie da pericia (linha com "perícia ...").
+regex_catalog:
+  pericia_especie:
+  - "(?i)per[ií]cia\\s+([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})"
+fields:
+  ESPECIE_DA_PERICIA:
+    candidates:
+    - source_file: 0012999__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op667-755[Tj]
+      hint: 'pericia no corpo ("perícia ...")'
+      match_regex: '(?i)per[ií]cia\s+(?!nos\b|na\b|no\b)([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})'
+      match_group: 1
+    - source_file: 0013996__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op525-616[Tj]
+      hint: 'pericia no corpo ("perícia ...")'
+      match_regex: '(?i)per[ií]cia\s+(?!nos\b|na\b|no\b)([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})'
+      match_group: 1
+    - source_file: 00117101__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op584-639[Tj]
+      hint: 'pericia no corpo ("perícia ...")'
+      match_regex: '(?i)per[ií]cia\s+(?!nos\b|na\b|no\b)([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})'
+      match_group: 1
+    - source_file: 0011710__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op584-639[Tj]
+      hint: 'pericia no corpo ("perícia ...")'
+      match_regex: '(?i)per[ií]cia\s+(?!nos\b|na\b|no\b)([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})'
+      match_group: 1
+    - source_file: 0027858__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op616-712[Tj]
+      hint: 'pericia no corpo ("perícia ...")'
+      match_regex: '(?i)per[ií]cia\s+(?!nos\b|na\b|no\b)([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})'
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op622-715[Tj]
+      hint: 'pericia no corpo ("perícia ...")'
+      match_regex: '(?i)per[ií]cia\s+(?!nos\b|na\b|no\b)([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})'
+      match_group: 1
+    - source_file: 0028287__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op613-709[Tj]
+      hint: 'pericia no corpo ("perícia ...")'
+      match_regex: '(?i)per[ií]cia\s+(?!nos\b|na\b|no\b)([A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+(?:\s+[A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ]+){0,2})'
+      match_group: 1

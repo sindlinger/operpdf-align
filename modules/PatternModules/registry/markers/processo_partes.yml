@@ -1,0 +1,19 @@
+promovente_start:
+  - "movido por"
+  - "movido pelo"
+  - "movido pela"
+  - "movida por"
+  - "movida pelo"
+  - "movida pela"
+
+promovente_cut:
+  - " em face de "
+  - " em face do "
+  - " em face da "
+  - " em face "
+
+promovido_start:
+  - " em face de "
+  - " em face do "
+  - " em face da "
+  - " em face "

@@ -1,0 +1,57 @@
+fields: ["VALOR ARBITRADO - JZ"]
+priority: 1.25
+sources:
+  - bucket: principal
+    name_matches: ["*Requerimento*.pdf", "*Requerimento*.html", "*Requerimento*"]
+  - bucket: apoio
+    name_matches: ["*Requerimento*.pdf", "*Requerimento*.html", "*Requerimento*"]
+  - bucket: outro
+    name_matches: ["*Requerimento*.pdf", "*Requerimento*.html", "*Requerimento*"]
+patterns:
+  - type: regex
+    label: requerimento_valor_arbitrado
+    pattern: 'valor\s+arbitrad[oa][^\n]{0,40}?(?:R\$\s*)?([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.35
+  - type: regex
+    label: requerimento_importe
+    pattern: 'importe[^\n]{0,60}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.25
+  - type: regex
+    label: sentenca_jz
+    pattern: '(?:fix[ao]s?|arbitro)\s+os?\s+honor[aá]rios[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.35
+  - type: regex
+    label: arbitrado_favor
+    pattern: 'arbitrad[oa]s?[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.25
+  - type: regex
+    label: honorarios_periciais
+    pattern: 'honor[aá]rios\s+periciais[^\n]{0,80}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.25
+  - type: regex
+    label: honorarios_fixados
+    pattern: 'honor[aá]rios[^\n]{0,80}?fixad[oa]s?[^\n]{0,40}?R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.25
+  - type: regex
+    label: no_valor_de
+    pattern: 'no\\s+valor\\s+de\\s*R\\s*\\$?\\s*([0-9][0-9\\.\\s]{0,20},\\s*\\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.2
+  - type: regex
+    label: empenhar_valor
+    pattern: 'em\s*penh\w*?\s*(?:o\s*)?valor\s+de\s*R\$\s*([0-9][0-9\.\s]{0,20},\s*\d{2})'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.2
+  - type: regex
+    label: valor_arbitrado_pos
+    pattern: 'R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,\d{2})[^\n]{0,60}?valor\s+arbitrad'
+    field: "VALOR ARBITRADO - JZ"
+    weight: 1.1
+clean: [clean_money]
+validate: [validate_money]

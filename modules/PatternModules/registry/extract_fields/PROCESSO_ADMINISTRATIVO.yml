@@ -1,0 +1,113 @@
+version: 1
+doc: tjpb_despacho
+obj: 14
+ops:
+- Tj
+- TJ
+source_anchors: outputs/inspect/anchors_p2/tjpb_despacho_obj14_concept.yml
+draft: true
+notes:
+- Mapa preliminar para PROCESSO_ADMINISTRATIVO (SEI) a partir das anchors p2 (obj14).
+fields:
+  PROCESSO_ADMINISTRATIVO:
+    candidates:
+    - obj: 14
+      op: Tj
+      op_range: op1-1[Tj]
+      hint: 'SEI (tipo 1 do processo administrativo) - fallback'
+      match_regex: '(?i)\bSEI\s*([0-9]{6,7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}(?:\.[0-9]{4})?)\b'
+      match_group: 1
+    - obj: 6
+      op: Tj
+      op_range: op118-148[Tj]
+      hint: 'header "Processo nº" (tipo 2) - fallback'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - obj: 6
+      op: Tj
+      op_range: op119-149[Tj]
+      hint: 'header "Processo nº" (tipo 2) - fallback'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - obj: 6
+      op: Tj
+      op_range: op119-150[Tj]
+      hint: 'header "Processo nº" (tipo 2) - fallback'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - obj: 6
+      op: Tj
+      op_range: op122-152[Tj]
+      hint: 'header "Processo nº" (tipo 2) - fallback'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - source_file: 0013996__p2.pdf
+      obj: 14
+      op: Tj
+      op_range: op1-1[Tj]
+      hint: 'SEI (tipo 1 do processo administrativo)'
+      match_regex: '(?i)\bSEI\s*([0-9]{6,7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}(?:\.[0-9]{4})?)\b'
+      match_group: 1
+    - source_file: 0027945__p2.pdf
+      obj: 14
+      op: Tj
+      op_range: op1-1[Tj]
+      hint: 'SEI (tipo 1 do processo administrativo)'
+      match_regex: '(?i)\bSEI\s*([0-9]{6,7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}(?:\.[0-9]{4})?)\b'
+      match_group: 1
+    - source_file: 0028287__p2.pdf
+      obj: 14
+      op: Tj
+      op_range: op1-1[Tj]
+      hint: 'SEI (tipo 1 do processo administrativo)'
+      match_regex: '(?i)\bSEI\s*([0-9]{6,7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}(?:\.[0-9]{4})?)\b'
+      match_group: 1
+    - source_file: 0012999__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op119-149[Tj]
+      hint: 'header "Processo nº" (tipo 2)'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - source_file: 0013996__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op118-148[Tj]
+      hint: 'header "Processo nº" (tipo 2)'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - source_file: 00117101__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op122-152[Tj]
+      hint: 'header "Processo nº" (tipo 2)'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - source_file: 0011710__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op122-152[Tj]
+      hint: 'header "Processo nº" (tipo 2)'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - source_file: 0027858__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op119-150[Tj]
+      hint: 'header "Processo nº" (tipo 2)'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - source_file: 0027945__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op119-149[Tj]
+      hint: 'header "Processo nº" (tipo 2)'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
+    - source_file: 0028287__p1.pdf
+      obj: 6
+      op: Tj
+      op_range: op119-150[Tj]
+      hint: 'header "Processo nº" (tipo 2)'
+      match_regex: '(?i)processo\s*(?:n[ºo]?\s*)?([0-9]{6,7}-[0-9]{2}\.\d{4}\.\d\.\d{2}(?:\.\d{4})?|[0-9]{4}\.[0-9]{3}\.[0-9]{3})'
+      match_group: 1
