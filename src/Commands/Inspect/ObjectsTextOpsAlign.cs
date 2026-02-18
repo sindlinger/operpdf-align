@@ -94,6 +94,89 @@ namespace Obj.Commands
             return string.Join(", ", changed.Take(maxKeys)) + $" ... (+{changed.Count - maxKeys})";
         }
 
+        private static string GetValueIgnoreCase(IDictionary<string, string>? values, string key)
+        {
+            if (values == null || string.IsNullOrWhiteSpace(key))
+                return "";
+            if (values.TryGetValue(key, out var direct))
+                return direct ?? "";
+            foreach (var kv in values)
+            {
+                if (string.Equals(kv.Key, key, StringComparison.OrdinalIgnoreCase))
+                    return kv.Value ?? "";
+            }
+            return "";
+        }
+
+        private static bool SameNormalizedValue(string? left, string? right)
+        {
+            var l = TextNormalization.NormalizeWhitespace(left ?? "");
+            var r = TextNormalization.NormalizeWhitespace(right ?? "");
+            return string.Equals(l, r, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static Dictionary<string, object> BuildFieldFlow(
+            IDictionary<string, string> parserValues,
+            IDictionary<string, string> finalValues,
+            IDictionary<string, string>? derivedValues,
+            string field)
+        {
+            var parserValue = GetValueIgnoreCase(parserValues, field);
+            var finalValue = GetValueIgnoreCase(finalValues, field);
+            var derivedValue = GetValueIgnoreCase(derivedValues, field);
+
+            var parserHas = !string.IsNullOrWhiteSpace(parserValue);
+            var finalHas = !string.IsNullOrWhiteSpace(finalValue);
+            var derivedHas = !string.IsNullOrWhiteSpace(derivedValue);
+            var applied = false;
+            var decision = "nao_encontrado";
+
+            if (parserHas)
+            {
+                if (derivedHas && !SameNormalizedValue(parserValue, derivedValue) && SameNormalizedValue(finalValue, parserValue))
+                    decision = "nao_aplicado_parser_prioritario";
+                else
+                    decision = "mantido_parser";
+            }
+            else if (derivedHas && finalHas && SameNormalizedValue(finalValue, derivedValue))
+            {
+                applied = true;
+                decision = "derivado_aplicado";
+            }
+            else if (!parserHas && finalHas && !derivedHas)
+            {
+                decision = "preenchido_outro_modulo";
+            }
+            else if (derivedHas && !finalHas)
+            {
+                decision = "derivado_nao_aplicado";
+            }
+
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["parser"] = parserValue,
+                ["derived_candidate"] = derivedValue,
+                ["final"] = finalValue,
+                ["applied"] = applied,
+                ["decision"] = decision
+            };
+        }
+
+        private static string DescribeFieldFlowInline(
+            IDictionary<string, string> parserValues,
+            IDictionary<string, string> finalValues,
+            IDictionary<string, string>? derivedValues,
+            string field)
+        {
+            var flow = BuildFieldFlow(parserValues, finalValues, derivedValues, field);
+            var parser = flow.TryGetValue("parser", out var pv) ? pv?.ToString() ?? "" : "";
+            var derived = flow.TryGetValue("derived_candidate", out var dv) ? dv?.ToString() ?? "" : "";
+            var final = flow.TryGetValue("final", out var fv) ? fv?.ToString() ?? "" : "";
+            var applied = flow.TryGetValue("applied", out var ap) && ap is bool b && b;
+            var decision = flow.TryGetValue("decision", out var dec) ? dec?.ToString() ?? "" : "";
+            return $"parser={ShortText(parser, 64)} derived={ShortText(derived, 64)} final={ShortText(final, 64)} applied={applied.ToString().ToLowerInvariant()} decision={decision}";
+        }
+
         // Lightweight align helper: compute only the op_range for B, no printing.
         internal static (int StartOp, int EndOp, bool HasValue) ComputeRangeForSelections(
             string modelPdf,
@@ -312,6 +395,7 @@ namespace Obj.Commands
                     PrintPipelineStep(
                         "passo 1/4 - detecção e seleção de objetos",
                         "passo 2/4 - alinhamento",
+                        ("modulo", "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker"),
                         ("pdf_a", Path.GetFileName(aPath)),
                         ("pdf_b", Path.GetFileName(bPath)),
                         ("sel_a", $"page={localPageA} obj={localObjA} source={sourceA}"),
@@ -387,6 +471,7 @@ namespace Obj.Commands
                     PrintPipelineStep(
                         "passo 2/4 - saída do alinhamento",
                         "passo 3/4 - extração (usa op_range + value_full)",
+                        ("modulo", "Obj.Align.ObjectsTextOpsDiff"),
                         ("anchors", report.Anchors.Count.ToString(CultureInfo.InvariantCulture)),
                         ("pairs", report.Alignments.Count.ToString(CultureInfo.InvariantCulture)),
                         ("fixed", report.FixedPairs.Count.ToString(CultureInfo.InvariantCulture)),
@@ -445,7 +530,7 @@ namespace Obj.Commands
                     }
 
                     if (!ReturnUtils.IsEnabled())
-                        PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo colorido + JSON em outputs/extract"));
+                        PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo colorido + JSON em outputs/extract"));
                     if (!ReturnUtils.IsEnabled())
                         PrintHumanSummary(report, top, outputMode);
                     if (!ReturnUtils.IsEnabled())
@@ -608,9 +693,19 @@ namespace Obj.Commands
             var side = backfill?.Summary?.PdfA;
             if (side != null)
             {
+                payload["status"] = side.Status ?? "";
+                payload["source"] = side.Source ?? "";
                 payload["especialidade"] = side.Especialidade ?? "";
+                payload["especialidade_source"] = side.EspecialidadeSource ?? "";
                 payload["especie_da_pericia"] = side.EspecieDaPericia ?? "";
+                payload["valor_field"] = side.ValorField ?? "";
+                payload["valor_raw"] = side.ValorRaw ?? "";
                 payload["fator"] = side.Fator ?? "";
+                payload["entry_id"] = side.EntryId ?? "";
+                payload["area"] = side.Area ?? "";
+                payload["perito_name_source"] = side.PeritoNameSource ?? "";
+                payload["perito_cpf_source"] = side.PeritoCpfSource ?? "";
+                payload["derivations"] = side.Derivations ?? new List<string>();
                 payload["valor_tabelado_anexo_i"] = side.ValorTabeladoAnexoI ?? "";
                 payload["valor_normalized"] = side.ValorNormalized ?? "";
                 payload["confidence"] = side.Confidence;
@@ -630,6 +725,7 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "passo 3.1/4 - preparação da extração",
                     "passo 3.2/4 - recorte value_full/op_range",
+                    ("modulo", "ObjectsTextOpsAlign + DocumentValidationRules"),
                     ("doc_key", resolvedDoc),
                     ("doc_type", outputDocType),
                     ("band", band),
@@ -657,6 +753,7 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "passo 3.2/4 - resultado do recorte para parser",
                     "passo 3.3/4 - parser do mapa YAML",
+                    ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
                     ("op_range_a", string.IsNullOrWhiteSpace(opRangeA) ? "(vazio)" : opRangeA),
                     ("op_range_b", string.IsNullOrWhiteSpace(opRangeB) ? "(vazio)" : opRangeB),
                     ("len_value_full_a", valueFullA.Length.ToString(CultureInfo.InvariantCulture)),
@@ -685,6 +782,7 @@ namespace Obj.Commands
                     PrintPipelineStep(
                         "passo 3.3/4 - parser do mapa YAML (falhou)",
                         "encerrado com erro de extração",
+                        ("modulo", "Obj.Commands.ObjectsMapFields"),
                         ("erro", string.IsNullOrWhiteSpace(extractError) ? "(sem detalhe)" : extractError!)
                     );
                 }
@@ -706,8 +804,11 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "passo 3.3/4 - parser do mapa YAML (ok)",
                     "passo 3.4/4 - enriquecimento de honorários",
+                    ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
                     ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
-                    ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture))
+                    ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
+                    ("origem_values_a", "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
+                    ("origem_values_b", "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
                 );
             }
 
@@ -722,8 +823,17 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "passo 3.4/4 - honorários aplicado",
                     "passo 3.5/4 - validação documental",
+                    ("modulo", "Obj.Honorarios.HonorariosFacade (Backfill + Enricher)"),
                     ("changed_keys_a", DescribeChangedKeys(beforeHonorariosA, valuesA)),
                     ("changed_keys_b", DescribeChangedKeys(beforeHonorariosB, valuesB)),
+                    ("status_honorarios_a", honorariosA?.Summary?.PdfA?.Status ?? "(sem status)"),
+                    ("status_honorarios_b", honorariosB?.Summary?.PdfA?.Status ?? "(sem status)"),
+                    ("especialidade_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "ESPECIALIDADE")),
+                    ("especialidade_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "ESPECIALIDADE")),
+                    ("especie_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "ESPECIE_DA_PERICIA")),
+                    ("especie_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "ESPECIE_DA_PERICIA")),
+                    ("valor_jz_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "VALOR_ARBITRADO_JZ")),
+                    ("valor_jz_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "VALOR_ARBITRADO_JZ")),
                     ("derived_valor_a", honorariosA?.DerivedValor ?? ""),
                     ("derived_valor_b", honorariosB?.DerivedValor ?? "")
                 );
@@ -742,9 +852,36 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "passo 3.5/4 - validação",
                     "passo 4/4 - resumo colorido e persistência",
+                    ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
                     ("validator_ok_b", okB.ToString().ToLowerInvariant()),
                     ("validator_reason_b", string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB!)
                 );
+            }
+
+            var trackedFields = new[]
+            {
+                "PROCESSO_ADMINISTRATIVO",
+                "PROCESSO_JUDICIAL",
+                "COMARCA",
+                "VARA",
+                "PROMOVENTE",
+                "PROMOVIDO",
+                "PERITO",
+                "CPF_PERITO",
+                "ESPECIALIDADE",
+                "ESPECIE_DA_PERICIA",
+                "VALOR_ARBITRADO_JZ",
+                "VALOR_ARBITRADO_FINAL",
+                "FATOR",
+                "VALOR_TABELADO_ANEXO_I"
+            };
+
+            var flowA = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var flowB = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            foreach (var field in trackedFields)
+            {
+                flowA[field] = BuildFieldFlow(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, field);
+                flowB[field] = BuildFieldFlow(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, field);
             }
 
             return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
@@ -766,6 +903,26 @@ namespace Obj.Commands
                         ["values"] = parsed.PdfB.Values,
                         ["fields"] = parsed.PdfB.Fields
                     }
+                },
+                ["pipeline"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["step_modules"] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["1_detection_selection"] = "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+                        ["2_alignment"] = "Obj.Align.ObjectsTextOpsDiff",
+                        ["3_1_prepare"] = "ObjectsTextOpsAlign + DocumentValidationRules",
+                        ["3_2_crop"] = "ObjectsTextOpsAlign.BuildValueFullFromBlocks",
+                        ["3_3_yaml_parser"] = "Obj.Commands.ObjectsMapFields",
+                        ["3_4_honorarios"] = "Obj.Honorarios.HonorariosFacade",
+                        ["3_5_validator"] = "Obj.ValidatorModule.ValidatorFacade",
+                        ["4_output"] = "ObjectsTextOpsAlign + JsonSerializer"
+                    },
+                    ["values_origin_note"] = "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento do módulo de honorários."
+                },
+                ["value_flow"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["pdf_a"] = flowA,
+                    ["pdf_b"] = flowB
                 },
                 ["validator"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -829,6 +986,7 @@ namespace Obj.Commands
             var hasValues = side.TryGetProperty("values", out var values) || side.TryGetProperty("Values", out values);
             if (!hasValues || values.ValueKind != JsonValueKind.Object)
                 return;
+            var hasFields = side.TryGetProperty("fields", out var fields) || side.TryGetProperty("Fields", out fields);
 
             var pairs = new List<(string Key, string Value)>();
             foreach (var prop in values.EnumerateObject())
@@ -841,7 +999,33 @@ namespace Obj.Commands
             pairs = pairs.OrderBy(p => p.Key, StringComparer.OrdinalIgnoreCase).ToList();
             Console.WriteLine(Colorize($"[{label}] ({pairs.Count})", AnsiInfo));
             foreach (var (key, value) in pairs)
+            {
+                string source = "(sem source)";
+                string opRange = "(sem op_range)";
+                string status = "";
+                var obj = 0;
+                var parserValue = "";
+                if (hasFields && fields.ValueKind == JsonValueKind.Object && fields.TryGetProperty(key, out var fieldMeta))
+                {
+                    if (fieldMeta.TryGetProperty("Source", out var sourceEl))
+                        source = string.IsNullOrWhiteSpace(sourceEl.GetString()) ? "(vazio)" : sourceEl.GetString() ?? "(vazio)";
+                    if (fieldMeta.TryGetProperty("OpRange", out var rangeEl))
+                        opRange = string.IsNullOrWhiteSpace(rangeEl.GetString()) ? "(vazio)" : rangeEl.GetString() ?? "(vazio)";
+                    if (fieldMeta.TryGetProperty("Status", out var statusEl))
+                        status = statusEl.GetString() ?? "";
+                    if (fieldMeta.TryGetProperty("Obj", out var objEl) && objEl.TryGetInt32(out var parsedObj))
+                        obj = parsedObj;
+                    if (fieldMeta.TryGetProperty("Value", out var parserEl))
+                        parserValue = parserEl.GetString() ?? "";
+                }
+
                 Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} \"{value}\"");
+                Console.WriteLine($"    origem={source} op={opRange} obj={obj} status={status} modulo=Obj.Commands.ObjectsMapFields");
+                if (string.IsNullOrWhiteSpace(parserValue) && !string.IsNullOrWhiteSpace(value))
+                    Console.WriteLine("    ajuste=Obj.Honorarios.HonorariosFacade parser=\"\" (valor preenchido por derivação/backfill)");
+                else if (!string.IsNullOrWhiteSpace(parserValue) && !SameNormalizedValue(parserValue, value))
+                    Console.WriteLine($"    ajuste=Obj.Honorarios.HonorariosFacade parser={ShortText(parserValue, 72)}");
+            }
         }
 
         private static void AddInput(List<string> inputs, string rawValue)
