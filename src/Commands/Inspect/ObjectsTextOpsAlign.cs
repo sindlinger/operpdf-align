@@ -239,6 +239,145 @@ namespace Obj.Commands
             }
         }
 
+        private static string DescribeMoneyPath(
+            IDictionary<string, string> values,
+            IDictionary<string, ObjectsMapFields.CompactFieldOutput> fields)
+        {
+            string Describe(string field)
+            {
+                var value = GetValueIgnoreCase(values, field);
+                var source = fields.TryGetValue(field, out var meta) && meta != null
+                    ? (string.IsNullOrWhiteSpace(meta.Source) ? "(sem source)" : meta.Source)
+                    : "(sem source)";
+                var op = fields.TryGetValue(field, out var meta2) && meta2 != null
+                    ? (string.IsNullOrWhiteSpace(meta2.OpRange) ? "(sem op_range)" : meta2.OpRange)
+                    : "(sem op_range)";
+                if (string.IsNullOrWhiteSpace(value))
+                    return $"{field}=<vazio> src={source} op={op}";
+                return $"{field}={ShortText(value, 36)} src={source} op={op}";
+            }
+
+            return string.Join(" | ", new[]
+            {
+                Describe("VALOR_ARBITRADO_DE"),
+                Describe("VALOR_ARBITRADO_JZ"),
+                Describe("VALOR_ARBITRADO_FINAL")
+            });
+        }
+
+        private static List<string> EnforceStrictArbitradoPolicy(
+            IDictionary<string, string> parserValues,
+            IDictionary<string, ObjectsMapFields.CompactFieldOutput> parserFields,
+            IDictionary<string, string> currentValues,
+            IDictionary<string, ObjectsMapFields.CompactFieldOutput> currentFields)
+        {
+            var changed = new List<string>();
+            var strictFields = new[] { "VALOR_ARBITRADO_JZ", "VALOR_ARBITRADO_FINAL" };
+
+            foreach (var field in strictFields)
+            {
+                var parserValue = GetValueIgnoreCase(parserValues, field);
+                var parserSource = parserFields.TryGetValue(field, out var parserMeta) && parserMeta != null
+                    ? parserMeta.Source ?? ""
+                    : "";
+                var parserExplicit = !string.IsNullOrWhiteSpace(parserValue) &&
+                    !parserSource.Contains("derived", StringComparison.OrdinalIgnoreCase);
+
+                var currentValue = GetValueIgnoreCase(currentValues, field);
+                if (!parserExplicit)
+                {
+                    if (!string.IsNullOrWhiteSpace(currentValue))
+                    {
+                        currentValues[field] = "";
+                        changed.Add($"{field}:clear_non_explicit");
+                    }
+
+                    if (!currentFields.TryGetValue(field, out var fieldMeta) || fieldMeta == null)
+                    {
+                        fieldMeta = new ObjectsMapFields.CompactFieldOutput
+                        {
+                            ValueRaw = "",
+                            Value = "",
+                            Source = "policy:validator:strict_found",
+                            OpRange = "",
+                            Obj = 0,
+                            Status = "NOT_FOUND",
+                            BBox = null
+                        };
+                    }
+                    else
+                    {
+                        var tag = "policy:validator:strict_found";
+                        if (string.IsNullOrWhiteSpace(fieldMeta.Source))
+                            fieldMeta.Source = tag;
+                        else if (!fieldMeta.Source.Contains(tag, StringComparison.OrdinalIgnoreCase))
+                            fieldMeta.Source = fieldMeta.Source + "|" + tag;
+                        fieldMeta.Status = "NOT_FOUND";
+                    }
+                    currentFields[field] = fieldMeta;
+                    continue;
+                }
+
+                if (!SameNormalizedValue(currentValue, parserValue))
+                {
+                    currentValues[field] = parserValue;
+                    changed.Add($"{field}:reset_parser_explicit");
+                }
+
+                if (currentFields.TryGetValue(field, out var keepMeta) && keepMeta != null)
+                {
+                    var tag = "policy:validator:strict_found";
+                    if (string.IsNullOrWhiteSpace(keepMeta.Source))
+                        keepMeta.Source = tag;
+                    else if (!keepMeta.Source.Contains(tag, StringComparison.OrdinalIgnoreCase))
+                        keepMeta.Source = keepMeta.Source + "|" + tag;
+                    keepMeta.Status = "OK";
+                    currentFields[field] = keepMeta;
+                }
+            }
+
+            return changed;
+        }
+
+        private static Dictionary<string, ObjectsMapFields.CompactFieldOutput> CloneFieldOutputs(
+            IDictionary<string, ObjectsMapFields.CompactFieldOutput> source)
+        {
+            var clone = new Dictionary<string, ObjectsMapFields.CompactFieldOutput>(StringComparer.OrdinalIgnoreCase);
+            if (source == null)
+                return clone;
+
+            foreach (var kv in source)
+            {
+                var meta = kv.Value;
+                if (meta == null)
+                    continue;
+
+                clone[kv.Key] = new ObjectsMapFields.CompactFieldOutput
+                {
+                    ValueRaw = meta.ValueRaw ?? "",
+                    Value = meta.Value ?? "",
+                    Source = meta.Source ?? "",
+                    OpRange = meta.OpRange ?? "",
+                    Obj = meta.Obj,
+                    Status = meta.Status ?? "",
+                    BBox = meta.BBox == null
+                        ? null
+                        : new ObjectsMapFields.CompactBoundingBox
+                        {
+                            X0 = meta.BBox.X0,
+                            Y0 = meta.BBox.Y0,
+                            X1 = meta.BBox.X1,
+                            Y1 = meta.BBox.Y1,
+                            StartOp = meta.BBox.StartOp,
+                            EndOp = meta.BBox.EndOp,
+                            Items = meta.BBox.Items
+                        }
+                };
+            }
+
+            return clone;
+        }
+
         // Lightweight align helper: compute only the op_range for B, no printing.
         internal static (int StartOp, int EndOp, bool HasValue) ComputeRangeForSelections(
             string modelPdf,
@@ -1027,6 +1166,9 @@ namespace Obj.Commands
                 MergeSideFrom(valuesB, fieldsB, parsedBack.PdfB);
             }
 
+            var parserFieldsA = CloneFieldOutputs(fieldsA);
+            var parserFieldsB = CloneFieldOutputs(fieldsB);
+
             if (verbose)
             {
                 PrintPipelineStep(
@@ -1065,14 +1207,20 @@ namespace Obj.Commands
                     ("especie_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "ESPECIE_DA_PERICIA")),
                     ("valor_jz_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "VALOR_ARBITRADO_JZ")),
                     ("valor_jz_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "VALOR_ARBITRADO_JZ")),
+                    ("valor_path_a_pre_validator", DescribeMoneyPath(valuesA, fieldsA)),
+                    ("valor_path_b_pre_validator", DescribeMoneyPath(valuesB, fieldsB)),
                     ("derived_valor_a", honorariosA?.DerivedValor ?? ""),
                     ("derived_valor_b", honorariosB?.DerivedValor ?? "")
                 );
             }
 
             var catalog = ValidatorFacade.GetPeritoCatalog(null);
+            var beforeValidatorA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeValidatorB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
             var okB = ValidatorFacade.ApplyAndValidateDocumentValues(valuesB, outputDocType, catalog, out var reasonB, out var validatorChangedB);
+            var policyChangedA = EnforceStrictArbitradoPolicy(beforeHonorariosA, parserFieldsA, valuesA, fieldsA);
+            var policyChangedB = EnforceStrictArbitradoPolicy(beforeHonorariosB, parserFieldsB, valuesB, fieldsB);
+            MarkModuleChanges(beforeValidatorA, valuesA, fieldsA, "validator");
             MarkModuleChanges(beforeValidatorB, valuesB, fieldsB, "validator");
             var ok = okB;
             var reason = reasonB ?? "";
@@ -1082,9 +1230,13 @@ namespace Obj.Commands
                     "passo 3.5/4 - validação",
                     "passo 4/4 - resumo colorido e persistência",
                     ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
+                    ("changed_keys_validator_a", DescribeChangedKeys(beforeValidatorA, valuesA)),
                     ("changed_keys_validator_b", validatorChangedB == null || validatorChangedB.Count == 0
                         ? "(nenhum)"
                         : string.Join(", ", validatorChangedB)),
+                    ("policy_strict_money_a", policyChangedA.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedA)),
+                    ("policy_strict_money_b", policyChangedB.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedB)),
+                    ("valor_path_b_pos_validator", DescribeMoneyPath(valuesB, fieldsB)),
                     ("validator_ok_b", okB.ToString().ToLowerInvariant()),
                     ("validator_reason_b", string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB!)
                 );
