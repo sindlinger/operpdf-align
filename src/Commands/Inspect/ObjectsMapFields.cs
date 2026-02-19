@@ -120,6 +120,7 @@ namespace Obj.Commands
             public string ValueRaw { get; set; } = "";
             public string Value { get; set; } = "";
             public string Source { get; set; } = "";
+            public string Module { get; set; } = "parser";
             public string OpRange { get; set; } = "";
             public int Obj { get; set; }
             public string Status { get; set; } = "";
@@ -260,6 +261,7 @@ namespace Obj.Commands
                     ValueRaw = field?.ValueRaw ?? "",
                     Value = value,
                     Source = field?.Source ?? "",
+                    Module = "parser",
                     OpRange = field?.OpRange ?? "",
                     Obj = field?.Obj ?? 0,
                     Status = string.IsNullOrWhiteSpace(value) ? "NOT_FOUND" : "OK",
@@ -695,18 +697,7 @@ namespace Obj.Commands
 
             if (fieldName.Equals("PERITO", StringComparison.OrdinalIgnoreCase))
             {
-                var norm = TextUtils.NormalizeWhitespace(trimmed);
-                if (norm.Length > 80)
-                {
-                    var matches = Regex.Matches(norm, @"[A-ZÁÂÃÀÉÊÍÓÔÕÚÇ]{2,}(?:\s+[A-ZÁÂÃÀÉÊÍÓÔÕÚÇ]{2,}){1,}");
-                    if (matches.Count > 0)
-                    {
-                        var candidate = matches[^1].Value;
-                        if (!string.IsNullOrWhiteSpace(candidate))
-                            return TextUtils.NormalizeWhitespace(candidate);
-                    }
-                }
-                return norm;
+                return NormalizePeritoValue(trimmed);
             }
 
             if (fieldName.StartsWith("VALOR_", StringComparison.OrdinalIgnoreCase))
@@ -744,6 +735,115 @@ namespace Obj.Commands
             }
 
             return TextUtils.NormalizeWhitespace(trimmed);
+        }
+
+        private static string NormalizePeritoValue(string raw)
+        {
+            var norm = TextUtils.NormalizeWhitespace(raw ?? "");
+            if (string.IsNullOrWhiteSpace(norm))
+                return "";
+
+            norm = Regex.Replace(norm, "(?i)^(?:interessad[oa]\\s*:\\s*|perit[oa]\\s*[:\\-]?\\s*)", "");
+            norm = TextUtils.NormalizeWhitespace(norm);
+
+            var clipped = ClipPeritoAtNoise(norm);
+            if (!string.IsNullOrWhiteSpace(clipped))
+                norm = clipped;
+
+            norm = Regex.Replace(norm, @"\s*[-–]\s*[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}.*$", "", RegexOptions.IgnoreCase);
+            norm = Regex.Replace(norm, "(?i)\\s*,\\s*(?:perit[oa]|m[eé]dic[oa]|engenheir[oa]|grafocopista|psiquiatr[ao]|contador(?:a)?|assistente\\s+t[eé]cnico).*$", "");
+            norm = TextUtils.NormalizeWhitespace(norm).Trim(',', ';', '.', ':', '-', '–');
+
+            var candidate = ExtractPeritoNameCandidate(norm);
+            if (!string.IsNullOrWhiteSpace(candidate))
+                return candidate;
+
+            // Evita falso positivo com narrativa longa sem nome confiável.
+            if (norm.Length > 80 || ContainsPeritoNoise(norm))
+                return "";
+
+            return norm;
+        }
+
+        private static string ClipPeritoAtNoise(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return value ?? "";
+
+            var stopHints = new[]
+            {
+                " adiantamento",
+                " no valor",
+                " correspondente",
+                " do valor",
+                " em favor",
+                " autos do processo",
+                " autos do",
+                " processo nº",
+                " processo n",
+                " os presentes",
+                " o presente",
+                " trata-se",
+                " considerando",
+                " movido por",
+                " movida por",
+                " em face",
+                " para realização",
+                " para realizacao"
+            };
+
+            var best = value.Length;
+            foreach (var hint in stopHints)
+            {
+                var idx = value.IndexOf(hint, StringComparison.OrdinalIgnoreCase);
+                if (idx > 0 && idx < best)
+                    best = idx;
+            }
+
+            if (best < value.Length)
+                return TextUtils.NormalizeWhitespace(value.Substring(0, best)).Trim(',', ';', '.', ':', '-', '–');
+
+            return value;
+        }
+
+        private static bool ContainsPeritoNoise(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            return Regex.IsMatch(
+                value,
+                "(?i)\\b(?:r\\$|processo|autos?|valor|honor[aá]rios|reserva|adiantamento|correspondente|movid[oa]|em\\s+face|tribunal|diretoria|comarca)\\b");
+        }
+
+        private static string ExtractPeritoNameCandidate(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return "";
+
+            var matches = Regex.Matches(
+                value,
+                "(?i)\\b(?:d(?:r|ra)\\.?\\s+)?[A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ'`.-]+(?:\\s+(?:de|da|do|dos|das|e))?(?:\\s+[A-ZÁÂÃÀÉÊÍÓÔÕÚÇ][A-Za-zÁÂÃÀÉÊÍÓÔÕÚÇ'`.-]+){1,6}\\b");
+
+            foreach (Match m in matches)
+            {
+                var candidate = TextUtils.NormalizeWhitespace(m.Value ?? "").Trim(',', ';', '.', ':', '-', '–');
+                if (string.IsNullOrWhiteSpace(candidate))
+                    continue;
+                if (LooksInstitutionalName(candidate))
+                    continue;
+                return candidate;
+            }
+
+            return "";
+        }
+
+        private static bool LooksInstitutionalName(string candidate)
+        {
+            if (string.IsNullOrWhiteSpace(candidate))
+                return true;
+
+            return Regex.IsMatch(candidate, "(?i)\\b(?:tribunal|justi[cç]a|diretoria|comarca|vara|ju[ií]zo|processo|conselho|documento|estado|para[ií]ba)\\b");
         }
 
         private static void ApplyDerivedFields(Dictionary<string, FieldOutput> output)

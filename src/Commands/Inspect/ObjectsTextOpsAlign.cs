@@ -254,8 +254,9 @@ namespace Obj.Commands
                     meta = new ObjectsMapFields.CompactFieldOutput
                     {
                         ValueRaw = "",
-                        Value = before ?? "",
+                        Value = after ?? "",
                         Source = "",
+                        Module = moduleTag,
                         OpRange = "",
                         Obj = 0,
                         Status = string.IsNullOrWhiteSpace(after) ? "NOT_FOUND" : "OK",
@@ -266,14 +267,29 @@ namespace Obj.Commands
                 var tag = string.IsNullOrWhiteSpace(before) && !string.IsNullOrWhiteSpace(after)
                     ? $"derived:{moduleTag}"
                     : $"adjusted:{moduleTag}";
-                if (string.IsNullOrWhiteSpace(meta.Source))
-                    meta.Source = tag;
-                else if (!meta.Source.Contains(moduleTag, StringComparison.OrdinalIgnoreCase))
-                    meta.Source = meta.Source + "|" + tag;
-
+                meta.Source = AppendPipeTag(meta.Source, tag);
+                meta.Module = AppendPipeTag(meta.Module, moduleTag);
+                meta.Value = after ?? "";
+                if (!string.IsNullOrWhiteSpace(after))
+                    meta.ValueRaw = after ?? "";
                 meta.Status = string.IsNullOrWhiteSpace(after) ? "NOT_FOUND" : "OK";
                 fields[key] = meta;
             }
+        }
+
+        private static string AppendPipeTag(string? existing, string? tag)
+        {
+            var value = (existing ?? "").Trim();
+            var add = (tag ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(add))
+                return value;
+            if (string.IsNullOrWhiteSpace(value))
+                return add;
+
+            var tags = value.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (tags.Any(t => string.Equals(t, add, StringComparison.OrdinalIgnoreCase)))
+                return value;
+            return value + "|" + add;
         }
 
         private static string DescribeMoneyPath(
@@ -336,6 +352,7 @@ namespace Obj.Commands
                             ValueRaw = "",
                             Value = "",
                             Source = "policy:validator:strict_found",
+                            Module = "validator",
                             OpRange = "",
                             Obj = 0,
                             Status = "NOT_FOUND",
@@ -345,10 +362,9 @@ namespace Obj.Commands
                     else
                     {
                         var tag = "policy:validator:strict_found";
-                        if (string.IsNullOrWhiteSpace(fieldMeta.Source))
-                            fieldMeta.Source = tag;
-                        else if (!fieldMeta.Source.Contains(tag, StringComparison.OrdinalIgnoreCase))
-                            fieldMeta.Source = fieldMeta.Source + "|" + tag;
+                        fieldMeta.Source = AppendPipeTag(fieldMeta.Source, tag);
+                        fieldMeta.Module = AppendPipeTag(fieldMeta.Module, "validator");
+                        fieldMeta.Value = "";
                         fieldMeta.Status = "NOT_FOUND";
                     }
                     currentFields[field] = fieldMeta;
@@ -364,10 +380,11 @@ namespace Obj.Commands
                 if (currentFields.TryGetValue(field, out var keepMeta) && keepMeta != null)
                 {
                     var tag = "policy:validator:strict_found";
-                    if (string.IsNullOrWhiteSpace(keepMeta.Source))
-                        keepMeta.Source = tag;
-                    else if (!keepMeta.Source.Contains(tag, StringComparison.OrdinalIgnoreCase))
-                        keepMeta.Source = keepMeta.Source + "|" + tag;
+                    keepMeta.Source = AppendPipeTag(keepMeta.Source, tag);
+                    keepMeta.Module = AppendPipeTag(keepMeta.Module, "validator");
+                    keepMeta.Value = parserValue ?? "";
+                    if (string.IsNullOrWhiteSpace(keepMeta.ValueRaw) && !string.IsNullOrWhiteSpace(parserValue))
+                        keepMeta.ValueRaw = parserValue ?? "";
                     keepMeta.Status = "OK";
                     currentFields[field] = keepMeta;
                 }
@@ -394,6 +411,7 @@ namespace Obj.Commands
                     ValueRaw = meta.ValueRaw ?? "",
                     Value = meta.Value ?? "",
                     Source = meta.Source ?? "",
+                    Module = meta.Module ?? "",
                     OpRange = meta.OpRange ?? "",
                     Obj = meta.Obj,
                     Status = meta.Status ?? "",
@@ -1598,8 +1616,27 @@ namespace Obj.Commands
             var flowB = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             foreach (var field in trackedFields)
             {
-                flowA[field] = BuildFieldFlow(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, field);
-                flowB[field] = BuildFieldFlow(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, field);
+                var fieldFlowA = BuildFieldFlow(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, field);
+                if (fieldsA.TryGetValue(field, out var metaA) && metaA != null)
+                {
+                    fieldFlowA["source"] = metaA.Source ?? "";
+                    fieldFlowA["module"] = string.IsNullOrWhiteSpace(metaA.Module) ? "parser" : metaA.Module;
+                    fieldFlowA["status"] = metaA.Status ?? "";
+                    fieldFlowA["op_range"] = metaA.OpRange ?? "";
+                    fieldFlowA["obj"] = metaA.Obj;
+                }
+                flowA[field] = fieldFlowA;
+
+                var fieldFlowB = BuildFieldFlow(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, field);
+                if (fieldsB.TryGetValue(field, out var metaB) && metaB != null)
+                {
+                    fieldFlowB["source"] = metaB.Source ?? "";
+                    fieldFlowB["module"] = string.IsNullOrWhiteSpace(metaB.Module) ? "parser" : metaB.Module;
+                    fieldFlowB["status"] = metaB.Status ?? "";
+                    fieldFlowB["op_range"] = metaB.OpRange ?? "";
+                    fieldFlowB["obj"] = metaB.Obj;
+                }
+                flowB[field] = fieldFlowB;
             }
 
             return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
@@ -1638,7 +1675,7 @@ namespace Obj.Commands
                         ["4_output"] = "ObjectsTextOpsAlign + JsonSerializer"
                     },
                     ["merge_policy"] = dualBand ? "front_head prioridade; back_tail preenche apenas campos vazios" : "single_band",
-                    ["values_origin_note"] = "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento do módulo de honorários."
+                    ["values_origin_note"] = "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento dos módulos honorarios/repairer/validator, com trilha em parsed.*.fields.Source e parsed.*.fields.Module."
                 },
                 ["value_flow"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -1840,12 +1877,15 @@ namespace Obj.Commands
                 string source = "(sem source)";
                 string opRange = "(sem op_range)";
                 string status = "";
+                string moduleTag = "parser";
                 var obj = 0;
                 var parserValue = "";
                 if (hasFields && fields.ValueKind == JsonValueKind.Object && fields.TryGetProperty(key, out var fieldMeta))
                 {
                     if (fieldMeta.TryGetProperty("Source", out var sourceEl))
                         source = string.IsNullOrWhiteSpace(sourceEl.GetString()) ? "(vazio)" : sourceEl.GetString() ?? "(vazio)";
+                    if (fieldMeta.TryGetProperty("Module", out var moduleEl))
+                        moduleTag = string.IsNullOrWhiteSpace(moduleEl.GetString()) ? "parser" : moduleEl.GetString() ?? "parser";
                     if (fieldMeta.TryGetProperty("OpRange", out var rangeEl))
                         opRange = string.IsNullOrWhiteSpace(rangeEl.GetString()) ? "(vazio)" : rangeEl.GetString() ?? "(vazio)";
                     if (fieldMeta.TryGetProperty("Status", out var statusEl))
@@ -1856,14 +1896,10 @@ namespace Obj.Commands
                         parserValue = parserEl.GetString() ?? "";
                 }
 
+                var moduleDisplay = ResolveModuleDisplay(moduleTag);
                 Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} \"{value}\"");
-                Console.WriteLine($"    origem={source} op={opRange} obj={obj} status={status} modulo=Obj.Commands.ObjectsMapFields");
-                var sourceNorm = source ?? "";
-                var adjustModule = "";
-                if (sourceNorm.Contains("validator", StringComparison.OrdinalIgnoreCase))
-                    adjustModule = "Obj.ValidatorModule.ValidatorFacade";
-                else if (sourceNorm.Contains("honorarios", StringComparison.OrdinalIgnoreCase))
-                    adjustModule = "Obj.Honorarios.HonorariosFacade";
+                Console.WriteLine($"    origem={source} op={opRange} obj={obj} status={status} modulo={moduleDisplay}");
+                var adjustModule = ResolveLastAdjustmentModule(moduleTag);
 
                 if (!string.IsNullOrWhiteSpace(adjustModule))
                 {
@@ -1873,6 +1909,54 @@ namespace Obj.Commands
                         Console.WriteLine($"    ajuste={adjustModule} parser={ShortText(parserValue, 72)}");
                 }
             }
+        }
+
+        private static string ResolveModuleDisplay(string moduleTags)
+        {
+            if (string.IsNullOrWhiteSpace(moduleTags))
+                return "Obj.Commands.ObjectsMapFields";
+
+            var mapped = new List<string>();
+            var parts = moduleTags.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var part in parts)
+            {
+                var name = MapModuleTag(part);
+                if (!mapped.Contains(name, StringComparer.OrdinalIgnoreCase))
+                    mapped.Add(name);
+            }
+
+            if (mapped.Count == 0)
+                return "Obj.Commands.ObjectsMapFields";
+            return string.Join("|", mapped);
+        }
+
+        private static string ResolveLastAdjustmentModule(string moduleTags)
+        {
+            if (string.IsNullOrWhiteSpace(moduleTags))
+                return "";
+
+            var parts = moduleTags.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            for (var i = parts.Length - 1; i >= 0; i--)
+            {
+                var part = parts[i];
+                if (string.Equals(part, "parser", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                return MapModuleTag(part);
+            }
+            return "";
+        }
+
+        private static string MapModuleTag(string moduleTag)
+        {
+            var norm = (moduleTag ?? "").Trim().ToLowerInvariant();
+            return norm switch
+            {
+                "parser" => "Obj.Commands.ObjectsMapFields",
+                "honorarios" => "Obj.Honorarios.HonorariosFacade",
+                "repairer" => "Obj.ValidationCore.ValidationRepairer",
+                "validator" => "Obj.ValidatorModule.ValidatorFacade",
+                _ => moduleTag
+            };
         }
 
         private static void AddInput(List<string> inputs, string rawValue)
