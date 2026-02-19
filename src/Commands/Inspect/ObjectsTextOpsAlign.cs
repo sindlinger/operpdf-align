@@ -834,7 +834,7 @@ namespace Obj.Commands
                     if (!ReturnUtils.IsEnabled())
                     {
                         PrintPipelineStep(
-                            "passo 3.6/4 - probe pós-extração",
+                            "passo 3.7/4 - probe pós-extração",
                             "passo 4/4 - saída e resumo",
                             ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
                             ("probe_side", sideKey),
@@ -1488,7 +1488,7 @@ namespace Obj.Commands
             {
                 PrintPipelineStep(
                     "passo 3.4/4 - honorários aplicado",
-                    "passo 3.5/4 - validação documental",
+                    "passo 3.5/4 - reparador",
                     ("modulo", "Obj.Honorarios.HonorariosFacade (Backfill + Enricher)"),
                     ("changed_keys_a", DescribeChangedKeys(beforeHonorariosA, valuesA)),
                     ("changed_keys_b", DescribeChangedKeys(beforeHonorariosB, valuesB)),
@@ -1508,6 +1508,32 @@ namespace Obj.Commands
             }
 
             var catalog = ValidatorFacade.GetPeritoCatalog(null);
+            var beforeRepairA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
+            var beforeRepairB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
+            var repairA = Obj.ValidationCore.ValidationRepairer.ApplyWithValidatorRules(valuesA, outputDocType, catalog);
+            var repairB = Obj.ValidationCore.ValidationRepairer.ApplyWithValidatorRules(valuesB, outputDocType, catalog);
+            MarkModuleChanges(beforeRepairA, valuesA, fieldsA, "repairer");
+            MarkModuleChanges(beforeRepairB, valuesB, fieldsB, "repairer");
+
+            if (verbose)
+            {
+                PrintPipelineStep(
+                    "passo 3.5/4 - reparador",
+                    "passo 3.6/4 - validação documental",
+                    ("modulo", "Obj.ValidationCore.ValidationRepairer"),
+                    ("repair_apply_a", repairA.Applied.ToString().ToLowerInvariant()),
+                    ("repair_apply_b", repairB.Applied.ToString().ToLowerInvariant()),
+                    ("repair_changed_a", Obj.ValidationCore.ValidationRepairer.DescribeChangedFields(repairA.ChangedFields)),
+                    ("repair_changed_b", Obj.ValidationCore.ValidationRepairer.DescribeChangedFields(repairB.ChangedFields)),
+                    ("repair_ok_a", repairA.Ok.ToString().ToLowerInvariant()),
+                    ("repair_reason_a", string.IsNullOrWhiteSpace(repairA.Reason) ? "(ok)" : repairA.Reason),
+                    ("repair_ok_b", repairB.Ok.ToString().ToLowerInvariant()),
+                    ("repair_reason_b", string.IsNullOrWhiteSpace(repairB.Reason) ? "(ok)" : repairB.Reason),
+                    ("repair_legacy_mirror_a", repairA.LegacyMirrorMatchesCore ? "match" : "mismatch"),
+                    ("repair_legacy_mirror_b", repairB.LegacyMirrorMatchesCore ? "match" : "mismatch")
+                );
+            }
+
             var beforeValidatorA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeValidatorB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
             var okA = ValidatorFacade.ApplyAndValidateDocumentValues(valuesA, outputDocType, catalog, out var reasonA, out var validatorChangedA);
@@ -1528,7 +1554,7 @@ namespace Obj.Commands
             if (verbose)
             {
                 PrintPipelineStep(
-                    "passo 3.5/4 - validação",
+                    "passo 3.6/4 - validação",
                     "passo 4/4 - resumo colorido e persistência",
                     ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
                     ("changed_keys_validator_a_apply", validatorChangedA == null || validatorChangedA.Count == 0
@@ -1606,7 +1632,9 @@ namespace Obj.Commands
                         ["3_2_crop"] = "ObjectsTextOpsAlign.BuildValueFullFromBlocks",
                         ["3_3_yaml_parser"] = "Obj.Commands.ObjectsMapFields",
                         ["3_4_honorarios"] = "Obj.Honorarios.HonorariosFacade",
-                        ["3_5_validator"] = "Obj.ValidatorModule.ValidatorFacade",
+                        ["3_5_repairer"] = "Obj.ValidationCore.ValidationRepairer",
+                        ["3_6_validator"] = "Obj.ValidatorModule.ValidatorFacade",
+                        ["3_7_probe_optional"] = "Obj.RootProbe.ExtractionProbeModule",
                         ["4_output"] = "ObjectsTextOpsAlign + JsonSerializer"
                     },
                     ["merge_policy"] = dualBand ? "front_head prioridade; back_tail preenche apenas campos vazios" : "single_band",
@@ -1630,6 +1658,21 @@ namespace Obj.Commands
                     ["reason_pair"] = reasonPair,
                     ["reason_a"] = reasonA ?? "",
                     ["reason_b"] = reasonB ?? ""
+                },
+                ["repairer"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["enabled"] = true,
+                    ["module"] = "Obj.ValidationCore.ValidationRepairer",
+                    ["apply_a"] = repairA.Applied,
+                    ["apply_b"] = repairB.Applied,
+                    ["ok_a"] = repairA.Ok,
+                    ["ok_b"] = repairB.Ok,
+                    ["reason_a"] = repairA.Reason,
+                    ["reason_b"] = repairB.Reason,
+                    ["changed_a"] = repairA.ChangedFields,
+                    ["changed_b"] = repairB.ChangedFields,
+                    ["legacy_mirror_a"] = repairA.LegacyMirrorMatchesCore,
+                    ["legacy_mirror_b"] = repairB.LegacyMirrorMatchesCore
                 },
                 ["honorarios"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
