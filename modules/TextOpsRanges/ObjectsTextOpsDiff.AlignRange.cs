@@ -48,6 +48,13 @@ namespace Obj.Align
         private static string NormalizeForSimilarity(string text)
         {
             text = CollapseSpaces(NormalizeBlockToken(text));
+            var useSemanticHint = HasExplicitAnchorMarker(text) || IsAnchorModelCue(text);
+            if (useSemanticHint)
+            {
+                var anchorHint = TryAnchorSemanticHint(text);
+                if (!string.IsNullOrWhiteSpace(anchorHint))
+                    text = anchorHint;
+            }
             if (string.IsNullOrEmpty(text))
                 return "";
             var sb = new StringBuilder(text.Length);
@@ -59,6 +66,110 @@ namespace Obj.Align
                     sb.Append(char.ToLowerInvariant(c));
             }
             return sb.ToString();
+        }
+
+        private static bool HasExplicitAnchorMarker(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            if (Regex.IsMatch(text, "<\\s*[A-Za-z_][A-Za-z0-9_]*\\s*>", RegexOptions.CultureInvariant))
+                return true;
+
+            return text.IndexOf("ANC_", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("[ANC", StringComparison.OrdinalIgnoreCase) >= 0
+                || text.IndexOf("ANC ", StringComparison.OrdinalIgnoreCase) == 0;
+        }
+
+        private static string TryAnchorSemanticHint(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return "";
+
+            var s = RemoveDiacritics(text).ToUpperInvariant();
+            var compact = new StringBuilder(s.Length);
+            foreach (var c in s)
+            {
+                if (char.IsLetterOrDigit(c) || c == '_')
+                    compact.Append(c);
+            }
+
+            var token = compact.ToString();
+            if (string.IsNullOrWhiteSpace(token))
+                return "";
+
+            // Captura variantes como [ANC_*], ANC_*, ANC*** com espaçamento/OCR ruidoso.
+            var idx = token.IndexOf("ANC", StringComparison.Ordinal);
+            if (idx >= 0)
+                token = token.Substring(idx + 3).Trim('_');
+
+            if (token.Length == 0)
+                return "";
+
+            if (token.Contains("PROCESSOADMIN", StringComparison.Ordinal) || token.Contains("PROCESSO_ADMIN", StringComparison.Ordinal))
+                return "processo administrativo";
+            if (token.Contains("PROCESSOJUDICIAL", StringComparison.Ordinal) || token.Contains("PROCESSO_JUDICIAL", StringComparison.Ordinal))
+                return "processo judicial";
+            if (token.Contains("VARA", StringComparison.Ordinal))
+                return "vara";
+            if (token.Contains("COMARCA", StringComparison.Ordinal))
+                return "comarca";
+            if (token.Contains("CPF", StringComparison.Ordinal))
+                return "cpf";
+            if (token.Contains("PERITO", StringComparison.Ordinal))
+                return "perito";
+            if (token.Contains("PROMOVENTE", StringComparison.Ordinal))
+                return "movido por";
+            if (token.Contains("PROMOVIDO", StringComparison.Ordinal))
+                return "em face de";
+            if (token.Contains("ESPECIALIDADE", StringComparison.Ordinal))
+                return "especialidade";
+            if (token.Contains("ESPECIE", StringComparison.Ordinal) || token.Contains("PERICIA", StringComparison.Ordinal))
+                return "pericia";
+            if (token.Contains("VALOR", StringComparison.Ordinal))
+                return "valor r";
+            if (token.Contains("TRIBUNAL", StringComparison.Ordinal))
+                return "tribunal de justica";
+            if (token.Contains("DIRETORIA", StringComparison.Ordinal))
+                return "diretoria especial";
+            if (token.Contains("ASSINATURA", StringComparison.Ordinal))
+                return "assinatura";
+            if (token.Contains("ENCAMINHE", StringComparison.Ordinal))
+                return "encaminhe se";
+            if (token.Contains("DATA", StringComparison.Ordinal))
+                return "data";
+
+            return "";
+        }
+
+        private static bool IsAnchorModelCue(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            var s = RemoveDiacritics(text).ToLowerInvariant();
+            s = Regex.Replace(s, @"[^a-z0-9_ ]", " ");
+            s = Regex.Replace(s, @"\s+", " ").Trim();
+            if (s.Length == 0)
+                return false;
+
+            if (s.Contains("anc", StringComparison.Ordinal))
+                return true;
+            if (s.Length > 44)
+                return false;
+
+            return s == "vara"
+                || s == "comarca"
+                || s == "cpf"
+                || s == "perito"
+                || s == "especialidade"
+                || s == "pericia"
+                || s == "processo administrativo"
+                || s == "processo judicial"
+                || s == "movido por"
+                || s == "em face de"
+                || s == "valor r"
+                || s == "data";
         }
 
         private static double ComputeSimilarity(string a, string b)
@@ -802,7 +913,13 @@ namespace Obj.Align
             else
             {
                 // Auto anchors (mutual best) to avoid random alignments.
-                var minLen = minLenRatio > 0 ? Math.Max(0.3, minLenRatio) : 0.3;
+                var anchorCueRateA = normA.Count == 0
+                    ? 0.0
+                    : normA.Count(IsAnchorModelCue) / (double)normA.Count;
+                var anchorMode = anchorCueRateA >= 0.25;
+                var minLen = minLenRatio > 0
+                    ? (anchorMode ? Math.Max(0.02, minLenRatio * 0.35) : Math.Max(0.3, minLenRatio))
+                    : (anchorMode ? 0.08 : 0.3);
                 anchors = BuildAnchorPairsAuto(normA, normB, minLen, out autoMaxSim);
             }
 
@@ -875,7 +992,8 @@ namespace Obj.Align
                     if (minSim > 0 && sim < minSim)
                         continue;
                     var lenRatio = ComputeLenRatio(normA[i], normB[j]);
-                    if (minLenRatio > 0 && lenRatio < minLenRatio)
+                    var anchorCue = IsAnchorModelCue(normA[i]) || IsAnchorModelCue(normB[j]);
+                    if (minLenRatio > 0 && lenRatio < minLenRatio && !anchorCue)
                         continue;
                     candidates.Add(new AnchorPair { AIndex = i, BIndex = j, Score = sim });
                 }
@@ -967,7 +1085,13 @@ namespace Obj.Align
                 }
             }
 
-            var threshold = Math.Max(0.35, maxSim - 0.15);
+            var anchorCueRateA = normA.Count == 0
+                ? 0.0
+                : normA.Count(IsAnchorModelCue) / (double)normA.Count;
+            var anchorMode = anchorCueRateA >= 0.25;
+            var threshold = anchorMode
+                ? Math.Max(0.10, maxSim - 0.30)
+                : Math.Max(0.35, maxSim - 0.15);
             var candidates = new List<AnchorPair>();
             for (int i = 0; i < normA.Count; i++)
             {
@@ -977,10 +1101,12 @@ namespace Obj.Align
                 if (bestIdxB[j] != i)
                     continue;
                 var sim = bestSimA[i];
-                if (sim < threshold)
+                var anchorCue = IsAnchorModelCue(normA[i]) || IsAnchorModelCue(normB[j]);
+                var localThreshold = anchorCue ? Math.Min(threshold, 0.12) : threshold;
+                if (sim < localThreshold)
                     continue;
                 var lenRatio = ComputeLenRatio(normA[i], normB[j]);
-                if (lenRatio < minLenRatio)
+                if (lenRatio < minLenRatio && !anchorCue)
                     continue;
                 candidates.Add(new AnchorPair { AIndex = i, BIndex = j, Score = sim });
             }
@@ -1078,14 +1204,17 @@ namespace Obj.Align
                     var withinBand = band <= 0 || Math.Abs(i - j) <= band;
                     var aIdx = startA + (i - 1);
                     var bIdx = startB + (j - 1);
+                    var anchorCueA = IsAnchorModelCue(normA[aIdx]);
                     var sim = ComputeAlignmentSimilarity(normA[aIdx], normB[bIdx]);
                     var lenRatio = ComputeLenRatio(normA[aIdx], normB[bIdx]);
                     var scoreDiag = negInf;
+                    var effectiveMinSim = anchorCueA ? Math.Min(minSim, 0.08) : minSim;
+                    var lenOk = (minLenRatio <= 0 || lenRatio >= minLenRatio || anchorCueA);
                     if (withinBand &&
-                        sim >= minSim &&
-                        (minLenRatio <= 0 || lenRatio >= minLenRatio))
+                        sim >= effectiveMinSim &&
+                        lenOk)
                     {
-                        var penalty = lenPenalty > 0 ? (1.0 - lenRatio) * lenPenalty : 0.0;
+                        var penalty = (lenPenalty > 0 && !anchorCueA) ? (1.0 - lenRatio) * lenPenalty : 0.0;
                         scoreDiag = dp[i - 1, j - 1] + sim - penalty;
                     }
                     var scoreUp = dp[i - 1, j] + gapPenalty;

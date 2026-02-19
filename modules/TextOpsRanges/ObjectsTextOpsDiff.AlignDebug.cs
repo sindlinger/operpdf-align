@@ -43,6 +43,8 @@ namespace Obj.Align
             public string Label { get; set; } = "";
             public string PdfA { get; set; } = "";
             public string PdfB { get; set; } = "";
+            public string RoleA { get; set; } = "";
+            public string RoleB { get; set; } = "";
             public int PageA { get; set; }
             public int PageB { get; set; }
             public int ObjA { get; set; }
@@ -65,6 +67,8 @@ namespace Obj.Align
             public AlignDebugRange RangeA { get; set; } = new AlignDebugRange();
             public AlignDebugRange RangeB { get; set; } = new AlignDebugRange();
             public object? Extraction { get; set; }
+            public Dictionary<string, object>? ReturnInfo { get; set; }
+            public Dictionary<string, object>? ReturnView { get; set; }
         }
 
         internal static AlignDebugReport? ComputeAlignDebugForSelection(
@@ -156,7 +160,10 @@ namespace Obj.Align
             {
                 if (align.AIndex >= 0 && align.BIndex >= 0)
                 {
-                    var same = string.Equals(normA[align.AIndex], normB[align.BIndex], StringComparison.Ordinal);
+                    var same = string.Equals(
+                        NormalizeForFixedComparison(blocksA[align.AIndex].Text),
+                        NormalizeForFixedComparison(blocksB[align.BIndex].Text),
+                        StringComparison.OrdinalIgnoreCase);
                     if (same)
                     {
                         report.FixedPairs.Add(new AlignDebugPair
@@ -240,6 +247,14 @@ namespace Obj.Align
                 MaxTokenLen = block.MaxTokenLen,
                 OpsLabel = block.OpsLabel ?? ""
             };
+        }
+
+        private static string NormalizeForFixedComparison(string? text)
+        {
+            var normalized = CollapseSpaces(NormalizeBlockToken(text ?? ""));
+            if (string.IsNullOrWhiteSpace(normalized))
+                return "";
+            return TextUtils.NormalizeWhitespace(TextUtils.FixMissingSpaces(normalized));
         }
 
         private static void AddVariable(SelfBlock block, ref VariableRange range, List<AlignDebugBlock> list)
