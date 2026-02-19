@@ -1,0 +1,209 @@
+﻿{
+  "source_pdf": "C:\\git\\operpdf-textopsalign\\reference\\models\\tjpb_despacho_model.pdf",
+  "output_pdf": "C:\\git\\operpdf-textopsalign\\reference\\models\\tjpb_despacho_anchor_model.pdf",
+  "generated_at_utc": "2026-02-19T04:47:09.2721190Z",
+  "anchors_total": 27,
+  "pages": [
+    {
+      "page": 1,
+      "count": 14,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICIARIO TRIBUNAL DE JUSTICA DA PARAIBA",
+          "x": 48,
+          "y": 739.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL - TRIBUNAL DE JUSTICA",
+          "x": 48,
+          "y": 726.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL",
+          "x": 48,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROCESSO",
+          "text": "PROCESSO N\u00BA \u003CPROCESSO_ADMINISTRATIVO\u003E",
+          "x": 48,
+          "y": 661.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "REQUERENTE: JUIZO DA \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E",
+          "x": 48,
+          "y": 648.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "REQUERENTE: JUIZO DA \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E",
+          "x": 48,
+          "y": 648.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "INTERESSADO: \u003CPERITO\u003E - \u003CESPECIALIDADE\u003E",
+          "x": 48,
+          "y": 635.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "INTERESSADO: \u003CPERITO\u003E - \u003CESPECIALIDADE\u003E",
+          "x": 48,
+          "y": 635.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "NO VALOR DE R$ \u003CVALOR_ARBITRADO_JZ\u003E, ARBITRADOS EM FAVOR DO PERITO \u003CPERITO\u003E,",
+          "x": 48,
+          "y": 596.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_CPF",
+          "text": "CPF \u003CCPF_PERITO\u003E, PARA REALIZACAO DE PERICIA \u003CESPECIE_DA_PERICIA\u003E NOS AUTOS DO PROCESSO N\u00BA \u003CPROCESSO_JUDICIAL\u003E,",
+          "x": 48,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_MOVIDO_POR",
+          "text": "MOVIDO POR \u003CPROMOVENTE\u003E, EM FACE DE \u003CPROMOVIDO\u003E, EM CURSO PERANTE A \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E.",
+          "x": 48,
+          "y": 570.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_EM_FACE_DE",
+          "text": "MOVIDO POR \u003CPROMOVENTE\u003E, EM FACE DE \u003CPROMOVIDO\u003E, EM CURSO PERANTE A \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E.",
+          "x": 48,
+          "y": 570.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "MOVIDO POR \u003CPROMOVENTE\u003E, EM FACE DE \u003CPROMOVIDO\u003E, EM CURSO PERANTE A \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E.",
+          "x": 48,
+          "y": 570.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "MOVIDO POR \u003CPROMOVENTE\u003E, EM FACE DE \u003CPROMOVIDO\u003E, EM CURSO PERANTE A \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E.",
+          "x": 48,
+          "y": 570.71625,
+          "height": 9.712524
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "count": 13,
+      "anchors": [
+        {
+          "label": "ANC_ENCAMINHE",
+          "text": "QUE DELEGOU ATRIBUICOES AO DIRETOR ESPECIAL, ENCAMINHEM-SE OS PRESENTES AUTOS A GERENCIA DE",
+          "x": 48,
+          "y": 739.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "QUE DELEGOU ATRIBUICOES AO DIRETOR ESPECIAL, ENCAMINHEM-SE OS PRESENTES AUTOS A GERENCIA DE",
+          "x": 48,
+          "y": 739.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "PROCEDER A RESERVA ORCAMENTARIA, NO VALOR SOLICITADO DE R$ \u003CVALOR_ARBITRADO_DE\u003E, ARBITRADO EM FAVOR DO PERITO \u003CPERITO\u003E,",
+          "x": 48,
+          "y": 713.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROCESSO",
+          "text": "CPF \u003CCPF_PERITO\u003E, PARA REALIZACAO DE PERICIA \u003CESPECIE_DA_PERICIA\u003E NOS AUTOS DO PROCESSO N\u00BA \u003CPROCESSO_JUDICIAL\u003E, MOVIDO POR",
+          "x": 48,
+          "y": 700.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "CPF \u003CCPF_PERITO\u003E, PARA REALIZACAO DE PERICIA \u003CESPECIE_DA_PERICIA\u003E NOS AUTOS DO PROCESSO N\u00BA \u003CPROCESSO_JUDICIAL\u003E, MOVIDO POR",
+          "x": 48,
+          "y": 700.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_CPF",
+          "text": "CPF \u003CCPF_PERITO\u003E, PARA REALIZACAO DE PERICIA \u003CESPECIE_DA_PERICIA\u003E NOS AUTOS DO PROCESSO N\u00BA \u003CPROCESSO_JUDICIAL\u003E, MOVIDO POR",
+          "x": 48,
+          "y": 700.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_MOVIDO_POR",
+          "text": "CPF \u003CCPF_PERITO\u003E, PARA REALIZACAO DE PERICIA \u003CESPECIE_DA_PERICIA\u003E NOS AUTOS DO PROCESSO N\u00BA \u003CPROCESSO_JUDICIAL\u003E, MOVIDO POR",
+          "x": 48,
+          "y": 700.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_EM_FACE_DE",
+          "text": "\u003CPROMOVENTE\u003E, EM FACE DE \u003CPROMOVIDO\u003E, EM CURSO PERANTE A \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E.",
+          "x": 48,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "\u003CPROMOVENTE\u003E, EM FACE DE \u003CPROMOVIDO\u003E, EM CURSO PERANTE A \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E.",
+          "x": 48,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "\u003CPROMOVENTE\u003E, EM FACE DE \u003CPROMOVIDO\u003E, EM CURSO PERANTE A \u003CVARA\u003E DA COMARCA DE \u003CCOMARCA\u003E.",
+          "x": 48,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "DIRETORIA ESPECIAL DO TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA, EM JOAO PESSOA, \u003CDATA_DESPESA\u003E.",
+          "x": 48,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL DO TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA, EM JOAO PESSOA, \u003CDATA_DESPESA\u003E.",
+          "x": 48,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "DIRETOR ESPECIAL",
+          "x": 48,
+          "y": 557.71625,
+          "height": 9.712524
+        }
+      ]
+    }
+  ]
+}

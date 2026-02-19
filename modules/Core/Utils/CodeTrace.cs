@@ -38,15 +38,25 @@ namespace Obj.Utils
             },
             ["textopsvar"] = new[]
             {
+                "src/Commands/Inspect/ObjectsTextOpsAlign.cs",
                 "modules/TextOpsRanges/ObjectsTextOpsDiff.cs",
                 "modules/TextOpsRanges/ObjectsTextOpsDiff.Helpers.cs",
-                "modules/TextOpsRanges/ObjectsTextOpsDiff.SelfBlocks.cs"
+                "modules/TextOpsRanges/ObjectsTextOpsDiff.SelfBlocks.cs",
+                "modules/HonorariosModule/HonorariosFacade.cs",
+                "modules/ValidationCore/Rules/FieldValidationRules.cs",
+                "modules/ValidationCore/Engine/ValidationEngine.cs",
+                "modules/ValidationCore/Docs/DocumentRuleSet.cs"
             },
             ["textopsfixed"] = new[]
             {
+                "src/Commands/Inspect/ObjectsTextOpsAlign.cs",
                 "modules/TextOpsRanges/ObjectsTextOpsDiff.cs",
                 "modules/TextOpsRanges/ObjectsTextOpsDiff.Helpers.cs",
-                "modules/TextOpsRanges/ObjectsTextOpsDiff.SelfBlocks.cs"
+                "modules/TextOpsRanges/ObjectsTextOpsDiff.SelfBlocks.cs",
+                "modules/HonorariosModule/HonorariosFacade.cs",
+                "modules/ValidationCore/Rules/FieldValidationRules.cs",
+                "modules/ValidationCore/Engine/ValidationEngine.cs",
+                "modules/ValidationCore/Docs/DocumentRuleSet.cs"
             },
             ["textopsdiff"] = new[]
             {
@@ -57,7 +67,11 @@ namespace Obj.Utils
             ["textopsalign"] = new[]
             {
                 "src/Commands/Inspect/ObjectsTextOpsAlign.cs",
-                "modules/Align/ObjectsTextOpsAlign.cs"
+                "modules/Align/ObjectsTextOpsAlign.cs",
+                "modules/HonorariosModule/HonorariosFacade.cs",
+                "modules/ValidationCore/Rules/FieldValidationRules.cs",
+                "modules/ValidationCore/Engine/ValidationEngine.cs",
+                "modules/ValidationCore/Docs/DocumentRuleSet.cs"
             },
             ["objdiff"] = new[]
             {

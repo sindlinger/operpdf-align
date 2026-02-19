@@ -271,7 +271,10 @@ namespace Obj.Utils
                 if (files.Count == 0)
                     return value;
                 if (invalidCount > 0)
-                    Console.Error.WriteLine($"[INDEX {key}] ignorados {invalidCount} arquivos invalidos");
+                {
+                    if (!ReturnUtils.IsEnabled())
+                        Console.Error.WriteLine($"[INDEX {key}] ignorados {invalidCount} arquivos invalidos");
+                }
             }
 
             var resolvedList = new List<string>();
@@ -280,12 +283,14 @@ namespace Obj.Utils
             {
                 if (i < 1 || i > files.Count)
                 {
-                    Console.Error.WriteLine($"[INDEX {key}] Indice invalido: {i}. Total arquivos: {files.Count}");
+                    if (!ReturnUtils.IsEnabled())
+                        Console.Error.WriteLine($"[INDEX {key}] Indice invalido: {i}. Total arquivos: {files.Count}");
                     continue;
                 }
 
                 var selectedPath = files[i - 1];
-                Console.Error.WriteLine($"[INDEX {key}] pick {i}/{files.Count} -> {selectedPath}");
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine($"[INDEX {key}] pick {i}/{files.Count} -> {selectedPath}");
                 resolvedList.Add(selectedPath);
             }
 
@@ -527,7 +532,8 @@ namespace Obj.Utils
 
             if (pick < 1 || pick > pdfs.Count)
             {
-                Console.Error.WriteLine($"[DEV] Indice invalido: {pick}. Total PDFs: {pdfs.Count}");
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine($"[DEV] Indice invalido: {pick}. Total PDFs: {pdfs.Count}");
                 return value;
             }
 
@@ -535,11 +541,20 @@ namespace Obj.Utils
                 return value;
 
             if (skipped > 0)
-                Console.Error.WriteLine($"[DEV] pick {pick}/{pdfs.Count} (skip {skipped} invalid -> {selectedIndex + 1}) -> {selected}");
+            {
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine($"[DEV] pick {pick}/{pdfs.Count} (skip {skipped} invalid -> {selectedIndex + 1}) -> {selected}");
+            }
             else if (fallbackBack)
-                Console.Error.WriteLine($"[DEV] pick {pick}/{pdfs.Count} (fallback -> {selectedIndex + 1}) -> {selected}");
+            {
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine($"[DEV] pick {pick}/{pdfs.Count} (fallback -> {selectedIndex + 1}) -> {selected}");
+            }
             else
-                Console.Error.WriteLine($"[DEV] pick {pick}/{pdfs.Count} -> {selected}");
+            {
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine($"[DEV] pick {pick}/{pdfs.Count} -> {selected}");
+            }
 
             return selected;
         }

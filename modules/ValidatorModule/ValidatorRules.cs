@@ -119,7 +119,7 @@ namespace Obj.ValidatorModule
             if (containsEspecialidadeToken != null && containsEspecialidadeToken(value))
                 return true;
             var v = TextUtils.RemoveDiacritics(value).ToLowerInvariant();
-            return Regex.IsMatch(v, @"\b(engenhar|arquitet|psicolog|psiquiatr|medic|fonoaud|fisioterap|odont|contador|assistente\s+social|grafotec|economist|administrador|biolog|quimic|farmac|ortoped|cardiolog|neurolog|nutricion|terapeuta)\b");
+            return Regex.IsMatch(v, @"\b(engenheir\w*|engenhar\w*|arquitet\w*|psicolog\w*|psiquiatr\w*|medic\w*|fonoaud\w*|fisioterap\w*|odont\w*|contador\w*|assistente\s+social|grafotec\w*|economist\w*|administrador\w*|biolog\w*|quimic\w*|farmac\w*|ortoped\w*|cardiolog\w*|neurolog\w*|nutricion\w*|terapeut\w*|seguranca\s+do\s+trabalho)\b");
         }
 
         public static bool LooksLikePartyValue(
@@ -255,13 +255,36 @@ namespace Obj.ValidatorModule
             if (field.Equals("ESPECIALIDADE", StringComparison.OrdinalIgnoreCase) ||
                 field.Equals("ESPECIE_DA_PERICIA", StringComparison.OrdinalIgnoreCase))
             {
-                if (ContainsEmail(value)) return false;
-                if (ContainsCpfPattern(value)) return false;
-                if (ContainsProcessualNoise(value)) return false;
-                if (LooksLikePersonNameLoose(value)) return false;
-                if (especialidadeValidator != null)
-                    return especialidadeValidator(value);
-                return LooksLikeEspecialidadeFallback(value);
+                var hasEmail = ContainsEmail(value);
+                var hasCpf = ContainsCpfPattern(value);
+                var hasNoise = ContainsProcessualNoise(value);
+                var looksPerson = LooksLikePersonNameLoose(value);
+                if (hasEmail || hasCpf || hasNoise || looksPerson)
+                {
+                    if (Environment.GetEnvironmentVariable("OPERPDF_VAL_DEBUG") == "1")
+                        Console.WriteLine($"[VALDBG-legacy] field={field} reject email={hasEmail} cpf={hasCpf} noise={hasNoise} person={looksPerson} value=\"{TextUtils.NormalizeWhitespace(value)}\"");
+                    return false;
+                }
+
+                if (especialidadeValidator != null && especialidadeValidator(value))
+                {
+                    if (Environment.GetEnvironmentVariable("OPERPDF_VAL_DEBUG") == "1")
+                        Console.WriteLine($"[VALDBG-legacy] field={field} accept=external_validator value=\"{TextUtils.NormalizeWhitespace(value)}\"");
+                    return true;
+                }
+
+                if (LooksLikeEspecialidadeFallback(value))
+                {
+                    if (Environment.GetEnvironmentVariable("OPERPDF_VAL_DEBUG") == "1")
+                        Console.WriteLine($"[VALDBG-legacy] field={field} accept=fallback_regex value=\"{TextUtils.NormalizeWhitespace(value)}\"");
+                    return true;
+                }
+
+                var fallback = TextUtils.NormalizeWhitespace(value);
+                var okLoose = fallback.Length >= 4 && Regex.IsMatch(fallback, @"[\p{L}]");
+                if (Environment.GetEnvironmentVariable("OPERPDF_VAL_DEBUG") == "1")
+                    Console.WriteLine($"[VALDBG-legacy] field={field} accept=loose:{okLoose.ToString().ToLowerInvariant()} value=\"{fallback}\"");
+                return okLoose;
             }
 
             if (field.Equals("COMARCA", StringComparison.OrdinalIgnoreCase))
@@ -285,7 +308,7 @@ namespace Obj.ValidatorModule
         {
             if (string.IsNullOrWhiteSpace(value)) return false;
             var v = TextUtils.RemoveDiacritics(value).ToLowerInvariant();
-            return Regex.IsMatch(v, @"\b(engenhar|arquitet|psicolog|psiquiatr|medic|fonoaud|fisioterap|odont|contador|assistente\s+social|grafotec|economist|administrador|biolog|quimic|farmac|ortoped|cardiolog|neurolog|nutricion|terapeuta)\b");
+            return Regex.IsMatch(v, @"\b(engenheir\w*|engenhar\w*|arquitet\w*|psicolog\w*|psiquiatr\w*|medic\w*|fonoaud\w*|fisioterap\w*|odont\w*|contador\w*|assistente\s+social|grafotec\w*|economist\w*|administrador\w*|biolog\w*|quimic\w*|farmac\w*|ortoped\w*|cardiolog\w*|neurolog\w*|nutricion\w*|terapeut\w*|seguranca\s+do\s+trabalho)\b");
         }
 
         public static bool LooksLikePersonNameLoose(string text)

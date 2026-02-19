@@ -1,0 +1,1602 @@
+﻿{
+  "source_pdf": "/mnt/c/Users/pichau/Desktop/geral_pdf/quarentena/2021042181.pdf",
+  "output_pdf": "/mnt/c/git/operpdf-textopsalign/reference/models/2021042181_anchor_lines.pdf",
+  "generated_at_utc": "2026-02-19T06:09:54.5399239Z",
+  "anchors_total": 202,
+  "pages": [
+    {
+      "page": 1,
+      "count": 7,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Poder Judici\u00E1rio",
+          "x": 261.8,
+          "y": 668.83,
+          "height": 9
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "PROCESSO n\u00BA 2021042181   (PA-TJ)",
+          "x": 182.03995,
+          "y": 535.245,
+          "height": 13.5
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "PROCESSO n\u00BA 2021042181   (PA-TJ)",
+          "x": 276.03995,
+          "y": 535.245,
+          "height": 13.5
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Assunto: HONOR\u00C1RIOS PERICIAIS - REQUISI\u00C7\u00C3O DE HONOR\u00C1RIOS PERICIAIS EM FAVOR DA PERITA",
+          "x": 35.999954,
+          "y": 448.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "DA 3\u00BA VARA DE FAM\u00CDLIA DA COMARCA DE CAMPINA GRANDE - PB",
+          "x": 35.999954,
+          "y": 418.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "DA 3\u00BA VARA DE FAM\u00CDLIA DA COMARCA DE CAMPINA GRANDE - PB",
+          "x": 99.999954,
+          "y": 418.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Data da Autua\u00E7\u00E3o: 06/04/2021",
+          "x": 35.999954,
+          "y": 403.93,
+          "height": 9.25
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "count": 12,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO",
+          "x": 250.17699,
+          "y": 720.0208,
+          "height": 10.798279
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "COMARCA DE CAMPINA GRANDE",
+          "x": 216.85681,
+          "y": 696.00964,
+          "height": 10.798279
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "REU: DENISE SANT",
+          "x": 35.002785,
+          "y": 551.9427,
+          "height": 10.798279
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Jo\u00E3o Pessoa-PB",
+          "x": 35.002785,
+          "y": 431.88696,
+          "height": 10.798248
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "TUREZA DA A\u00C7\u00C3O:",
+          "x": 48.367638,
+          "y": 119.7419,
+          "height": 10.798264
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "A\u00E7\u00E3o de Guarda Unilateral",
+          "x": 155.56764,
+          "y": 119.7419,
+          "height": 10.798264
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "ara de Fam\u00EDlia da Comarca de Campina Grande",
+          "x": 240.88373,
+          "y": 100.232864,
+          "height": 10.798264
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF/CNPJ:",
+          "x": 223.1058,
+          "y": 80.72377,
+          "height": 10.798264
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "R\u00C9U(S):",
+          "x": 35.002785,
+          "y": 61.214737,
+          "height": 10.798264
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF/CNPJ:",
+          "x": 203.35054,
+          "y": 61.214737,
+          "height": 10.798264
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 1 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.20559.77161.63443.01941-0",
+          "x": 574.216,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 1 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.20559.77161.63443.01941-0",
+          "x": 668.216,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "count": 5,
+      "anchors": [
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF:",
+          "x": 35.002785,
+          "y": 624.72656,
+          "height": 10.798279
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "Assistente Social",
+          "x": 96.50792,
+          "y": 590.9609,
+          "height": 10.798279
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 1 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.20559.77161.63443.01941-0",
+          "x": 574.216,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 1 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.20559.77161.63443.01941-0",
+          "x": 668.216,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 1 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.20559.77161.63443.01941-0",
+          "x": 775.416,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "count": 6,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Poder Judici\u00E1rio",
+          "x": 228.39038,
+          "y": 673.2069,
+          "height": 7.7095337
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "3\u00AA Vara de Fam\u00EDlia de Campina Grande",
+          "x": 208.78928,
+          "y": 661.4164,
+          "height": 7.7095337
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: FABIO JOSE DE OLIVEIRA ARAUJO - 28/02/2018 14:34:46",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 2 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 2 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 2 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "count": 7,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Poder Judici\u00E1rio",
+          "x": 228.39038,
+          "y": 673.2069,
+          "height": 7.7095337
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "3\u00AA Vara de Fam\u00EDlia de Campina Grande",
+          "x": 208.78928,
+          "y": 661.4164,
+          "height": 7.7095337
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Com a apresenta\u00E7\u00E3o do estudo social, ser\u00E1 designada audi\u00EAncia.",
+          "x": 56.90036,
+          "y": 246.709,
+          "height": 7.7095337
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: ROSIMEIRE VENTURA LEITE - 03/12/2020 18:13:53",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 2 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 2 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 2 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "count": 12,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO",
+          "x": 229.8049,
+          "y": 663.3507,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "COMARCA DE CAMPINA GRANDE",
+          "x": 193.76555,
+          "y": 639.40063,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "3\u00AA VARA DE FAM\u00CDLIA - CART\u00D3RIO UNIFICADO",
+          "x": 162.16302,
+          "y": 615.45056,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "PROCESSO N\u00BA 0802011-45.2018.8.15.0001",
+          "x": 56.90036,
+          "y": 543.9605,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "PROCESSO N\u00BA 0802011-45.2018.8.15.0001",
+          "x": 150.90036,
+          "y": 543.9605,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "AUTOR: TIAGO DA SILVA MARTINS",
+          "x": 56.90036,
+          "y": 520.0016,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "REU: DENISE SANTOS DE MELO",
+          "x": 56.90036,
+          "y": 496.05154,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "(Documento assinado eletronicamente)",
+          "x": 198.90524,
+          "y": 259.0634,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "(Documento assinado eletronicamente)",
+          "x": 275.30524,
+          "y": 259.0634,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: ALINE ARAUJO DE MELO COSTA - 18/02/2021 16:51:04",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 2 p\u00E1gina 3 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 2 p\u00E1gina 3 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 7,
+      "count": 4,
+      "anchors": [
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: ALINE ARAUJO DE MELO COSTA - 18/02/2021 16:51:05",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 2 p\u00E1gina 4 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 2 p\u00E1gina 4 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 2 p\u00E1gina 4 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 8,
+      "count": 4,
+      "anchors": [
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: ALINE ARAUJO DE MELO COSTA - 18/02/2021 16:51:05",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 2 p\u00E1gina 5 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 2 p\u00E1gina 5 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 2 p\u00E1gina 5 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 9,
+      "count": 4,
+      "anchors": [
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: ALINE ARAUJO DE MELO COSTA - 18/02/2021 16:51:05",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 2 p\u00E1gina 6 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 2 p\u00E1gina 6 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 2 p\u00E1gina 6 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "count": 4,
+      "anchors": [
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: ALINE ARAUJO DE MELO COSTA - 18/02/2021 16:51:05",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 2 p\u00E1gina 7 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 2 p\u00E1gina 7 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 2 p\u00E1gina 7 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.01388.35443.77161.30559-5",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 11,
+      "count": 16,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO DO ESTADO DA PARA\u00CDBA",
+          "x": 165.81,
+          "y": 647.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL",
+          "x": 233.82,
+          "y": 611.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo n\u00BA.",
+          "x": 36,
+          "y": 446.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Processo n\u00BA.",
+          "x": 130,
+          "y": 446.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Requerente: Ju\u00EDzo da\u00A03\u00AA Vara de Fam\u00EDlia de Campina Grande",
+          "x": 36,
+          "y": 392.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "Interessada:",
+          "x": 36,
+          "y": 374.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "MAURIDETE GRANGEIRO DE BARROS - Assistente Social",
+          "x": 116.8,
+          "y": 374.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "da\u00A0Assistente Social\u00A0MAURIDETE GRANGEIRO DE BARROS, no valor de\u00A01,5 (uma vez e meia) ,",
+          "x": 36,
+          "y": 320.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "da\u00A0Assistente Social\u00A0MAURIDETE GRANGEIRO DE BARROS, no valor de\u00A01,5 (uma vez e meia) ,",
+          "x": 125.6,
+          "y": 320.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "na forma do ANEXO I da Resolu\u00E7\u00E3o n\u00BA 09/2017, deste\u00A0Tribunal,\u00A0tendo em vista a realiza\u00E7\u00E3o de",
+          "x": 36,
+          "y": 302.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "figuram\u00A0como\u00A0autor\u00A0TIAGO DA SILVA MARTINS, CPF\u00A0076.625.764-93\u00A0r\u00E9 DENISE SANTOS DE",
+          "x": 36,
+          "y": 266.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "figuram\u00A0como\u00A0autor\u00A0TIAGO DA SILVA MARTINS, CPF\u00A0076.625.764-93\u00A0r\u00E9 DENISE SANTOS DE",
+          "x": 112.4,
+          "y": 266.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "MELO, CPF 076.514.924-98.",
+          "x": 36,
+          "y": 248.516,
+          "height": 11.099991
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "atendendo ao grau de especializa\u00E7\u00E3o do perito, \u00E0\u00A0complexidade da mat\u00E9ria, o lugar e o tempo",
+          "x": 36,
+          "y": 104.516,
+          "height": 11.099998
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 3 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 3 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "count": 10,
+      "anchors": [
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "assistente social",
+          "x": 316.06506,
+          "y": 749.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "DE BARROS , para realiza\u00E7\u00E3o de estudo social, ultrapassa o valor m\u00E1ximo estabelecido.\u00A0Nesse",
+          "x": 36,
+          "y": 731.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "contexto, o pagamento da despesa fica condicionado \u00E0 aprova\u00E7\u00E3o pelo Conselho da Magistratura,",
+          "x": 36,
+          "y": 713.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_ENCAMINHE",
+          "text": "Encaminhem-se os autos \u00E0 Ger\u00EAncia Judici\u00E1ria (DISTRIBUI\u00C7\u00C3O).",
+          "x": 36,
+          "y": 605.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 9 \u00A0de mar\u00E7o de",
+          "x": 36,
+          "y": 569.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 9 \u00A0de mar\u00E7o de",
+          "x": 103.600006,
+          "y": 569.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 9 \u00A0de mar\u00E7o de",
+          "x": 175.6,
+          "y": 569.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "Robson de Lima Canan\u00E9a \u2013 Diretor Especial em exerc\u00EDcio",
+          "x": 36,
+          "y": 497.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 3 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 3 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 13,
+      "count": 10,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA",
+          "x": 35.999985,
+          "y": 769.8071,
+          "height": 8.625366
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Numera\u00E7\u00E3o        : 02 A 13                                Qtd Vol.Apenso:",
+          "x": 35.999985,
+          "y": 643.80695,
+          "height": 8.625366
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Hist\u00F3rico        : OF.116/2021-JUIZA IEDA MARIA DANTAS, 3\u00AA VARA/FAM",
+          "x": 35.999985,
+          "y": 552.24677,
+          "height": 8.625366
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "C.GRANDE,SOL.PAGAM.HONOR. PERICIA PERITA MAURIDE",
+          "x": 35.999985,
+          "y": 540.72675,
+          "height": 8.625366
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "Autor: TIAGO DA SILVA MARTINS",
+          "x": 35.999985,
+          "y": 495.00677,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "Reu  : DENISE SANTOS DE MELO",
+          "x": 35.999985,
+          "y": 483.4868,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Jo\u00E3o Pessoa, 13 de abril     de 2021",
+          "x": 35.999985,
+          "y": 414.84686,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Responsavel pela Digita\u00E7\u00E3o",
+          "x": 35.999985,
+          "y": 369.00693,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 4 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.72389.38161.02893.01141-2",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 4 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.72389.38161.02893.01141-2",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "count": 11,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA",
+          "x": 35.999985,
+          "y": 678.12695,
+          "height": 8.625366
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "TERMO DE AUTUA\u00C7\u00C3O, REGISTRO E DISTRIBUI\u00C7\u00C3O",
+          "x": 35.999985,
+          "y": 643.80695,
+          "height": 8.625366
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Comarca        : 999 ---------------",
+          "x": 35.999985,
+          "y": 506.40677,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "IDENTIFICACAO DAS PARTES:",
+          "x": 35.999985,
+          "y": 380.52692,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "EXPEDIENTE ORIGINADO DO OF.N.116/2021-JUIZO DA 3A.",
+          "x": 35.999985,
+          "y": 346.08694,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "VARA/FAMILIA/C.GRANDE,SOLICITANDO PAGAMENTO DE HO-",
+          "x": 35.999985,
+          "y": 334.68695,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "NORARIOS PERICIAIS A PERITA MAURIDETE GRANGEIRO DE",
+          "x": 35.999985,
+          "y": 323.167,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "18.815.0001, MOVIDO POR TIAGO DA SILVA MARTINS, EM",
+          "x": 35.999985,
+          "y": 300.367,
+          "height": 8.625336
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "JOAO PESSOA,  13 DE ABRIL     DE  2021",
+          "x": 35.999985,
+          "y": 220.20706,
+          "height": 8.625366
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 5 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.82389.38161.02893.01681-0",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 5 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.82389.38161.02893.01681-0",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 15,
+      "count": 5,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO",
+          "x": 234.134,
+          "y": 735.134,
+          "height": 14.944519
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Jo\u00E3o Pessoa/PB,",
+          "x": 128.94,
+          "y": 384.402,
+          "height": 17.158478
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 6 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.90720.19161.82777.11520-1",
+          "x": 573.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 6 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.90720.19161.82777.11520-1",
+          "x": 667.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 6 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.90720.19161.82777.11520-1",
+          "x": 774.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 16,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 7 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.74430.49161.34094.11616-1",
+          "x": 569.656,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 7 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.74430.49161.34094.11616-1",
+          "x": 663.656,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 7 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.74430.49161.34094.11616-1",
+          "x": 770.856,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 17,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 8 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.85772.43261.31432.11042-3",
+          "x": 574.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 8 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.85772.43261.31432.11042-3",
+          "x": 668.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 8 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.85772.43261.31432.11042-3",
+          "x": 775.776,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 18,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 9 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.83083.65261.82722.11457-3",
+          "x": 574.536,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 9 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.83083.65261.82722.11457-3",
+          "x": 668.536,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 9 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.83083.65261.82722.11457-3",
+          "x": 775.736,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 19,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 10 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11779.27890.16261.18004-8",
+          "x": 574.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 10 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11779.27890.16261.18004-8",
+          "x": 668.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 10 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11779.27890.16261.18004-8",
+          "x": 775.776,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 20,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 11 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.08004.16261.27890.11209-0",
+          "x": 574.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 11 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.08004.16261.27890.11209-0",
+          "x": 668.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 11 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.08004.16261.27890.11209-0",
+          "x": 775.776,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 21,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 12 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.00114.26261.49936.11620-3",
+          "x": 723.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 12 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.00114.26261.49936.11620-3",
+          "x": 817.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 12 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.00114.26261.49936.11620-3",
+          "x": 924.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 22,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 12 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.00114.26261.49936.11620-3",
+          "x": 723.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 12 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.00114.26261.49936.11620-3",
+          "x": 817.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 12 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.00114.26261.49936.11620-3",
+          "x": 924.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 23,
+      "count": 18,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Tribunal de Justi\u00E7a do Estado da Para\u00EDba",
+          "x": 209.47,
+          "y": 648.137,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial",
+          "x": 259.47998,
+          "y": 630.137,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Jo\u00E3o Pessoa, 14 de Julho de 2021.",
+          "x": 35.999985,
+          "y": 558.137,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Mauridete Grangeiro de Barros \u2013 Perita Assistente Social",
+          "x": 35.999985,
+          "y": 504.137,
+          "height": 8.324982
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "Mauridete Grangeiro de Barros \u2013 Perita Assistente Social",
+          "x": 99.999985,
+          "y": 504.137,
+          "height": 8.324982
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Senhora Perita,",
+          "x": 35.999985,
+          "y": 432.137,
+          "height": 8.325012
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Comunico a Vossa Senhoria que o Processo n\u00BA 2021.042.181, relativo ao pagamento da per\u00EDcia realizada nos autos",
+          "x": 35.999985,
+          "y": 377.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Comunico a Vossa Senhoria que o Processo n\u00BA 2021.042.181, relativo ao pagamento da per\u00EDcia realizada nos autos",
+          "x": 129.99998,
+          "y": 377.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "da A\u00E7\u00E3o n\u00BA 0802011-45.2018.8.15.0001, movida por TIAGO DA SILVA MARTINS, CPF 076.625.754-93, em face de",
+          "x": 35.999985,
+          "y": 359.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "da A\u00E7\u00E3o n\u00BA 0802011-45.2018.8.15.0001, movida por TIAGO DA SILVA MARTINS, CPF 076.625.754-93, em face de",
+          "x": 112.39999,
+          "y": 359.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "da A\u00E7\u00E3o n\u00BA 0802011-45.2018.8.15.0001, movida por TIAGO DA SILVA MARTINS, CPF 076.625.754-93, em face de",
+          "x": 219.59999,
+          "y": 359.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "DENISE SANTOS DE MELO, CPF 076.514.924-98, perante o Ju\u00EDzo da 3\u00AA Vara de Fam\u00EDlia da Comarca de Campina",
+          "x": 35.999985,
+          "y": 341.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "DENISE SANTOS DE MELO, CPF 076.514.924-98, perante o Ju\u00EDzo da 3\u00AA Vara de Fam\u00EDlia da Comarca de Campina",
+          "x": 112.39999,
+          "y": 341.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "DENISE SANTOS DE MELO, CPF 076.514.924-98, perante o Ju\u00EDzo da 3\u00AA Vara de Fam\u00EDlia da Comarca de Campina",
+          "x": 176.4,
+          "y": 341.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Grande, encontra-se nesta Diretoria Especial (diesp@tjpb.jus.br), aguardando que seja providenciada a nota fiscal da",
+          "x": 35.999985,
+          "y": 323.93,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "Robson de Lima Canan\u00E9a \u2013 Diretor Especial em exerc\u00EDcio",
+          "x": 35.999985,
+          "y": 144.137,
+          "height": 8.325012
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 13 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11300.44770.36261.41614-6",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 13 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11300.44770.36261.41614-6",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 24,
+      "count": 17,
+      "anchors": [
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial \u003Cdiesp@tjpb.jus.br\u003E",
+          "x": 104.7852,
+          "y": 700.14557,
+          "height": 14.478699
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial",
+          "x": 57.513245,
+          "y": 622.7996,
+          "height": 13.398254
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Jo\u00E3o Pessoa, 14 de Julho de 2021.",
+          "x": 57.513245,
+          "y": 581.53046,
+          "height": 13.398254
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "A Sua Senhoria, a Senhora Mauridete Grangeiro de Barros \u2013 Perita Assistente Social",
+          "x": 57.513245,
+          "y": 568.0242,
+          "height": 13.398254
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "A Sua Senhoria, a Senhora Mauridete Grangeiro de Barros \u2013 Perita Assistente Social",
+          "x": 121.513245,
+          "y": 568.0242,
+          "height": 13.398254
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Senhora Perita,",
+          "x": 57.513245,
+          "y": 513.2487,
+          "height": 13.398254
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "ossa Senhoria que o Processo n\u00BA 2021.042.181, relativo ao pagamento da",
+          "x": 132.255,
+          "y": 485.48584,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "ossa Senhoria que o Processo n\u00BA 2021.042.181, relativo ao pagamento da",
+          "x": 226.255,
+          "y": 485.48584,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "per\u00EDcia realizada nos autos da A\u00E7\u00E3o n\u00BA 080201",
+          "x": 57.513245,
+          "y": 471.97958,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "TINS, CPF 076.625.754-93, em face de DENISE SANT",
+          "x": 139.57677,
+          "y": 458.4733,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "TINS, CPF 076.625.754-93, em face de DENISE SANT",
+          "x": 215.97678,
+          "y": 458.4733,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF 076.514.924-98, perante o Ju\u00EDzo da 3\u00AA V",
+          "x": 57.513245,
+          "y": 444.96704,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "CPF 076.514.924-98, perante o Ju\u00EDzo da 3\u00AA V",
+          "x": 133.91324,
+          "y": 444.96704,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "ara de Fam\u00EDlia da Comarca de Campina",
+          "x": 300.00482,
+          "y": 444.96704,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "Robson de Lima Canan\u00E9a \u2013 Diretor Especial em exerc\u00EDcio",
+          "x": 57.513245,
+          "y": 294.14694,
+          "height": 13.398224
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 14 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11294.55535.36261.22714-7",
+          "x": 574.216,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 14 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11294.55535.36261.22714-7",
+          "x": 668.216,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 25,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 15 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11348.28872.76261.74134-5",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 15 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11348.28872.76261.74134-5",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 15 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11348.28872.76261.74134-5",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 26,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 16 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.64134.76261.28872.11926-0",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 16 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.64134.76261.28872.11926-0",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 16 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.64134.76261.28872.11926-0",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 27,
+      "count": 14,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Poder Judici\u00E1rio do Estado da Para\u00EDba",
+          "x": 196.94,
+          "y": 647.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial",
+          "x": 251.04,
+          "y": 629.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo n\u00BA",
+          "x": 36,
+          "y": 557.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Processo n\u00BA",
+          "x": 130,
+          "y": 557.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Requerente: Ju\u00EDzo da 3\u00AA Vara de Fam\u00EDlia da Comarca de Campina Grande",
+          "x": 36,
+          "y": 545.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Requerente: Ju\u00EDzo da 3\u00AA Vara de Fam\u00EDlia da Comarca de Campina Grande",
+          "x": 100,
+          "y": 545.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "Interessada: Mauridete Grangeiro de Barros \u2013 Perita",
+          "x": 36,
+          "y": 527.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Interessada: Mauridete Grangeiro de Barros \u2013 Perita",
+          "x": 116.8,
+          "y": 527.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa,",
+          "x": 36,
+          "y": 401.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa,",
+          "x": 108,
+          "y": 401.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "Robson de Lima Canan\u00E9a \u2013 Diretor Especial em exerc\u00EDcio",
+          "x": 36,
+          "y": 347.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 17 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11754.53682.76261.15134-6",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 17 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11754.53682.76261.15134-6",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 17 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.11754.53682.76261.15134-6",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 28,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 18 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 723.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 18 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 817.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 18 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 924.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 29,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 18 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 723.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 18 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 817.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 18 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 924.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 30,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 18 p\u00E1gina 3 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 723.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 18 p\u00E1gina 3 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 817.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 18 p\u00E1gina 3 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.98644.96261.20997.11799-2",
+          "x": 924.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    }
+  ]
+}

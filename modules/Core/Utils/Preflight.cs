@@ -38,7 +38,10 @@ namespace Obj.Utils
                 valid.Add(item);
             }
             if (skipped > 0)
-                Console.Error.WriteLine($"[PREFLIGHT] {label}: ignorados {skipped} arquivos invalidos");
+            {
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine($"[PREFLIGHT] {label}: ignorados {skipped} arquivos invalidos");
+            }
             return valid;
         }
 
@@ -69,7 +72,7 @@ namespace Obj.Utils
                 if (!CheckPdf(file, timeout, out var reason))
                 {
                     invalid.Add(file);
-                    if (log && !string.IsNullOrWhiteSpace(reason))
+                    if (log && !string.IsNullOrWhiteSpace(reason) && !ReturnUtils.IsEnabled())
                         Console.Error.WriteLine($"[PREFLIGHT] invalid: {Path.GetFileName(file)} ({reason})");
                 }
                 progress?.Tick(Path.GetFileName(file));
@@ -83,7 +86,10 @@ namespace Obj.Utils
             }
 
             if (InvalidFiles.Count > 0)
-                Console.Error.WriteLine($"[PREFLIGHT] invalid_total={InvalidFiles.Count}");
+            {
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine($"[PREFLIGHT] invalid_total={InvalidFiles.Count}");
+            }
         }
 
         private static bool CheckPdf(string path, double timeoutSec, out string reason)

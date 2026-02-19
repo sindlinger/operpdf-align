@@ -1,0 +1,251 @@
+﻿{
+  "source_pdf": "C:\\git\\operpdf-textopsalign\\reference\\models\\tjpb_despacho_model.pdf",
+  "output_pdf": "C:\\git\\operpdf-textopsalign\\reference\\models\\tjpb_despacho_anchor_model_v5.pdf",
+  "generated_at_utc": "2026-02-19T04:57:17.1854969Z",
+  "anchors_total": 33,
+  "pages": [
+    {
+      "page": 1,
+      "count": 18,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICIARIO TRIBUNAL DE JUSTICA DA PARAIBA",
+          "x": 150.9831,
+          "y": 739.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL - TRIBUNAL DE JUSTICA",
+          "x": 48,
+          "y": 726.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL",
+          "x": 48,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "\u003CPROCESSO_ADMINISTRATIVO\u003E",
+          "x": 127.01901,
+          "y": 661.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "\u003CVARA\u003E",
+          "x": 184.2171,
+          "y": 648.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "\u003CCOMARCA\u003E",
+          "x": 320.4342,
+          "y": 648.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "INTERESSADO: \u003CPERITO\u003E - \u003CESPECIALIDADE\u003E",
+          "x": 48,
+          "y": 635.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "\u003CPERITO\u003E",
+          "x": 128.8,
+          "y": 635.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "\u003CESPECIALIDADE\u003E",
+          "x": 194.15353,
+          "y": 635.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "\u003CVALOR_ARBITRADO_JZ\u003E",
+          "x": 141.39752,
+          "y": 596.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "\u003CPERITO\u003E",
+          "x": 465.17554,
+          "y": 596.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "\u003CCPF_PERITO\u003E",
+          "x": 72.78227,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_ESPECIE_PERICIA",
+          "text": "\u003CESPECIE_DA_PERICIA\u003E",
+          "x": 326.80057,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "\u003CPROCESSO_JUDICIAL\u003E",
+          "x": 611.7967,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "\u003CPROMOVENTE\u003E",
+          "x": 119.183,
+          "y": 570.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "\u003CPROMOVIDO\u003E",
+          "x": 280.96252,
+          "y": 570.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "\u003CVARA\u003E",
+          "x": 488.04034,
+          "y": 570.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "\u003CCOMARCA\u003E",
+          "x": 623.9352,
+          "y": 570.71625,
+          "height": 9.712524
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "count": 15,
+      "anchors": [
+        {
+          "label": "ANC_ENCAMINHE",
+          "text": "QUE DELEGOU ATRIBUICOES AO DIRETOR ESPECIAL, ENCAMINHEM-SE OS PRESENTES AUTOS A GERENCIA DE",
+          "x": 48,
+          "y": 739.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "QUE DELEGOU ATRIBUICOES AO DIRETOR ESPECIAL, ENCAMINHEM-SE OS PRESENTES AUTOS A GERENCIA DE",
+          "x": 219.38356,
+          "y": 739.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VALOR_DE",
+          "text": "\u003CVALOR_ARBITRADO_DE\u003E",
+          "x": 420.60068,
+          "y": 713.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "\u003CPERITO\u003E",
+          "x": 742.6792,
+          "y": 713.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "\u003CCPF_PERITO\u003E",
+          "x": 72.88156,
+          "y": 700.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_ESPECIE_PERICIA",
+          "text": "\u003CESPECIE_DA_PERICIA\u003E",
+          "x": 327.91754,
+          "y": 700.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "\u003CPROCESSO_JUDICIAL\u003E",
+          "x": 614.0555,
+          "y": 700.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "\u003CPROMOVENTE\u003E",
+          "x": 48,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "\u003CPROMOVIDO\u003E",
+          "x": 209.78056,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "\u003CVARA\u003E",
+          "x": 416.85968,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "\u003CCOMARCA\u003E",
+          "x": 552.7554,
+          "y": 687.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL DO TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA, EM JOAO PESSOA, \u003CDATA_DESPESA\u003E.",
+          "x": 48,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "DIRETORIA ESPECIAL DO TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA, EM JOAO PESSOA, \u003CDATA_DESPESA\u003E.",
+          "x": 183.12773,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "\u003CDATA_DESPESA\u003E",
+          "x": 539.37354,
+          "y": 583.71625,
+          "height": 9.712524
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "DIRETOR ESPECIAL",
+          "x": 48,
+          "y": 557.71625,
+          "height": 9.712524
+        }
+      ]
+    }
+  ]
+}

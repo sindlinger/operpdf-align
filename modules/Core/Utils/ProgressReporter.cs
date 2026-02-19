@@ -50,7 +50,8 @@ namespace Obj.Utils
                 var msg = $"[PROGRESS] {_label} {count}/{_total} ({pct:0.0}%) elapsed={FormatDuration(elapsed)} eta={FormatDuration(eta)}";
                 if (!string.IsNullOrWhiteSpace(item))
                     msg += $" item={item}";
-                Console.Error.WriteLine(msg);
+                if (!ReturnUtils.IsEnabled())
+                    Console.Error.WriteLine(msg);
             }
         }
 

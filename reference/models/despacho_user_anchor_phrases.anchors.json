@@ -1,0 +1,201 @@
+﻿{
+  "source_pdf": "/mnt/c/Users/pichau/Downloads/despacho.pdf",
+  "output_pdf": "/mnt/c/git/operpdf-textopsalign/reference/models/despacho_user_anchor_phrases.pdf",
+  "generated_at_utc": "2026-02-19T06:35:03.9784197Z",
+  "anchors_total": 25,
+  "pages": [
+    {
+      "page": 1,
+      "count": 16,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Tribunal de Justi\u00E7a do Estado da Para\u00EDba",
+          "x": 36,
+          "y": 648.137,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial",
+          "x": 36,
+          "y": 630.137,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo n\u00BA 2018.198.741",
+          "x": 36,
+          "y": 587.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Processo n\u00BA 2018.198.741",
+          "x": 130,
+          "y": 587.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Requerente: Ju\u00EDzo da 8\u00AA Vara C\u00EDvel da Comarca de Jo\u00E3o Pessoa",
+          "x": 36,
+          "y": 575.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Requerente: Ju\u00EDzo da 8\u00AA Vara C\u00EDvel da Comarca de Jo\u00E3o Pessoa",
+          "x": 100,
+          "y": 575.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Requerente: Ju\u00EDzo da 8\u00AA Vara C\u00EDvel da Comarca de Jo\u00E3o Pessoa",
+          "x": 164,
+          "y": 575.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "Interessada: Marta Liane de Almeida Ramalho Loureiro",
+          "x": 36,
+          "y": 563.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "nto, no valor de R$ 5.082,00 (cinco mil e oitenta e dois reais),",
+          "x": 93.135,
+          "y": 509.69098,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "vor da perita",
+          "x": 66.695,
+          "y": 437.69098,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "do processo n\u00BA 0028841-13.2009.815.200",
+          "x": 69.187,
+          "y": 419.69098,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "do processo n\u00BA 0028841-13.2009.815.200",
+          "x": 163.187,
+          "y": 419.69098,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "erante o Ju\u00EDzo da 8\u00AA Vara C\u00EDvel desta",
+          "x": 42.9,
+          "y": 401.69098,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Comarca de Jo\u00E3o Pessoa,",
+          "x": 258.67,
+          "y": 401.69098,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Comarca de Jo\u00E3o Pessoa,",
+          "x": 322.67,
+          "y": 401.69098,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "movida MARIA DE F\u00C1TIMA FERNANDES DOS SANTOS, CPF",
+          "x": 36.000015,
+          "y": 383.69098,
+          "height": 11.100006
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "count": 6,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "iretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba,",
+          "x": 44.74,
+          "y": 785.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "em Jo\u00E3o Pessoa, 31 de maio de",
+          "x": 383.598,
+          "y": 785.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "Robson de Lima Canan\u00E9a \u2013 Diretor Especial em exerc\u00EDcio",
+          "x": 36,
+          "y": 731.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 16 p\u00E1gina 2 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.11679.30820.52261.32612-7",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 16 p\u00E1gina 2 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.11679.30820.52261.32612-7",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 16 p\u00E1gina 2 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.11679.30820.52261.32612-7",
+          "x": 775.456,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 17 p\u00E1gina 1 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.91652.13261.51939.11857-4",
+          "x": 574.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Documento 17 p\u00E1gina 1 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.91652.13261.51939.11857-4",
+          "x": 668.576,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 17 p\u00E1gina 1 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.91652.13261.51939.11857-4",
+          "x": 775.776,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    }
+  ]
+}

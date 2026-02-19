@@ -29,13 +29,14 @@
 
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="../../modules/Align/**/*.cs;../../modules/Core/**/*.cs;../../modules/DocDetector/**/*.cs;../../modules/ExtractionModule/**/*.cs;../../modules/HonorariosModule/**/*.cs;../../modules/Logger/**/*.cs;../../modules/TextOpsRanges/**/*.cs;../../modules/ValidatorModule/**/*.cs;../../src/AssemblyInfo.cs;../../src/Commands/Inspect/PdfTextExtraction.cs;../../src/Commands/Inspect/ObjectsTextOpsAlign.cs;../../src/Commands/Inspect/ObjectsMapFields.cs"
+    <Compile Include="../../modules/Align/**/*.cs;../../modules/Core/**/*.cs;../../modules/DocDetector/**/*.cs;../../modules/ExtractionModule/**/*.cs;../../modules/HonorariosModule/**/*.cs;../../modules/Logger/**/*.cs;../../modules/TextOpsRanges/**/*.cs;../../modules/ValidatorModule/**/*.cs;../../modules/ValidationCore/Adapters/**/*.cs;../../modules/ValidationCore/Catalog/**/*.cs;../../modules/ValidationCore/Context/**/*.cs;../../modules/ValidationCore/Diagnostics/**/*.cs;../../modules/ValidationCore/Docs/**/*.cs;../../modules/ValidationCore/Rules/FieldValidationRules.cs;../../modules/ValidationCore/Engine/ValidationEngine.cs;../../probe/**/*.cs;../../src/AssemblyInfo.cs;../../src/Commands/Inspect/PdfTextExtraction.cs;../../src/Commands/Inspect/ObjectsTextOpsAlign.cs;../../src/Commands/Inspect/ObjectsMapFields.cs;../../src/Commands/Inspect/BuildAnchorModelDespacho.cs"
              Exclude="**/bin/**;**/obj/**;../../cli/OperCli/**;../../tools/**;../../modules/DocDetector/**/*Runner*.cs;../../modules/DocDetector/Detectors/WeightedDespachoDetector.cs;../../modules/ExtractionModule/TypedFieldExtractor.cs;../../modules/ExtractionModule/TjpbDespachoExtractor/Commands/**/*.cs" />
   </ItemGroup>
 
   <Target Name="CopyOperPdfToRoot" AfterTargets="Build">
     <PropertyGroup>
       <OperPdfRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</OperPdfRootDir>
+      <OperPdfRepoDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))</OperPdfRepoDir>
     </PropertyGroup>
     <Copy SourceFiles="$(TargetDir)$(AssemblyName).exe"
           DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).exe"
@@ -53,11 +54,29 @@
           DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).runtimeconfig.json"
           SkipUnchangedFiles="true"
           Condition="Exists('$(TargetDir)$(AssemblyName).runtimeconfig.json')" />
+
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll"
+          DestinationFiles="$(OperPdfRepoDir)/$(AssemblyName).dll"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).dll')" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).deps.json"
+          DestinationFiles="$(OperPdfRepoDir)/$(AssemblyName).deps.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).deps.json')" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).runtimeconfig.json"
+          DestinationFiles="$(OperPdfRepoDir)/$(AssemblyName).runtimeconfig.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).runtimeconfig.json')" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).exe"
+          DestinationFiles="$(OperPdfRepoDir)/align.exe"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(AssemblyName).exe')" />
   </Target>
 
   <Target Name="CopyOperPdfPublishToRoot" AfterTargets="Publish">
     <PropertyGroup>
       <OperPdfRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</OperPdfRootDir>
+      <OperPdfRepoDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))</OperPdfRepoDir>
       <PublishExe>$(PublishDir)$(AssemblyName).exe</PublishExe>
       <PublishDll>$(PublishDir)$(AssemblyName).dll</PublishDll>
       <PublishDeps>$(PublishDir)$(AssemblyName).deps.json</PublishDeps>
@@ -79,6 +98,27 @@
           DestinationFiles="$(OperPdfRootDir)/$(AssemblyName).runtimeconfig.json"
           SkipUnchangedFiles="true"
           Condition="Exists('$(PublishRuntime)')" />
+
+    <Copy SourceFiles="$(PublishExe)"
+          DestinationFiles="$(OperPdfRepoDir)/$(AssemblyName).exe"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishExe)')" />
+    <Copy SourceFiles="$(PublishDll)"
+          DestinationFiles="$(OperPdfRepoDir)/$(AssemblyName).dll"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishDll)')" />
+    <Copy SourceFiles="$(PublishDeps)"
+          DestinationFiles="$(OperPdfRepoDir)/$(AssemblyName).deps.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishDeps)')" />
+    <Copy SourceFiles="$(PublishRuntime)"
+          DestinationFiles="$(OperPdfRepoDir)/$(AssemblyName).runtimeconfig.json"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishRuntime)')" />
+    <Copy SourceFiles="$(PublishExe)"
+          DestinationFiles="$(OperPdfRepoDir)/align.exe"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(PublishExe)')" />
   </Target>
 
 </Project>

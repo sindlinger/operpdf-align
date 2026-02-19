@@ -1,0 +1,202 @@
+﻿{
+  "source_pdf": "C:\\git\\operpdf-textopsalign\\reference\\models\\tmp_despacho_p11_12.pdf",
+  "output_pdf": "C:\\git\\operpdf-textopsalign\\reference\\models\\2021042181_despacho_p11-12_anchor_phrases.pdf",
+  "generated_at_utc": "2026-02-19T06:12:44.0984067Z",
+  "anchors_total": 26,
+  "pages": [
+    {
+      "page": 1,
+      "count": 16,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO DO ESTADO DA PARA\u00CDBA",
+          "x": 165.81,
+          "y": 647.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "DIRETORIA ESPECIAL",
+          "x": 233.82,
+          "y": 611.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo n\u00BA.",
+          "x": 36,
+          "y": 446.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Processo n\u00BA.",
+          "x": 130,
+          "y": 446.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Requerente: Ju\u00EDzo da\u00A03\u00AA Vara de Fam\u00EDlia de Campina Grande",
+          "x": 36,
+          "y": 392.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "Interessada:",
+          "x": 36,
+          "y": 374.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "MAURIDETE GRANGEIRO DE BARROS - Assistente Social",
+          "x": 116.8,
+          "y": 374.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "da\u00A0Assistente Social\u00A0MAURIDETE GRANGEIRO DE BARROS, no valor de\u00A01,5 (uma vez e meia) ,",
+          "x": 36,
+          "y": 320.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "da\u00A0Assistente Social\u00A0MAURIDETE GRANGEIRO DE BARROS, no valor de\u00A01,5 (uma vez e meia) ,",
+          "x": 125.6,
+          "y": 320.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "na forma do ANEXO I da Resolu\u00E7\u00E3o n\u00BA 09/2017, deste\u00A0Tribunal,\u00A0tendo em vista a realiza\u00E7\u00E3o de",
+          "x": 36,
+          "y": 302.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "figuram\u00A0como\u00A0autor\u00A0TIAGO DA SILVA MARTINS, CPF\u00A0076.625.764-93\u00A0r\u00E9 DENISE SANTOS DE",
+          "x": 36,
+          "y": 266.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "figuram\u00A0como\u00A0autor\u00A0TIAGO DA SILVA MARTINS, CPF\u00A0076.625.764-93\u00A0r\u00E9 DENISE SANTOS DE",
+          "x": 112.4,
+          "y": 266.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "MELO, CPF 076.514.924-98.",
+          "x": 36,
+          "y": 248.516,
+          "height": 11.099991
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "atendendo ao grau de especializa\u00E7\u00E3o do perito, \u00E0\u00A0complexidade da mat\u00E9ria, o lugar e o tempo",
+          "x": 36,
+          "y": 104.516,
+          "height": 11.099998
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 3 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 3 p\u00E1gina 1 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "count": 10,
+      "anchors": [
+        {
+          "label": "ANC_ESPECIALIDADE",
+          "text": "assistente social",
+          "x": 316.06506,
+          "y": 749.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "DE BARROS , para realiza\u00E7\u00E3o de estudo social, ultrapassa o valor m\u00E1ximo estabelecido.\u00A0Nesse",
+          "x": 36,
+          "y": 731.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "contexto, o pagamento da despesa fica condicionado \u00E0 aprova\u00E7\u00E3o pelo Conselho da Magistratura,",
+          "x": 36,
+          "y": 713.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_ENCAMINHE",
+          "text": "Encaminhem-se os autos \u00E0 Ger\u00EAncia Judici\u00E1ria (DISTRIBUI\u00C7\u00C3O).",
+          "x": 36,
+          "y": 605.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 9 \u00A0de mar\u00E7o de",
+          "x": 36,
+          "y": 569.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 9 \u00A0de mar\u00E7o de",
+          "x": 103.600006,
+          "y": 569.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 9 \u00A0de mar\u00E7o de",
+          "x": 175.6,
+          "y": 569.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "Robson de Lima Canan\u00E9a \u2013 Diretor Especial em exerc\u00EDcio",
+          "x": 36,
+          "y": 497.516,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 3 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 3 p\u00E1gina 2 assinado, do processo n\u00BA 2021042181, nos termos da Lei 11.419. ADME.04279.08161.20201.01840-0",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    }
+  ]
+}

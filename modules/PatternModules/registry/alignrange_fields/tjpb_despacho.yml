@@ -5,6 +5,10 @@ fields:
     sources:
       - band: front_head
         regex:
+          - pattern: '(?i)p\s*r\s*o\s*c\s*e\s*s\s*s\s*o\s*a\s*d\s*m\s*i\s*n\s*i\s*s\s*t\s*r\s*a\s*t\s*i\s*v\s*o\s*(?:n[ºo°]?|nº)?\s*[:\-]?\s*([0-9][0-9\./\-]{5,30})'
+            group: 1
+          - pattern: '(?i)p\s*r\s*o\s*c\s*e\s*s\s*s\s*o\s*(?:a\s*d\s*m\s*i\s*n\s*i\s*s\s*t\s*r\s*a\s*t\s*i\s*v\s*o\s*)?(?:n[ºo°]?|nº)?\s*[:\-]?\s*([0-9]{4}\.[0-9]{3}\.[0-9]{3}|[0-9]{10,20})'
+            group: 1
           - pattern: '(?i)processo\s*:\s*([0-9]{4}\.[0-9]{3}\.[0-9]{3})'
             group: 1
           - pattern: '(?i)processo\s*(?:administrativo|adme|ci|sei)\s*(?:n[ºo]?|nº)?\s*[:\-]?\s*([0-9\./\-]{6,25})'
@@ -117,27 +121,27 @@ fields:
       - band: front_head
         nlp_labels: [VALOR]
         regex:
-          - pattern: '(?i)valor\\s+arbitrad[oa][^\\n]{0,40}?(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)valor\\s+arbitrad[oa][^\\n]{0,40}?(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)importe[^\\n]{0,60}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)importe[^\\n]{0,60}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)(?:fix[ao]s?|arbitro)\\s+os?\\s+honor[aá]rios[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)(?:fix[ao]s?|arbitro)\\s+os?\\s+honor[aá]rios[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)arbitrad[oa]s?[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)arbitrad[oa]s?[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)honor[aá]rios\\s+periciais[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)honor[aá]rios\\s+periciais[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)honor[aá]rios[^\\n]{0,80}?fixad[oa]s?[^\\n]{0,40}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)honor[aá]rios[^\\n]{0,80}?fixad[oa]s?[^\\n]{0,40}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)no\\s+valor\\s+de\\s*(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)no\\s+valor\\s+de\\s*(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)valor\\s+de\\s*(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)valor\\s+de\\s*(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
   VALOR_ARBITRADO_CM:
     sources:
       - band: front_head
         regex:
-          - pattern: '(?i)conselho\s+da\s+magistratura[\s\S]{0,120}?valor\s+de\s+(R\$\s*\d{1,3}(?:\.\d{3})*,\d{2})'
+          - pattern: '(?i)conselho\s+da\s+magistratura[\s\S]{0,120}?valor\s+de\s+(R\$\s*\d{1,3}(?:\.\d{3})*,\s*\d{2})'
             group: 1
   DATA_DESPESA:
     sources:
@@ -157,13 +161,13 @@ fields:
     sources:
       - band: back_tail
         regex:
-          - pattern: '(?i)autorizo\\s+o\\s+pagamento[^\\n]{0,120}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)autorizo\\s+o\\s+pagamento[^\\n]{0,120}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)reserva\\s+orçament[aá]ria[^\\n]{0,120}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)reserva\\s+orçament[aá]ria[^\\n]{0,120}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)reserva[\\s\\S]{0,120}?no\\s+valor(?:\\s+solicitado)?\\s+de\\s*R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)reserva[\\s\\S]{0,120}?no\\s+valor(?:\\s+solicitado)?\\s+de\\s*R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)valor\\s+arbitrado[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)valor\\s+arbitrado[^\\n]{0,80}?R\\$\\s*(\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1
-          - pattern: '(?i)no\\s+valor(?:\\s+solicitado)?\\s+de\\s*(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\d{2})'
+          - pattern: '(?i)no\\s+valor(?:\\s+solicitado)?\\s+de\\s*(R\\$\\s*\\d{1,3}(?:\\.\\d{3})*,\\s*\\d{2})'
             group: 1

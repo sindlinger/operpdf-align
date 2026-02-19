@@ -13,6 +13,7 @@ using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using Obj.Align;
 using Obj.DocDetector;
 using Obj.Honorarios;
+using Obj.RootProbe;
 using Obj.Utils;
 using Obj.ValidatorModule;
 
@@ -63,6 +64,42 @@ namespace Obj.Commands
             if (t.Length <= max)
                 return "\"" + t + "\"";
             return "\"" + t.Substring(0, max - 3) + "...\"";
+        }
+
+        private static string DetectInputRole(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return "pdf_alvo_extracao";
+
+            var name = Path.GetFileNameWithoutExtension(path).ToLowerInvariant();
+            var full = "";
+            try
+            {
+                full = Path.GetFullPath(path).Replace('\\', '/').ToLowerInvariant();
+            }
+            catch
+            {
+                full = (path ?? "").Replace('\\', '/').ToLowerInvariant();
+            }
+
+            var envModelDespacho = (Environment.GetEnvironmentVariable("OBJPDF_MODEL_DESPACHO") ?? "").Replace('\\', '/').ToLowerInvariant();
+            var envModelCertidao = (Environment.GetEnvironmentVariable("OBJPDF_MODEL_CERTIDAO") ?? "").Replace('\\', '/').ToLowerInvariant();
+            var envModelReq = (Environment.GetEnvironmentVariable("OBJPDF_MODEL_REQUERIMENTO") ?? "").Replace('\\', '/').ToLowerInvariant();
+            var envModelGeneric = (Environment.GetEnvironmentVariable("OBJPDF_MODEL") ?? "").Replace('\\', '/').ToLowerInvariant();
+
+            if ((!string.IsNullOrWhiteSpace(envModelDespacho) && full == envModelDespacho) ||
+                (!string.IsNullOrWhiteSpace(envModelCertidao) && full == envModelCertidao) ||
+                (!string.IsNullOrWhiteSpace(envModelReq) && full == envModelReq) ||
+                (!string.IsNullOrWhiteSpace(envModelGeneric) && full == envModelGeneric) ||
+                name.Contains("model", StringComparison.Ordinal) ||
+                name.Contains("modelo", StringComparison.Ordinal) ||
+                name.Contains("anchor", StringComparison.Ordinal) ||
+                name.Contains("template", StringComparison.Ordinal))
+            {
+                return "template_modelo";
+            }
+
+            return "pdf_alvo_extracao";
         }
 
         private static int CountNonEmptyValues(Dictionary<string, string>? values)
@@ -430,8 +467,9 @@ namespace Obj.Commands
         internal static void ExecuteWithMode(string[] args, OutputMode outputMode)
         {
             Console.OutputEncoding = Encoding.UTF8;
-            PrintStage("iniciando o modo de detecção");
-            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack, out var sideSpecified))
+            if (!ReturnUtils.IsEnabled())
+                PrintStage("iniciando o modo de detecção");
+            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack, out var sideSpecified, out var allowStack, out var probeEnabled, out var probeFile, out var probePage, out var probeSide, out var probeMaxFields))
             {
                 ShowHelp();
                 return;
@@ -440,6 +478,13 @@ namespace Obj.Commands
             if (inputs.Count < 2)
             {
                 ShowHelp();
+                return;
+            }
+
+            if (inputs.Count > 2 && !allowStack)
+            {
+                Console.WriteLine("Erro: múltiplos PDFs alvo na mesma execução foram bloqueados para isolamento.");
+                Console.WriteLine("Use exatamente 2 entradas (modelo + alvo) ou passe --allow-stack para liberar lote.");
                 return;
             }
 
@@ -462,7 +507,7 @@ namespace Obj.Commands
 
             int PickPageOrDefault(string path)
             {
-                var p = ResolvePage(path, trace: true);
+                var p = ResolvePage(path, trace: !ReturnUtils.IsEnabled());
                 if (p > 0)
                     return p;
                 try
@@ -502,7 +547,7 @@ namespace Obj.Commands
                 var docKey = DocumentValidationRules.ResolveDocKeyForDetection(roiDoc);
                 if (!string.Equals(docKey, "despacho", StringComparison.OrdinalIgnoreCase))
                     return false;
-                var p1 = ResolvePage(pdfPath, trace: true);
+                var p1 = ResolvePage(pdfPath, trace: !ReturnUtils.IsEnabled());
                 if (p1 <= 0)
                     return false;
 
@@ -571,8 +616,9 @@ namespace Obj.Commands
             }
 
             ResolveSelection(aPath, pageAUser, objAUser, pageA, objA, out pageA, out objA, out var sourceA);
-            if (sourceA.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
+            if (!ReturnUtils.IsEnabled() && sourceA.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
                 Console.WriteLine($"Despacho route A: p{pageA} o{objA} ({sourceA})");
+            var roleA = DetectInputRole(aPath);
 
             var reports = new List<ObjectsTextOpsDiff.AlignDebugReport>();
             foreach (var rawB in inputs.Skip(1))
@@ -587,8 +633,9 @@ namespace Obj.Commands
                 int localPageA = pageA;
                 int localObjA = objA;
                 ResolveSelection(bPath, pageBUser, objBUser, pageB, objB, out var localPageB, out var localObjB, out var sourceB);
-                if (sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
+                if (!ReturnUtils.IsEnabled() && sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
                     Console.WriteLine($"Despacho route B: p{localPageB} o{localObjB} ({sourceB})");
+                var roleB = DetectInputRole(bPath);
 
                 var sideLabel = useBack ? "back_tail" : "front_head";
                 if (!ReturnUtils.IsEnabled())
@@ -597,6 +644,8 @@ namespace Obj.Commands
                         "passo 1/4 - detecção e seleção de objetos",
                         "passo 2/4 - alinhamento",
                         ("modulo", "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker"),
+                        ("role_a", roleA),
+                        ("role_b", roleB),
                         ("pdf_a", Path.GetFileName(aPath)),
                         ("pdf_b", Path.GetFileName(bPath)),
                         ("sel_a", $"page={localPageA} obj={localObjA} source={sourceA}"),
@@ -606,7 +655,8 @@ namespace Obj.Commands
                         ("params", $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}")
                     );
                 }
-                PrintStage($"iniciando o modo de alinhamento ({sideLabel})");
+                if (!ReturnUtils.IsEnabled())
+                    PrintStage($"iniciando o modo de alinhamento ({sideLabel})");
                 var report = ObjectsTextOpsDiff.ComputeAlignDebugForSelection(
                     aPath,
                     bPath,
@@ -662,6 +712,8 @@ namespace Obj.Commands
                         return;
                     }
                 }
+                report.RoleA = roleA;
+                report.RoleB = roleB;
 
                 ObjectsTextOpsDiff.AlignDebugReport? backReport = null;
                 var autoDualDespacho = DocumentValidationRules.IsDocMatch(docKey, "despacho") && !useBack && !sideSpecified;
@@ -699,6 +751,11 @@ namespace Obj.Commands
                             anchorMinSim,
                             anchorMinLenRatio,
                             gapPenalty);
+                        if (backReport != null)
+                        {
+                            backReport.RoleA = roleA;
+                            backReport.RoleB = roleB;
+                        }
 
                         if (!ReturnUtils.IsEnabled())
                         {
@@ -761,8 +818,46 @@ namespace Obj.Commands
                         PrintAlignmentList(report, alignTop, showDiff: true);
                 }
 
-                PrintStage("iniciando o modo de extração");
+                if (!ReturnUtils.IsEnabled())
+                    PrintStage("iniciando o modo de extração");
                 report.Extraction = BuildExtractionPayload(report, backReport, aPath, bPath, docKey, verbose: !ReturnUtils.IsEnabled());
+                Dictionary<string, object>? deferredProbePayload = null;
+                if (probeEnabled)
+                {
+                    var probeSideNormalized = (probeSide ?? "").Trim().ToLowerInvariant();
+                    var probeUseA = probeSideNormalized == "a" || probeSideNormalized == "pdf_a" || probeSideNormalized == "left";
+                    var sideKey = probeUseA ? "pdf_a" : "pdf_b";
+                    var effectiveProbeFile = string.IsNullOrWhiteSpace(probeFile) ? (probeUseA ? aPath : bPath) : probeFile;
+                    var effectiveProbePage = probePage > 0 ? probePage : (probeUseA ? report.PageA : report.PageB);
+                    var probeValues = ReadValuesForProbe(report.Extraction, sideKey);
+
+                    if (!ReturnUtils.IsEnabled())
+                    {
+                        PrintPipelineStep(
+                            "passo 3.6/4 - probe pós-extração",
+                            "passo 4/4 - saída e resumo",
+                            ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
+                            ("probe_side", sideKey),
+                            ("probe_file", effectiveProbeFile),
+                            ("probe_page", effectiveProbePage.ToString(CultureInfo.InvariantCulture)),
+                            ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture))
+                        );
+                    }
+
+                    var probePayload = ExtractionProbeModule.Run(
+                        effectiveProbeFile,
+                        effectiveProbePage,
+                        probeValues,
+                        sideKey,
+                        probeMaxFields);
+
+                    AttachProbeToExtraction(report.Extraction, probePayload);
+                    deferredProbePayload = probePayload;
+                }
+                var reportBaseA = Path.GetFileNameWithoutExtension(aPath);
+                var reportBaseB = Path.GetFileNameWithoutExtension(bPath);
+                report.ReturnInfo = BuildReturnInfo(outputMode, $"{reportBaseA}__{reportBaseB}__output_pipe.json");
+                report.ReturnView = BuildReturnView(report, outputMode);
                 reports.Add(report);
 
                 if (inputs.Count == 2)
@@ -773,9 +868,14 @@ namespace Obj.Commands
                         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                     };
                     var json = JsonSerializer.Serialize(report, jsonOptions);
+                    var baseA = Path.GetFileNameWithoutExtension(aPath);
+                    var baseB = Path.GetFileNameWithoutExtension(bPath);
                     var emitJsonToStdout = ReturnUtils.IsEnabled();
                     if (emitJsonToStdout)
+                    {
                         Console.WriteLine(json);
+                        ReturnUtils.PersistJson(json, $"{baseA}__{baseB}__output_pipe.json");
+                    }
 
                     if (!string.IsNullOrWhiteSpace(outPath) && outSpecified)
                     {
@@ -788,8 +888,6 @@ namespace Obj.Commands
                     {
                         if (outputMode == OutputMode.All)
                         {
-                            var baseA = Path.GetFileNameWithoutExtension(aPath);
-                            var baseB = Path.GetFileNameWithoutExtension(bPath);
                             outPath = Path.Combine("outputs", "align_ranges", $"{baseA}__{baseB}__textops_align.json");
                             Directory.CreateDirectory(Path.GetDirectoryName(outPath) ?? ".");
                             File.WriteAllText(outPath, json, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
@@ -799,8 +897,6 @@ namespace Obj.Commands
 
                     if (report.Extraction != null && !ReturnUtils.IsEnabled())
                     {
-                        var baseA = Path.GetFileNameWithoutExtension(aPath);
-                        var baseB = Path.GetFileNameWithoutExtension(bPath);
                         var extractionOutPath = Path.Combine("outputs", "extract", $"{baseA}__{baseB}__textops_extract.json");
                         Directory.CreateDirectory(Path.GetDirectoryName(extractionOutPath) ?? ".");
                         var extractionJson = JsonSerializer.Serialize(report.Extraction, jsonOptions);
@@ -812,6 +908,8 @@ namespace Obj.Commands
                         PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
                     if (!ReturnUtils.IsEnabled())
                         PrintExtractionSummary(report.Extraction);
+                    if (!ReturnUtils.IsEnabled() && deferredProbePayload != null)
+                        PrintProbeSummary(deferredProbePayload);
                 }
             }
 
@@ -826,6 +924,8 @@ namespace Obj.Commands
                     };
                     var json = JsonSerializer.Serialize(reports, jsonOptions);
                     Console.WriteLine(json);
+                    var baseA = Path.GetFileNameWithoutExtension(aPath);
+                    ReturnUtils.PersistJson(json, $"{baseA}__STACK__output_pipe.json");
                     if (!string.IsNullOrWhiteSpace(outPath) && outSpecified)
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(outPath) ?? ".");
@@ -987,6 +1087,199 @@ namespace Obj.Commands
             }
 
             return payload;
+        }
+
+        private static string ResolveReturnCommandName(OutputMode outputMode)
+        {
+            return outputMode switch
+            {
+                OutputMode.VariablesOnly => "textopsvar",
+                OutputMode.FixedOnly => "textopsfixed",
+                _ => "textopsalign"
+            };
+        }
+
+        private static Dictionary<string, object> BuildReturnInfo(OutputMode outputMode, string defaultFileName)
+        {
+            var enabled = ReturnUtils.IsEnabled();
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["schema_version"] = "operpdf.return.v1",
+                ["command"] = ResolveReturnCommandName(outputMode),
+                ["output_mode"] = outputMode.ToString(),
+                ["return_enabled"] = enabled,
+                ["io_file"] = enabled ? ReturnUtils.ResolveOutputPath(defaultFileName) : "",
+                ["generated_at_utc"] = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture)
+            };
+        }
+
+        private static string CompactText(string? text, int max = 180)
+        {
+            var normalized = TextNormalization.NormalizeWhitespace(text ?? "");
+            if (normalized.Length <= max)
+                return normalized;
+            return normalized.Substring(0, max - 3) + "...";
+        }
+
+        private static string BuildBlockOpRange(ObjectsTextOpsDiff.AlignDebugBlock? block)
+        {
+            if (block == null || block.StartOp <= 0 || block.EndOp <= 0)
+                return "";
+            return block.StartOp == block.EndOp
+                ? $"op{block.StartOp}"
+                : $"op{block.StartOp}-op{block.EndOp}";
+        }
+
+        private static bool IsSelectedByOutputMode(string? kind, OutputMode outputMode)
+        {
+            var normalized = (kind ?? "").Trim().ToLowerInvariant();
+            return outputMode switch
+            {
+                OutputMode.VariablesOnly => normalized == "variable" || normalized == "gap_a" || normalized == "gap_b",
+                OutputMode.FixedOnly => normalized == "fixed",
+                _ => normalized == "fixed" || normalized == "variable" || normalized == "gap_a" || normalized == "gap_b"
+            };
+        }
+
+        private static Dictionary<string, object> BuildReturnPairPreview(int indexZeroBased, ObjectsTextOpsDiff.AlignDebugPair pair)
+        {
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["n"] = indexZeroBased + 1,
+                ["kind"] = pair.Kind ?? "",
+                ["score"] = pair.Score,
+                ["a_index"] = pair.AIndex >= 0 ? pair.AIndex + 1 : 0,
+                ["b_index"] = pair.BIndex >= 0 ? pair.BIndex + 1 : 0,
+                ["a_op_range"] = BuildBlockOpRange(pair.A),
+                ["b_op_range"] = BuildBlockOpRange(pair.B),
+                ["a_text"] = CompactText(pair.A?.Text),
+                ["b_text"] = CompactText(pair.B?.Text)
+            };
+        }
+
+        private static int CountNonEmptyParsedValues(JsonElement root, string sideName)
+        {
+            if (!root.TryGetProperty("parsed", out var parsed) || parsed.ValueKind != JsonValueKind.Object)
+                return 0;
+            if (!parsed.TryGetProperty(sideName, out var side) || side.ValueKind != JsonValueKind.Object)
+                return 0;
+
+            JsonElement values;
+            var hasValues = side.TryGetProperty("values", out values) || side.TryGetProperty("Values", out values);
+            if (!hasValues || values.ValueKind != JsonValueKind.Object)
+                return 0;
+
+            var count = 0;
+            foreach (var prop in values.EnumerateObject())
+            {
+                var value = prop.Value.ValueKind == JsonValueKind.String
+                    ? prop.Value.GetString() ?? ""
+                    : prop.Value.ToString();
+                if (!string.IsNullOrWhiteSpace(value))
+                    count++;
+            }
+            return count;
+        }
+
+        private static Dictionary<string, object> BuildExtractionReturnSummary(object? extraction)
+        {
+            var summary = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["status"] = extraction == null ? "not_available" : "unknown",
+                ["doc_key"] = "",
+                ["doc_type"] = "",
+                ["band"] = "",
+                ["fields_non_empty_a"] = 0,
+                ["fields_non_empty_b"] = 0,
+                ["validator_ok"] = false,
+                ["validator_reason"] = "",
+                ["honorarios_apply_a"] = false,
+                ["honorarios_apply_b"] = false
+            };
+
+            if (extraction == null)
+                return summary;
+
+            try
+            {
+                using var doc = JsonDocument.Parse(JsonSerializer.Serialize(extraction));
+                var root = doc.RootElement;
+
+                if (root.TryGetProperty("status", out var statusEl))
+                    summary["status"] = statusEl.GetString() ?? "";
+                if (root.TryGetProperty("doc_key", out var docKeyEl))
+                    summary["doc_key"] = docKeyEl.GetString() ?? "";
+                if (root.TryGetProperty("doc_type", out var docTypeEl))
+                    summary["doc_type"] = docTypeEl.GetString() ?? "";
+                if (root.TryGetProperty("band", out var bandEl))
+                    summary["band"] = bandEl.GetString() ?? "";
+
+                summary["fields_non_empty_a"] = CountNonEmptyParsedValues(root, "pdf_a");
+                summary["fields_non_empty_b"] = CountNonEmptyParsedValues(root, "pdf_b");
+
+                if (root.TryGetProperty("validator", out var validator) && validator.ValueKind == JsonValueKind.Object)
+                {
+                    if (validator.TryGetProperty("ok", out var okEl) && (okEl.ValueKind == JsonValueKind.True || okEl.ValueKind == JsonValueKind.False))
+                        summary["validator_ok"] = okEl.GetBoolean();
+                    if (validator.TryGetProperty("reason", out var reasonEl))
+                        summary["validator_reason"] = reasonEl.GetString() ?? "";
+                }
+
+                if (root.TryGetProperty("honorarios", out var honorarios) && honorarios.ValueKind == JsonValueKind.Object)
+                {
+                    if (honorarios.TryGetProperty("apply_a", out var applyAEl) && (applyAEl.ValueKind == JsonValueKind.True || applyAEl.ValueKind == JsonValueKind.False))
+                        summary["honorarios_apply_a"] = applyAEl.GetBoolean();
+                    if (honorarios.TryGetProperty("apply_b", out var applyBEl) && (applyBEl.ValueKind == JsonValueKind.True || applyBEl.ValueKind == JsonValueKind.False))
+                        summary["honorarios_apply_b"] = applyBEl.GetBoolean();
+                }
+            }
+            catch
+            {
+                summary["status"] = "invalid";
+            }
+
+            return summary;
+        }
+
+        private static Dictionary<string, object> BuildReturnView(ObjectsTextOpsDiff.AlignDebugReport report, OutputMode outputMode)
+        {
+            var allPairs = report.Alignments ?? new List<ObjectsTextOpsDiff.AlignDebugPair>();
+            var indexed = allPairs.Select((pair, idx) => (pair, idx)).ToList();
+            var selected = indexed.Where(x => IsSelectedByOutputMode(x.pair.Kind, outputMode)).ToList();
+
+            var countsAll = allPairs
+                .GroupBy(p => string.IsNullOrWhiteSpace(p.Kind) ? "(unknown)" : p.Kind.Trim().ToLowerInvariant())
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+            var countsSelected = selected
+                .GroupBy(p => string.IsNullOrWhiteSpace(p.pair.Kind) ? "(unknown)" : p.pair.Kind.Trim().ToLowerInvariant())
+                .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
+            var selectedIndexes = selected.Select(x => x.idx + 1).ToList();
+            var preview = selected
+                .Take(20)
+                .Select(x => BuildReturnPairPreview(x.idx, x.pair))
+                .ToList();
+
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["mode"] = outputMode.ToString(),
+                ["selected_rule"] = outputMode switch
+                {
+                    OutputMode.VariablesOnly => "variable + gap_a + gap_b",
+                    OutputMode.FixedOnly => "fixed",
+                    _ => "fixed + variable + gap_a + gap_b"
+                },
+                ["counts"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["all"] = allPairs.Count,
+                    ["selected"] = selected.Count,
+                    ["all_by_kind"] = countsAll,
+                    ["selected_by_kind"] = countsSelected
+                },
+                ["selected_alignment_indexes"] = selectedIndexes,
+                ["selected_preview_top20"] = preview,
+                ["extraction_summary"] = BuildExtractionReturnSummary(report.Extraction)
+            };
         }
 
         private static object BuildExtractionPayload(ObjectsTextOpsDiff.AlignDebugReport report, string aPath, string bPath, string docKey, bool verbose = false)
@@ -1217,12 +1510,20 @@ namespace Obj.Commands
             var catalog = ValidatorFacade.GetPeritoCatalog(null);
             var beforeValidatorA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeValidatorB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
+            var okA = ValidatorFacade.ApplyAndValidateDocumentValues(valuesA, outputDocType, catalog, out var reasonA, out var validatorChangedA);
             var okB = ValidatorFacade.ApplyAndValidateDocumentValues(valuesB, outputDocType, catalog, out var reasonB, out var validatorChangedB);
             var policyChangedA = EnforceStrictArbitradoPolicy(beforeHonorariosA, parserFieldsA, valuesA, fieldsA);
             var policyChangedB = EnforceStrictArbitradoPolicy(beforeHonorariosB, parserFieldsB, valuesB, fieldsB);
             MarkModuleChanges(beforeValidatorA, valuesA, fieldsA, "validator");
             MarkModuleChanges(beforeValidatorB, valuesB, fieldsB, "validator");
+            var okPair = okA && okB;
             var ok = okB;
+            var reasonParts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(reasonA))
+                reasonParts.Add($"A:{reasonA}");
+            if (!string.IsNullOrWhiteSpace(reasonB))
+                reasonParts.Add($"B:{reasonB}");
+            var reasonPair = reasonParts.Count == 0 ? "" : string.Join(" | ", reasonParts);
             var reason = reasonB ?? "";
             if (verbose)
             {
@@ -1230,13 +1531,21 @@ namespace Obj.Commands
                     "passo 3.5/4 - validação",
                     "passo 4/4 - resumo colorido e persistência",
                     ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
+                    ("changed_keys_validator_a_apply", validatorChangedA == null || validatorChangedA.Count == 0
+                        ? "(nenhum)"
+                        : string.Join(", ", validatorChangedA)),
                     ("changed_keys_validator_a", DescribeChangedKeys(beforeValidatorA, valuesA)),
                     ("changed_keys_validator_b", validatorChangedB == null || validatorChangedB.Count == 0
                         ? "(nenhum)"
                         : string.Join(", ", validatorChangedB)),
                     ("policy_strict_money_a", policyChangedA.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedA)),
                     ("policy_strict_money_b", policyChangedB.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedB)),
+                    ("valor_path_a_pos_validator", DescribeMoneyPath(valuesA, fieldsA)),
                     ("valor_path_b_pos_validator", DescribeMoneyPath(valuesB, fieldsB)),
+                    ("validator_ok_pair", okPair.ToString().ToLowerInvariant()),
+                    ("validator_reason_pair", string.IsNullOrWhiteSpace(reasonPair) ? "(ok)" : reasonPair),
+                    ("validator_ok_a", okA.ToString().ToLowerInvariant()),
+                    ("validator_reason_a", string.IsNullOrWhiteSpace(reasonA) ? "(ok)" : reasonA!),
                     ("validator_ok_b", okB.ToString().ToLowerInvariant()),
                     ("validator_reason_b", string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB!)
                 );
@@ -1310,17 +1619,118 @@ namespace Obj.Commands
                 },
                 ["validator"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
+                    ["enabled"] = true,
+                    ["module"] = "Obj.ValidatorModule.ValidatorFacade",
+                    ["scope"] = "target_b_only(model_a_reference)",
                     ["ok"] = ok,
+                    ["ok_pair"] = okPair,
+                    ["ok_a"] = okA,
                     ["ok_b"] = okB,
                     ["reason"] = reason,
+                    ["reason_pair"] = reasonPair,
+                    ["reason_a"] = reasonA ?? "",
                     ["reason_b"] = reasonB ?? ""
                 },
                 ["honorarios"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
+                    ["enabled"] = true,
+                    ["module"] = "Obj.Honorarios.HonorariosFacade",
+                    ["apply_a"] = true,
+                    ["apply_b"] = true,
                     ["pdf_a"] = BuildHonorariosSnapshot(honorariosA),
                     ["pdf_b"] = BuildHonorariosSnapshot(honorariosB)
                 }
             };
+        }
+
+        private static Dictionary<string, string> ReadValuesForProbe(object? extraction, string sideKey)
+        {
+            var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (extraction == null)
+                return values;
+
+            try
+            {
+                using var doc = JsonDocument.Parse(JsonSerializer.Serialize(extraction));
+                var root = doc.RootElement;
+                if (!root.TryGetProperty("parsed", out var parsed) || parsed.ValueKind != JsonValueKind.Object)
+                    return values;
+                if (!parsed.TryGetProperty(sideKey, out var side) || side.ValueKind != JsonValueKind.Object)
+                    return values;
+
+                JsonElement valuesEl;
+                var hasValues = side.TryGetProperty("values", out valuesEl) || side.TryGetProperty("Values", out valuesEl);
+                if (!hasValues || valuesEl.ValueKind != JsonValueKind.Object)
+                    return values;
+
+                foreach (var prop in valuesEl.EnumerateObject())
+                {
+                    var value = prop.Value.ValueKind == JsonValueKind.String
+                        ? (prop.Value.GetString() ?? "")
+                        : prop.Value.ToString();
+                    values[prop.Name] = value ?? "";
+                }
+            }
+            catch
+            {
+                // best-effort only
+            }
+
+            return values;
+        }
+
+        private static void AttachProbeToExtraction(object? extraction, Dictionary<string, object> probePayload)
+        {
+            if (extraction is Dictionary<string, object> extractionDict)
+            {
+                extractionDict["probe"] = probePayload;
+                return;
+            }
+
+            if (extraction is Dictionary<string, object?> extractionNullableDict)
+                extractionNullableDict["probe"] = probePayload;
+        }
+
+        private static void PrintProbeSummary(Dictionary<string, object> probePayload)
+        {
+            if (probePayload == null)
+                return;
+
+            try
+            {
+                var status = probePayload.TryGetValue("status", out var statusObj) ? statusObj?.ToString() ?? "" : "";
+                var pdf = probePayload.TryGetValue("pdf", out var pdfObj) ? pdfObj?.ToString() ?? "" : "";
+                var page = probePayload.TryGetValue("page", out var pageObj) ? pageObj?.ToString() ?? "0" : "0";
+                var side = probePayload.TryGetValue("side", out var sideObj) ? sideObj?.ToString() ?? "" : "";
+                var checkedFields = probePayload.TryGetValue("fields_checked", out var checkedObj) ? checkedObj?.ToString() ?? "0" : "0";
+                var found = probePayload.TryGetValue("found", out var foundObj) ? foundObj?.ToString() ?? "0" : "0";
+                var missing = probePayload.TryGetValue("missing", out var missingObj) ? missingObj?.ToString() ?? "0" : "0";
+                var ok = string.Equals(status, "ok", StringComparison.OrdinalIgnoreCase);
+
+                Console.WriteLine(Colorize(
+                    $"[PROBE] {(ok ? "OK" : "FAIL")} side={side} file={Path.GetFileName(pdf)} page={page} found={found}/{checkedFields} missing={missing}",
+                    ok ? AnsiOk : AnsiErr));
+
+                if (probePayload.TryGetValue("items", out var itemsObj) && itemsObj is List<Dictionary<string, object>> items)
+                {
+                    foreach (var item in items)
+                    {
+                        var field = item.TryGetValue("field", out var fObj) ? fObj?.ToString() ?? "" : "";
+                        var value = item.TryGetValue("value", out var vObj) ? vObj?.ToString() ?? "" : "";
+                        var itemFound = item.TryGetValue("found", out var ffObj) && ffObj is bool b && b;
+                        var method = item.TryGetValue("method", out var mObj) ? mObj?.ToString() ?? "" : "";
+                        var matches = item.TryGetValue("matches", out var mmObj) ? mmObj?.ToString() ?? "0" : "0";
+                        var color = itemFound ? AnsiOk : AnsiErr;
+                        var valueDisplay = ShortText(value, 64);
+                        Console.WriteLine($"  {Colorize(field + ":", AnsiWarn)} {Colorize(valueDisplay, color)} -> {Colorize(itemFound ? "FOUND" : "MISS", color)} method={method} matches={matches}");
+                    }
+                }
+                Console.WriteLine();
+            }
+            catch
+            {
+                // best-effort only
+            }
         }
 
         private static void PrintExtractionSummary(object? extraction)
@@ -1436,6 +1846,209 @@ namespace Obj.Commands
             }
         }
 
+        private static bool TryReadEnvBool(string key, out bool value)
+        {
+            value = false;
+            var raw = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrWhiteSpace(raw))
+                return false;
+            var t = raw.Trim().ToLowerInvariant();
+            if (t is "1" or "true" or "yes" or "on")
+            {
+                value = true;
+                return true;
+            }
+            if (t is "0" or "false" or "no" or "off")
+            {
+                value = false;
+                return true;
+            }
+            return false;
+        }
+
+        private static bool TryReadEnvInt(string key, out int value)
+        {
+            value = 0;
+            var raw = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrWhiteSpace(raw))
+                return false;
+            return int.TryParse(raw.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+        }
+
+        private static bool TryReadEnvDouble(string key, out double value)
+        {
+            value = 0;
+            var raw = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrWhiteSpace(raw))
+                return false;
+            return double.TryParse(raw.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+        }
+
+        private static void AddInputsFromEnv(List<string> inputs, string key)
+        {
+            var raw = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrWhiteSpace(raw))
+                return;
+            foreach (var token in raw.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                AddInput(inputs, token);
+        }
+
+        private static void AddOpFilterFromEnv(HashSet<string> opFilter, string key)
+        {
+            var raw = Environment.GetEnvironmentVariable(key);
+            if (string.IsNullOrWhiteSpace(raw))
+                return;
+            foreach (var op in raw.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var t = op.Trim();
+                if (t.Length > 0)
+                    opFilter.Add(t);
+            }
+        }
+
+        private static void ApplyTextOpsAlignEnvDefaults(
+            ref List<string> inputs,
+            ref int pageA,
+            ref int pageB,
+            ref int objA,
+            ref int objB,
+            ref HashSet<string> opFilter,
+            ref int backoff,
+            ref string outPath,
+            ref bool outSpecified,
+            ref int top,
+            ref double minSim,
+            ref int band,
+            ref double minLenRatio,
+            ref double lenPenalty,
+            ref double anchorMinSim,
+            ref double anchorMinLenRatio,
+            ref double gapPenalty,
+            ref bool showAlign,
+            ref int alignTop,
+            ref bool pageAUser,
+            ref bool pageBUser,
+            ref bool objAUser,
+            ref bool objBUser,
+            ref string docKey,
+            ref bool useBack,
+            ref bool sideSpecified,
+            ref bool allowStack,
+            ref bool probeEnabled,
+            ref string probeFile,
+            ref int probePage,
+            ref string probeSide,
+            ref int probeMaxFields)
+        {
+            AddInputsFromEnv(inputs, "OBJ_TEXTOPSALIGN_INPUTS");
+            AddOpFilterFromEnv(opFilter, "OBJ_TEXTOPSALIGN_OPS");
+
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PAGE_A", out var envPageA) && envPageA > 0)
+            {
+                pageA = envPageA;
+                pageAUser = true;
+            }
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PAGE_B", out var envPageB) && envPageB > 0)
+            {
+                pageB = envPageB;
+                pageBUser = true;
+            }
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_OBJ_A", out var envObjA) && envObjA > 0)
+            {
+                objA = envObjA;
+                objAUser = true;
+            }
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_OBJ_B", out var envObjB) && envObjB > 0)
+            {
+                objB = envObjB;
+                objBUser = true;
+            }
+
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_BACKOFF", out var envBackoff))
+                backoff = envBackoff;
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_TOP", out var envTop))
+                top = envTop;
+            if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_MIN_SIM", out var envMinSim))
+                minSim = envMinSim;
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_BAND", out var envBand))
+                band = envBand;
+            if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_MIN_LEN_RATIO", out var envMinLenRatio))
+                minLenRatio = Math.Max(0, Math.Min(1, envMinLenRatio));
+            if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_LEN_PENALTY", out var envLenPenalty))
+                lenPenalty = Math.Max(0, Math.Min(1, envLenPenalty));
+            if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_ANCHOR_MIN_SIM", out var envAnchorSim))
+                anchorMinSim = Math.Max(0, Math.Min(1, envAnchorSim));
+            if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_ANCHOR_MIN_LEN_RATIO", out var envAnchorLen))
+                anchorMinLenRatio = Math.Max(0, Math.Min(1, envAnchorLen));
+            if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_GAP_PENALTY", out var envGap))
+                gapPenalty = Math.Max(-1, Math.Min(1, envGap));
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_ALIGN_TOP", out var envAlignTop))
+                alignTop = envAlignTop;
+            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_SHOW_ALIGN", out var envShowAlign))
+                showAlign = envShowAlign;
+            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_ALLOW_STACK", out var envAllowStack))
+                allowStack = envAllowStack;
+
+            var envOut = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_OUT");
+            if (!string.IsNullOrWhiteSpace(envOut))
+            {
+                outPath = envOut.Trim();
+                outSpecified = true;
+            }
+
+            var envDoc = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_DOC");
+            if (!string.IsNullOrWhiteSpace(envDoc))
+                docKey = envDoc.Trim();
+
+            var envSide = (Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_SIDE") ?? "").Trim().ToLowerInvariant();
+            if (envSide is "back" or "p2" or "verso")
+            {
+                useBack = true;
+                sideSpecified = true;
+            }
+            else if (envSide is "front" or "p1" or "anverso")
+            {
+                useBack = false;
+                sideSpecified = true;
+            }
+
+            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_BACK", out var envBack))
+            {
+                useBack = envBack;
+                sideSpecified = true;
+            }
+
+            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_PROBE", out var envProbe))
+                probeEnabled = envProbe;
+            var envProbeFile = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_PROBE_FILE");
+            if (!string.IsNullOrWhiteSpace(envProbeFile))
+            {
+                probeFile = envProbeFile.Trim();
+                probeEnabled = true;
+            }
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PROBE_PAGE", out var envProbePage))
+            {
+                probePage = Math.Max(0, envProbePage);
+                probeEnabled = true;
+            }
+            var envProbeSide = (Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_PROBE_SIDE") ?? "").Trim().ToLowerInvariant();
+            if (envProbeSide is "a" or "pdf_a" or "left")
+            {
+                probeSide = "a";
+                probeEnabled = true;
+            }
+            else if (envProbeSide is "b" or "pdf_b" or "right")
+            {
+                probeSide = "b";
+                probeEnabled = true;
+            }
+            if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PROBE_MAX_FIELDS", out var envProbeMax))
+            {
+                probeMaxFields = Math.Max(0, envProbeMax);
+                probeEnabled = true;
+            }
+        }
+
         private static bool ParseOptions(
             string[] args,
             out List<string> inputs,
@@ -1463,7 +2076,13 @@ namespace Obj.Commands
             out bool objBUser,
             out string docKey,
             out bool useBack,
-            out bool sideSpecified)
+            out bool sideSpecified,
+            out bool allowStack,
+            out bool probeEnabled,
+            out string probeFile,
+            out int probePage,
+            out string probeSide,
+            out int probeMaxFields)
         {
             inputs = new List<string>();
             pageA = 0;
@@ -1491,6 +2110,46 @@ namespace Obj.Commands
             docKey = "";
             useBack = false;
             sideSpecified = false;
+            allowStack = false;
+            probeEnabled = false;
+            probeFile = "";
+            probePage = 0;
+            probeSide = "b";
+            probeMaxFields = 0;
+
+            ApplyTextOpsAlignEnvDefaults(
+                ref inputs,
+                ref pageA,
+                ref pageB,
+                ref objA,
+                ref objB,
+                ref opFilter,
+                ref backoff,
+                ref outPath,
+                ref outSpecified,
+                ref top,
+                ref minSim,
+                ref band,
+                ref minLenRatio,
+                ref lenPenalty,
+                ref anchorMinSim,
+                ref anchorMinLenRatio,
+                ref gapPenalty,
+                ref showAlign,
+                ref alignTop,
+                ref pageAUser,
+                ref pageBUser,
+                ref objAUser,
+                ref objBUser,
+                ref docKey,
+                ref useBack,
+                ref sideSpecified,
+                ref allowStack,
+                ref probeEnabled,
+                ref probeFile,
+                ref probePage,
+                ref probeSide,
+                ref probeMaxFields);
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -1630,6 +2289,61 @@ namespace Obj.Commands
                     showAlign = true;
                     continue;
                 }
+                if (string.Equals(arg, "--allow-stack", StringComparison.OrdinalIgnoreCase))
+                {
+                    allowStack = true;
+                    continue;
+                }
+                if (string.Equals(arg, "--probe", StringComparison.OrdinalIgnoreCase))
+                {
+                    probeEnabled = true;
+                    if (i + 1 < args.Length)
+                    {
+                        var next = args[i + 1] ?? "";
+                        if (!next.StartsWith("-", StringComparison.Ordinal))
+                        {
+                            probeFile = next.Trim().Trim('"');
+                            i++;
+                        }
+                    }
+                    continue;
+                }
+                if (arg.StartsWith("--probe=", StringComparison.OrdinalIgnoreCase))
+                {
+                    probeEnabled = true;
+                    var split = arg.Split('=', 2);
+                    probeFile = split.Length == 2 ? split[1].Trim().Trim('"') : "";
+                    continue;
+                }
+                if (string.Equals(arg, "--probe-file", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    probeEnabled = true;
+                    probeFile = (args[++i] ?? "").Trim().Trim('"');
+                    continue;
+                }
+                if (string.Equals(arg, "--probe-page", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    probeEnabled = true;
+                    int.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out probePage);
+                    continue;
+                }
+                if (string.Equals(arg, "--probe-side", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    probeEnabled = true;
+                    var rawSide = (args[++i] ?? "").Trim().ToLowerInvariant();
+                    if (rawSide == "a" || rawSide == "pdf_a" || rawSide == "left")
+                        probeSide = "a";
+                    else if (rawSide == "b" || rawSide == "pdf_b" || rawSide == "right")
+                        probeSide = "b";
+                    continue;
+                }
+                if (string.Equals(arg, "--probe-max-fields", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    probeEnabled = true;
+                    int.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out probeMaxFields);
+                    probeMaxFields = Math.Max(0, probeMaxFields);
+                    continue;
+                }
 
                 if (!arg.StartsWith("-", StringComparison.Ordinal))
                 {
@@ -1645,7 +2359,8 @@ namespace Obj.Commands
 
         private static void ShowHelp()
         {
-            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--align] [--align-top N] [--out file]");
+            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--align] [--align-top N] [--out file] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
+            Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1");
         }
 
         private static void WriteStackedOutput(string aPath, List<ObjectsTextOpsDiff.AlignDebugReport> reports, string outPath)

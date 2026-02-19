@@ -1,0 +1,447 @@
+# Mapa de Centralização — Validator e Honorários
+
+Gerado em: 2026-02-16 15:31:22
+
+## Objetivo
+Consolidar todos os pontos de validação documental/campos e enriquecimento de honorários em módulos centrais, sem perda de regra e sem remoção de comportamento útil.
+
+## Núcleos Centrais (fontes canônicas)
+- Validator:
+  - `modules/ValidatorModule/DocumentValidationRules.cs`
+  - `modules/ValidatorModule/DocumentDetectionPolicy.cs`
+  - `modules/ValidatorModule/ValidatorRules.cs`
+  - `modules/ValidatorModule/ValidatorContext.cs`
+  - `modules/ValidatorModule/ValidatorDiagnostics.cs`
+- Honorários:
+  - `modules/HonorariosModule/HonorariosEnricher.cs`
+  - `modules/HonorariosModule/HonorariosBackfill.cs`
+  - `modules/HonorariosModule/HonorariosApi.cs`
+
+## Dependências de Honorários que ainda estão fora do módulo
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs`
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/PeritoCatalog.cs`
+- `modules/ExtractionModule/TjpbDespachoExtractor/Config/TjpbDespachoConfig.cs` (tipos de config usados por honorários)
+
+## Uso espalhado de Validator (fora de `modules/ValidatorModule`)
+- `modules/Core/Utils/BookmarkClassifier.cs:77`:            if (DocumentValidationRules.IsRequerimento(norm))
+- `modules/Core/Utils/BookmarkClassifier.cs:79`:            if (DocumentValidationRules.IsLikelyOficio(norm))
+- `modules/Core/Utils/BookmarkClassifier.cs:81`:            if (DocumentValidationRules.IsCertidaoConselho(norm))
+- `modules/Core/Utils/BookmarkClassifier.cs:83`:            if (DocumentValidationRules.IsDespacho(norm))
+- `modules/ExtractionModule/NlpFieldMapper.cs:134`:            var docTypeHintKey = DocumentValidationRules.ResolveDocKeyFromHint(docTypeHint);
+- `modules/ExtractionModule/NlpFieldMapper.cs:142`:                    DocumentValidationRules.IsDocMatch(r.Key, docTypeHintKey) ||
+- `modules/ExtractionModule/NlpFieldMapper.cs:145`:                    docType = DocumentValidationRules.ResolveDocKeyFromHint(rule.Key);
+- `modules/ExtractionModule/NlpFieldMapper.cs:151`:            var resolvedDocType = DocumentValidationRules.ResolveDocKeyFromHint(docType);
+- `modules/ExtractionModule/NlpFieldMapper.cs:166`:                    DocumentValidationRules.IsDocMatch(docType, dt) ||
+- `modules/ExtractionModule/NlpFieldMapper.cs:238`:                    bestKey = DocumentDetectionPolicy.NormalizeDocTypeKey(rule.Key);
+- `modules/ExtractionModule/NlpFieldMapper.cs:249`:            return DocumentDetectionPolicy.ScoreKeywordRule(normText, rule.KeywordsAny, rule.KeywordsAll);
+- `modules/ExtractionModule/NlpFieldMapper.cs:256`:            return DocumentDetectionPolicy.MatchesKeywordRule(normText, rule.KeywordsAny, rule.KeywordsAll);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Commands/TjpbDespachoExtractorCommand.cs:642`:                return ValidatorRules.ContainsInstitutional(norm);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/CertidaoExtraction.cs:100`:            return DocumentValidationRules.ValidateCertidaoPageSignals(
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/CertidaoExtraction.cs:26`:                        if (page1 > 0 && DocumentValidationRules.IsCertidaoBookmarkTitle(item.Title))
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/DespachoExtractor.cs:630`:                if (DocumentValidationRules.ContainsBookmarkKeywordsForDoc(bm.Title, null))
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/DespachoExtractor.cs:753`:            if (DocumentValidationRules.ContainsBookmarkKeywordsForDoc(norm, "despacho")) return true;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1750`:            return ValidatorRules.HasSignatureAnchor(text, _cfg.Anchors?.SignerHints);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1755`:            return ValidatorRules.HasPjeSignatureAnchor(text);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1760`:            return ValidatorRules.LooksLikeAssinanteName(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1888`:                if (ValidatorRules.TryNormalizeProcessoJudicial(pj.Value, _cnj, out var normalized))
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1901`:                if (ValidatorRules.TryNormalizeCpfDigits(cpf.Value, out var digits))
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2033`:            return ValidatorRules.LooksLikeNoisePerito(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2038`:            return ValidatorRules.LooksWeakEspecialidadeValue(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2054`:            return ValidatorRules.CleanPartyName(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2059`:            return ValidatorRules.LooksLikePartyNameSimple(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2064`:            return ValidatorRules.IsInstitutionalRequester(label, value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2069`:            return ValidatorRules.IsInstitutionalPartyValue(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2074`:            return ValidatorRules.CleanPersonName(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2079`:            return ValidatorRules.TrimPeritoName(value);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2084`:            return ValidatorRules.InferEspecieFromEspecialidade(especialidade);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:2089`:            return ValidatorRules.IsWeakEspecieToken(tokenNorm);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldStrategyEngine.cs:306`:                v = ValidatorRules.ApplyStrategyCleanRule(key, v);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldStrategyEngine.cs:320`:                    if (!ValidatorRules.IsStrategyValidationRuleValid(key, val, _moneyRegex))
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldStrategyEngine.cs:327`:                if (!ValidatorRules.IsValidProcessoJudicial(val, _cnjRegex)) return false;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldStrategyEngine.cs:331`:                if (!ValidatorRules.TryNormalizeCpfDigits(val, out _)) return false;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldStrategyEngine.cs:338`:            return ValidatorRules.NormalizeExtractorValue(field, value, _cnjRegex, collapseWeirdSpacing: true);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/PeritoCatalog.cs:157`:            return ValidatorRules.LooksLikeCatalogName(name);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Utils/BandSegmenter.cs:51`:                    if (DocumentValidationRules.ContainsContentsTitleKeywordsForDoc(norm, null))
+- `modules/PatternModules/ObjectsPattern.RegexCatalog.cs:244`:            var docKey = DocumentValidationRules.ResolveDocKeyFromHint(docName);
+- `modules/PatternModules/ObjectsPattern.RegexCatalog.cs:245`:            if (DocumentValidationRules.IsDocMatch(docKey, DocumentValidationRules.DocKeyCertidaoConselho))
+- `src/Commands/Inspect/ObjectsAlignRange.cs:658`:            var resolved = DocumentValidationRules.ResolveDocKeyForDetection(raw);
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:232`:            return DocumentValidationRules.IsDocMatch(docKey, onlyDoc);
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:237`:            return DocumentValidationRules.NormalizeOnlyDocFilter(only);
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:324`:                    if (DocumentValidationRules.IsDocMatch(r.DocType, only))
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:342`:            return DocumentValidationRules.ResolvePatternForDoc(docType);
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:373`:            var tag = DocumentDetectionPolicy.ResolveDetectorColorTag(name);
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:388`:            return DocumentDetectionPolicy.ResolveWeight(detector, DocumentDetectionPolicy.ProfileDetectDocCli);
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:414`:            var profile = DocumentDetectionPolicy.ProfileDetectDocCli;
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:415`:            foreach (var detector in DocumentDetectionPolicy.GetLegendDetectors(profile))
+- `src/Commands/Inspect/ObjectsDetectDoc.cs:418`:                var weight = DocumentDetectionPolicy.ResolveWeight(detector, profile);
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:16`:            DocumentValidationRules.DocKeyDespacho,
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:17`:            DocumentValidationRules.DocKeyCertidaoConselho,
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:18`:            DocumentValidationRules.DocKeyRequerimentoHonorarios
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:23`:            var detectDocKey = DocumentValidationRules.ResolveDocKeyForDetection(docHint);
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:25`:            if (DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:28`:            if (DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyCertidaoConselho))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:31`:            if (DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:39`:            var key = DocumentValidationRules.ResolveDocKeyForDetection(docHint);
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:40`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:42`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyCertidaoConselho))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:44`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:51`:            var key = DocumentValidationRules.ResolveDocKeyForDetection(docHint);
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:52`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:54`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyCertidaoConselho))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:56`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1032`:                if (item.Page > 0 && DocumentValidationRules.ContainsBookmarkKeywordsForDoc(item.Title, roiDoc))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1085`:                    if (DocumentValidationRules.IsLikelyOficio(norm))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1362`:                if (DocumentValidationRules.IsLikelyOficio(prefixNorm))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1365`:                if (DocumentValidationRules.IsBlockedDespacho(prefixNorm) || DocumentValidationRules.IsBlockedDespacho(collapsed))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1369`:                               DocumentValidationRules.ContainsContentsTitleKeywordsForDoc(prefixNorm, roiDoc);
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1409`:                if (DocumentValidationRules.IsLikelyOficio(prefixNorm))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1412`:                if (DocumentValidationRules.IsBlockedDespacho(prefixNorm) || DocumentValidationRules.IsBlockedDespacho(collapsed))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1416`:                               DocumentValidationRules.ContainsContentsTitleKeywordsForDoc(prefixNorm, roiDoc);
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1710`:            return DocumentValidationRules.ContainsContentsTitleKeywordsForDoc(norm, roiDoc);
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1717`:            if (DocumentValidationRules.IsLikelyOficioRaw(text))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1720`:            if (DocumentValidationRules.IsLikelyOficio(norm))
+- `src/Commands/Inspect/ObjectsFindDespacho.cs:1732`:            return DocumentValidationRules.ContainsHeaderFallbackForDoc(norm, roiDoc);
+- `src/Commands/Inspect/ObjectsPattern.cs:11028`:            return ValidatorRules.ContainsGeorc(text);
+- `src/Commands/Inspect/ObjectsPattern.cs:11643`:            return ValidatorRules.ContainsAdiantamento(text, NormalizePatternText);
+- `src/Commands/Inspect/ObjectsPattern.cs:3745`:            DocumentValidationRules.EnsureDespachoRejectTexts(rejectTexts, docName);
+- `src/Commands/Inspect/ObjectsPattern.cs:3809`:                                      docName.Equals(DocumentValidationRules.DocKeyDespacho, StringComparison.OrdinalIgnoreCase);
+- `src/Commands/Inspect/ObjectsPattern.cs:3813`:            var detectDocKey = DocumentValidationRules.ResolveDocKeyForDetection(docName);
+- `src/Commands/Inspect/ObjectsPattern.cs:3814`:            var isDespachoDoc = DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyDespacho);
+- `src/Commands/Inspect/ObjectsPattern.cs:3815`:            var isCertidaoPattern = DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyCertidaoConselho);
+- `src/Commands/Inspect/ObjectsPattern.cs:3816`:            var isRequerimentoPattern = DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyRequerimentoHonorarios);
+- `src/Commands/Inspect/ObjectsPattern.cs:3858`:                return DocumentValidationRules.GetMissingRequiredFields(
+- `src/Commands/Inspect/ObjectsPattern.cs:3954`:                        var guardPass = DocumentValidationRules.IsTargetGuardPass(detectDocKey, fullA, combined);
+- `src/Commands/Inspect/ObjectsPattern.cs:3955`:                        var strongPass = DocumentValidationRules.IsTargetStrongPass(detectDocKey, combined);
+- `src/Commands/Inspect/ObjectsPattern.cs:3956`:                        var otherStrong = DocumentValidationRules.IsOtherDocStrongAgainstTarget(detectDocKey, combined, fullA, combined);
+- `src/Commands/Inspect/ObjectsPattern.cs:4052`:                        if (DocumentValidationRules.ShouldFallbackDetectDoc(
+- `src/Commands/Inspect/ObjectsPattern.cs:4185`:                                 docName.Equals(DocumentValidationRules.DocKeyDespacho, StringComparison.OrdinalIgnoreCase)))
+- `src/Commands/Inspect/ObjectsPattern.cs:4190`:                                if (DocumentValidationRules.IsBlockedDespacho(baseCheck))
+- `src/Commands/Inspect/ObjectsPattern.cs:4201`:                                var hasDespacho = DocumentValidationRules.ContainsContentsTitleKeywordsForDoc(loose, docName) ||
+- `src/Commands/Inspect/ObjectsPattern.cs:4202`:                                                  DocumentValidationRules.ContainsContentsTitleKeywordsForDoc(looseCompact, docName);
+- `src/Commands/Inspect/ObjectsPattern.cs:4203`:                                var hasOficio = DocumentValidationRules.IsLikelyOficioLoose(loose, looseCompact);
+- `src/Commands/Inspect/ObjectsPattern.cs:4217`:                                if (DocumentValidationRules.HasRejectTextMatchLoose(baseText, rejectTexts))
+- `src/Commands/Inspect/ObjectsPattern.cs:4351`:                            if (DocumentValidationRules.HasRejectTextMatchLoose(baseText, rejectTexts))
+- `src/Commands/Inspect/ObjectsPattern.cs:4917`:            return ValidatorRules.IsWeakPeritoValue(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:4922`:            return ValidatorRules.IsWeakPartyValue(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5140`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPattern.cs:5345`:            var issues = ValidatorDiagnostics.CollectSummaryIssues(values);
+- `src/Commands/Inspect/ObjectsPattern.cs:5376`:            return ValidatorRules.ContainsInstitutional(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5381`:            return ValidatorRules.LooksLikeCpf(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5386`:            return ValidatorRules.ContainsCpfPattern(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5391`:            return ValidatorRules.ContainsVaraComarca(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5396`:            return ValidatorRules.IsPeritoNameFromCatalog(value, catalog, out confidence);
+- `src/Commands/Inspect/ObjectsPattern.cs:5401`:            return ValidatorRules.StripKnownLabelPrefix(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5406`:            return ValidatorRules.IsValidFieldFormat(
+- `src/Commands/Inspect/ObjectsPattern.cs:5418`:            return ValidatorRules.ContainsProcessualNoise(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5423`:            return ValidatorRules.ContainsDocumentBoilerplate(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5428`:            return ValidatorRules.LooksLikeEspecialidadeValue(value, ContainsEspecialidadeToken);
+- `src/Commands/Inspect/ObjectsPattern.cs:5433`:            return ValidatorRules.LooksLikeComarcaValue(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5438`:            return ValidatorRules.LooksLikeVaraValue(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5443`:            return ValidatorRules.LooksLikePartyValue(
+- `src/Commands/Inspect/ObjectsPattern.cs:5452`:            return ValidatorRules.ContainsEmail(value);
+- `src/Commands/Inspect/ObjectsPattern.cs:5457`:            return ValidatorRules.LooksLikePersonNameLoose(text);
+- `src/Commands/Inspect/ObjectsPattern.cs:5462`:            return ValidatorRules.IsValueValidForField(
+- `src/Commands/Inspect/ObjectsPattern.cs:5482`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPattern.cs:5483`:            ValidatorRules.ApplyValidatorFiltersAndReanalysis(
+- `src/Commands/Inspect/ObjectsPattern.cs:5575`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPattern.cs:5576`:            return ValidatorRules.ShouldRejectByValidator(
+- `src/Commands/Inspect/ObjectsPattern.cs:7836`:            var cleanPromovente = ValidatorRules.CleanPartyName(rawPromovente).Trim().TrimEnd(',', ';', '–', '—', '-');
+- `src/Commands/Inspect/ObjectsPattern.cs:7837`:            var cleanPromovido = ValidatorRules.CleanPartyName(rawPromovido).Trim().TrimEnd(',', ';', '–', '—', '-');
+- `src/Commands/Inspect/ObjectsPattern.cs:7864`:                var clean = ValidatorRules.CleanPartyName(emFaceWithDoc.Groups[1].Value);
+- `src/Commands/Inspect/ObjectsPattern.cs:7902`:                var clean = ValidatorRules.CleanPartyName(emFace.Groups[1].Value);
+- `src/Commands/Inspect/ObjectsPattern.cs:7976`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPattern.cs:8818`:            return ValidatorRules.ExplainPeritoReject(
+- `src/Commands/Inspect/ObjectsPattern.cs:8832`:            return ValidatorRules.CleanPeritoValue(
+- `src/Commands/Inspect/ObjectsPattern.cs:8835`:                isPeritoStopwordToken: ValidatorRules.IsPeritoStopwordToken,
+- `src/Commands/Inspect/ObjectsPattern.cs:8836`:                stripPeritoTrailingContext: ValidatorRules.StripPeritoTrailingContext,
+- `src/Commands/Inspect/ObjectsPattern.cs:8842`:                extractLeadingNameCandidate: t => ValidatorRules.ExtractLeadingNameCandidate(t, NormalizeToken),
+- `src/Commands/Inspect/ObjectsPattern.cs:9298`:            DocumentValidationRules.EnsureDespachoRejectTexts(rejectTexts, docName);
+- `src/Commands/Inspect/ObjectsPattern.cs:9350`:                        if (DocumentValidationRules.HasRejectTextMatch(baseText, rejectTexts))
+- `src/Commands/Inspect/ObjectsPattern.cs:9875`:            DocumentValidationRules.EnsureDespachoRejectTexts(rejectTexts, docName);
+- `src/Commands/Inspect/ObjectsPattern.cs:9917`:                        if (DocumentValidationRules.HasRejectTextMatch(baseText, rejectTexts))
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:1551`:            var docKey = DocumentValidationRules.ResolveDocKeyFromHint(norm);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:1553`:                docKey = DocumentValidationRules.ClassifyDocByPageEvidence(norm, norm, norm, norm, norm, out _);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:1554`:            return DocumentValidationRules.MapDocKeyToOutputType(docKey);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:1559`:            return DocumentValidationRules.MapDocKeyToOutputType(docKey);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:1564`:            return DocumentValidationRules.MapOutputTypeToDocKey(docType);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:1636`:                FrontRequireMarker = DocumentValidationRules.IsDocMatch(docHint, DocumentValidationRules.DocKeyDespacho)
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2568`:            if (!ValidatorRules.IsValidFieldFormat(field, value))
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2571`:            if (!ValidatorRules.IsValueValidForField(field, value, null, null, null, out _))
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2588`:                ValidatorRules.ContainsDocumentBoilerplate(value))
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2593`:                if (!ValidatorRules.LooksLikePersonNameLoose(value))
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2597`:                if (ValidatorRules.ContainsProcessualNoise(peritoNorm) || ValidatorRules.ContainsDocumentBoilerplate(peritoNorm))
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2611`:                if (ValidatorRules.ContainsProcessualNoise(value) || ValidatorRules.ContainsDocumentBoilerplate(value))
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2905`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3441`:            return ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3463`:            return ValidatorRules.PassesDocumentValidator(values, doc.DocType, catalog, out reason);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:495`:            var opts = DocumentValidationRules.BuildDefaultDetectionOptions();
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:534`:            var opts = DocumentValidationRules.BuildDefaultDetectionOptions();
+- `src/Commands/Inspect/ObjectsPipeline.cs:1098`:                var requireMarker = DocumentValidationRules.IsDocMatch(hit.TitleKey, DocumentValidationRules.DocKeyDespacho);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1138`:            if (DocumentValidationRules.IsDocMatch(hit.TitleKey, DocumentValidationRules.DocKeyDespacho) && hit.Page > 0)
+- `src/Commands/Inspect/ObjectsPipeline.cs:1553`:            return DocumentValidationRules.NormalizeDocKey(titleKey);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1591`:            if (!DocumentValidationRules.IsDocMatch(docType, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2119`:                docHint = DocumentValidationRules.DocKeyDespacho;
+- `src/Commands/Inspect/ObjectsPipeline.cs:2530`:            if (DocumentValidationRules.IsDocMatch(docHint, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2541`:            if (DocumentValidationRules.IsDocMatch(docHint, DocumentValidationRules.DocKeyDespacho) && frontBack != null)
+- `src/Commands/Inspect/ObjectsPipeline.cs:2782`:            var consolidateKey = DocumentValidationRules.MapDocKeyToConsolidationInput(docType);
+- `src/Commands/Inspect/ObjectsPipeline.cs:2796`:                var despachoInputKey = DocumentValidationRules.MapDocKeyToConsolidationInput(DocumentValidationRules.DocKeyDespacho);
+- `src/Commands/Inspect/ObjectsPipeline.cs:2797`:                var requerimentoInputKey = DocumentValidationRules.MapDocKeyToConsolidationInput(DocumentValidationRules.DocKeyRequerimentoHonorarios);
+- `src/Commands/Inspect/ObjectsPipeline.cs:2798`:                var certidaoInputKey = DocumentValidationRules.MapDocKeyToConsolidationInput(DocumentValidationRules.DocKeyCertidaoConselho);
+- `src/Commands/Inspect/ObjectsPipeline.cs:2829`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2831`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyCertidaoConselho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2833`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2841`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2843`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyCertidaoConselho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2845`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3329`:                result = DocumentTitleDetector.Detect(pdfPath, DocumentValidationRules.BuildDefaultDetectionOptions());
+- `src/Commands/Inspect/ObjectsPipeline.cs:3357`:            var opts = DocumentValidationRules.BuildDefaultDetectionOptions();
+- `src/Commands/Inspect/ObjectsPipeline.cs:3393`:                if (DocumentValidationRules.IsCertidaoConselho(top) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3394`:                    DocumentValidationRules.IsCertidaoConselho(body) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3395`:                    DocumentValidationRules.IsCertidaoConselho(combined))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3403`:                        TitleKey = DocumentValidationRules.DocKeyCertidaoConselho,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3406`:                        MatchedKeyword = DocumentValidationRules.DocKeyCertidaoConselho,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3411`:                var isReqStrong = DocumentValidationRules.IsRequerimentoStrong(top) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3412`:                                  DocumentValidationRules.IsRequerimentoStrong(body) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3413`:                                  DocumentValidationRules.IsRequerimentoStrong(combined);
+- `src/Commands/Inspect/ObjectsPipeline.cs:3422`:                        TitleKey = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3425`:                        MatchedKeyword = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3430`:                if (DocumentValidationRules.IsDespacho(key) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3431`:                    DocumentValidationRules.IsDespacho(top) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3432`:                    DocumentValidationRules.IsDespacho(body) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3433`:                    DocumentValidationRules.IsDespacho(combined))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3442`:                            TitleKey = DocumentValidationRules.DocKeyDespacho,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3445`:                            MatchedKeyword = DocumentValidationRules.DocKeyDespacho,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3452`:                    (DocumentValidationRules.IsRequerimento(top) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3453`:                     DocumentValidationRules.IsRequerimento(body) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3454`:                     DocumentValidationRules.IsRequerimento(combined) ||
+- `src/Commands/Inspect/ObjectsPipeline.cs:3455`:                     DocumentValidationRules.IsRequerimento(key)))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3462`:                        TitleKey = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3465`:                        MatchedKeyword = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3510`:                    if (!DocumentValidationRules.IsRequerimentoStrong(norm) &&
+- `src/Commands/Inspect/ObjectsPipeline.cs:3511`:                        !DocumentValidationRules.IsRequerimento(norm))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3519`:                        TitleKey = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3522`:                        MatchedKeyword = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3541`:            var opts = DocumentValidationRules.BuildDefaultDetectionOptions();
+- `src/Commands/Inspect/ObjectsPipeline.cs:3614`:            if (DocumentValidationRules.IsDocMatch(docKey, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:361`:            var opts = DocumentValidationRules.BuildDefaultDetectionOptions(keywords);
+- `src/Commands/Inspect/ObjectsPipeline.cs:3652`:                if (!DocumentValidationRules.IsDocMatch(seg.TitleKey, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3688`:            return ClassifyDespachoSubtypeSide(front, back, DocumentValidationRules.DocKeyDespacho, cfg);
+- `src/Commands/Inspect/ObjectsPipeline.cs:3716`:            return DocumentValidationRules.ResolveDocKeyFromHint(norm);
+- `src/Commands/Inspect/ObjectsPipeline.cs:3741`:            var docKey = DocumentValidationRules.ClassifyDocByPageEvidence(
+- `src/Commands/Inspect/ObjectsPipeline.cs:3782`:                det = DocumentTitleDetector.Detect(pdfPath, DocumentValidationRules.BuildDefaultDetectionOptions());
+- `src/Commands/Inspect/ObjectsPipeline.cs:3806`:                if (!DocumentValidationRules.IsSupportedDocKey(docType))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3829`:                if (DocumentValidationRules.IsDocMatch(docType, DocumentValidationRules.DocKeyDespacho) && scored.Any(s => s.Summary.BackBodyObj > 0))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3886`:            return DocumentValidationRules.ScoreDocumentCandidate(
+- `src/Commands/Inspect/ObjectsPipeline.cs:413`:                        despacho = GetKeywordsForDocType(DocumentValidationRules.DocKeyDespacho),
+- `src/Commands/Inspect/ObjectsPipeline.cs:414`:                        requerimento = GetKeywordsForDocType(DocumentValidationRules.DocKeyRequerimentoHonorarios),
+- `src/Commands/Inspect/ObjectsPipeline.cs:415`:                        certidao = GetKeywordsForDocType(DocumentValidationRules.DocKeyCertidaoConselho)
+- `src/Commands/Inspect/ObjectsPipeline.cs:522`:            return DocumentValidationRules.NormalizeDocKey(raw);
+- `src/Commands/Inspect/ObjectsPipeline.cs:527`:            return DocumentValidationRules.GetDetectionKeywordsAll(includeGenericHeaders: true, includeExtendedSignals: true).ToList();
+- `src/Commands/Inspect/ObjectsPipeline.cs:532`:            return DocumentValidationRules.GetDetectionKeywordsForDocExtended(docType).ToList();
+- `src/Commands/Inspect/ObjectsPipeline.cs:713`:                DocumentValidationRules.IsDocMatch(docTypeA, DocumentValidationRules.DocKeyDespacho) &&
+- `src/Commands/Inspect/ObjectsPipeline.cs:714`:                DocumentValidationRules.IsDocMatch(docTypeB, DocumentValidationRules.DocKeyDespacho);
+- `src/Commands/Inspect/ObjectsPipeline.cs:864`:                else if (DocumentValidationRules.IsDocMatch(docTypeA, DocumentValidationRules.DocKeyDespacho))
+- `src/Commands/Inspect/ObjectsPipeline.cs:878`:                if (DocumentValidationRules.IsDocMatch(docTypeA, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsTextOpsAlign.cs:137`:                var docKey = DocumentValidationRules.ResolveDocKeyForDetection(roiDoc);
+
+## Uso espalhado de Honorários (fora de `modules/HonorariosModule`)
+- `modules/Core/Utils/BookmarkClassifier.cs:86`:                return New("Pagamento/Honorarios", "anexo", "pagamento");
+- `modules/Core/Utils/CodePreview.cs:83`:                "src/Commands/Inspect/ObjectsHonorariosApi.cs",
+- `modules/Core/Utils/CodePreview.cs:84`:                "modules/HonorariosModule/*",
+- `modules/Core/Utils/CodeTrace.cs:74`:                "modules/HonorariosModule/HonorariosApi.cs",
+- `modules/Core/Utils/CodeTrace.cs:75`:                "modules/HonorariosModule/HonorariosEnricher.cs"
+- `modules/ExtractionModule/TjpbDespachoExtractor/Config/TjpbDespachoConfig.cs:353`:        public HonorariosConfig Honorarios { get; set; } = new HonorariosConfig();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Config/TjpbDespachoConfig.cs:356`:    public class HonorariosConfig
+- `modules/ExtractionModule/TjpbDespachoExtractor/Config/TjpbDespachoConfig.cs:360`:        public List<HonorariosAreaMap> AreaMap { get; set; } = new List<HonorariosAreaMap>();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Config/TjpbDespachoConfig.cs:366`:    public class HonorariosAreaMap
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:131`:            EnrichWithPeritoCatalog(result);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:133`:            ApplyHonorariosLookup(result);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1923`:        private void EnrichWithPeritoCatalog(Dictionary<string, FieldInfo> fields)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1973`:        private void ApplyHonorariosLookup(Dictionary<string, FieldInfo> fields)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1979`:            if (_cfg.Reference.Honorarios.PreferValorDe && fields.TryGetValue("VALOR_ARBITRADO_DE", out var vde) && vde.Method != "not_found")
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:1981`:            else if (_cfg.Reference.Honorarios.AllowValorJz && fields.TryGetValue("VALOR_ARBITRADO_JZ", out var vjz) && vjz.Method != "not_found")
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:54`:        private readonly PeritoCatalog _peritoCatalog;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:55`:        private readonly HonorariosTable _honorarios;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:74`:            _peritoCatalog = PeritoCatalog.Load(cfg.BaseDir, cfg.Reference.PeritosCatalogPaths);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Extraction/FieldExtractor.cs:75`:            _honorarios = new HonorariosTable(cfg.Reference.Honorarios, cfg.BaseDir);
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:100`:            entry = new HonorariosEntry();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:139`:        public bool TryGetById(string rawId, out HonorariosEntry entry)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:141`:            entry = new HonorariosEntry();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:14`:    public class HonorariosEntry
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:208`:        private HonorariosEntry? MatchAlias(string text)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:22`:    public class HonorariosTable
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:24`:        private readonly List<HonorariosEntry> _entries = new List<HonorariosEntry>();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:253`:        private bool TryMatchCandidates(IEnumerable<HonorariosEntry> candidates, decimal valor, out HonorariosEntry entry, out decimal diffPct)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:255`:            entry = new HonorariosEntry();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:259`:            HonorariosEntry? best = null;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:25`:        private readonly List<HonorariosAlias> _aliases = new List<HonorariosAlias>();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:26`:        private readonly HonorariosConfig _cfg;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:28`:        public HonorariosTable(HonorariosConfig cfg, string baseDir)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:301`:                _entries.Add(new HonorariosEntry
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:30`:            _cfg = cfg ?? new HonorariosConfig();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:327`:                    _aliases.Add(new HonorariosAlias { TargetId = target, Keywords = keywords });
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:357`:        private class HonorariosAlias
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:45`:        public bool TryMatch(string especialidade, decimal valor, out HonorariosEntry entry, out double confidence)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:47`:            entry = new HonorariosEntry();
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:52`:            List<HonorariosEntry> candidates;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:57`:                candidates = new List<HonorariosEntry> { aliasEntry };
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:69`:            HonorariosEntry? best = null;
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/HonorariosTable.cs:95`:            out HonorariosEntry entry,
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/PeritoCatalog.cs:20`:    public class PeritoCatalog
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/PeritoCatalog.cs:27`:        public static PeritoCatalog Load(string baseDir, IEnumerable<string> paths)
+- `modules/ExtractionModule/TjpbDespachoExtractor/Reference/PeritoCatalog.cs:29`:            var cat = new PeritoCatalog();
+- `modules/ValidatorModule/DocumentValidationRules.cs:1019`:            if (string.Equals(targetDocKey, DocKeyRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/DocumentValidationRules.cs:1104`:                matchedDoc = DocKeyRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:1132`:            else if (string.Equals(targetDocKey, DocKeyRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/DocumentValidationRules.cs:1225`:                return DocKeyRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:1235`:                return DocKeyRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:1246`:                return DocKeyRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:1256`:                return DocKeyRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:1281`:            else if (docType == DocKeyRequerimentoHonorarios)
+- `modules/ValidatorModule/DocumentValidationRules.cs:151`:            if (string.Equals(key, DocKeyRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/DocumentValidationRules.cs:152`:                return OutputDocRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:15`:        public const string DocKeyRequerimentoHonorarios = "requerimento_honorarios";
+- `modules/ValidatorModule/DocumentValidationRules.cs:168`:            if (string.Equals(key, OutputDocRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/DocumentValidationRules.cs:169`:                return DocKeyRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:180`:            if (string.Equals(key, DocKeyRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/DocumentValidationRules.cs:19`:        public const string OutputDocRequerimentoHonorarios = "REQUERIMENTO_HONORARIOS";
+- `modules/ValidatorModule/DocumentValidationRules.cs:28`:            DocKeyRequerimentoHonorarios
+- `modules/ValidatorModule/DocumentValidationRules.cs:379`:            var doc = DocDetectCatalog.GetDoc(DocKeyRequerimentoHonorarios);
+- `modules/ValidatorModule/DocumentValidationRules.cs:392`:            var doc = DocDetectCatalog.GetDoc(DocKeyRequerimentoHonorarios);
+- `modules/ValidatorModule/DocumentValidationRules.cs:398`:            var doc = DocDetectCatalog.GetDoc(DocKeyRequerimentoHonorarios);
+- `modules/ValidatorModule/DocumentValidationRules.cs:486`:                return DocKeyRequerimentoHonorarios;
+- `modules/ValidatorModule/DocumentValidationRules.cs:521`:            if (string.Equals(key, DocKeyRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/DocumentValidationRules.cs:564`:        public static string ResolveHonorariosDocTypeFromPatternPath(string? patternsPath, string? docNameHint = null)
+- `modules/ValidatorModule/DocumentValidationRules.cs:970`:            if (string.Equals(targetDocKey, DocKeyRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/DocumentValidationRules.cs:990`:            if (string.Equals(targetDocKey, DocKeyRequerimentoHonorarios, StringComparison.OrdinalIgnoreCase))
+- `modules/ValidatorModule/ValidatorContext.cs:14`:        private static PeritoCatalog? _catalog;
+- `modules/ValidatorModule/ValidatorContext.cs:16`:        public static PeritoCatalog? GetPeritoCatalog(string? configPath = null)
+- `modules/ValidatorModule/ValidatorContext.cs:35`:                    _catalog = PeritoCatalog.Load(cfg.BaseDir, cfg.Reference.PeritosCatalogPaths);
+- `modules/ValidatorModule/ValidatorRules.cs:1051`:            PeritoCatalog? catalog,
+- `modules/ValidatorModule/ValidatorRules.cs:1097`:                (string field, string value, PeritoCatalog? peritoCatalog, out string why) =>
+- `modules/ValidatorModule/ValidatorRules.cs:14`:        public delegate bool FieldValueValidator(string field, string value, PeritoCatalog? catalog, out string reason);
+- `modules/ValidatorModule/ValidatorRules.cs:15`:        public delegate bool PeritoCatalogResolver(string value, PeritoCatalog? catalog, out double confidence);
+- `modules/ValidatorModule/ValidatorRules.cs:641`:        public static bool IsPeritoNameFromCatalog(string? value, PeritoCatalog? catalog, out double confidence)
+- `modules/ValidatorModule/ValidatorRules.cs:683`:            PeritoCatalog? catalog,
+- `modules/ValidatorModule/ValidatorRules.cs:782`:            PeritoCatalog? catalog,
+- `modules/ValidatorModule/ValidatorRules.cs:789`:            PeritoCatalogResolver isPeritoNameFromCatalog,
+- `modules/ValidatorModule/ValidatorRules.cs:876`:            PeritoCatalog? catalog,
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:18`:            DocumentValidationRules.DocKeyRequerimentoHonorarios
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:31`:            if (DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:44`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsDetectionRouter.cs:56`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:101`:        private static HonorariosSummary RunFromJson(string json, string? docTypeArg, string? configPath)
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:119`:                    return HonorariosEnricher.RunFromValues(dict, docType, configPath);
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:11`:    internal static class ObjectsHonorariosApi
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:123`:                    return HonorariosEnricher.Run(mapFields, docType, configPath);
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:125`:                return new HonorariosSummary
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:132`:                return new HonorariosSummary
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:154`:        private static void PrintHuman(HonorariosSummary summary)
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:175`:        private static void PrintSide(string label, HonorariosSide side)
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:59`:            HonorariosSummary summary;
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:6`:using Obj.Honorarios;
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:76`:                    summary = HonorariosEnricher.Run(inputPath, docType ?? "", configPath);
+- `src/Commands/Inspect/ObjectsHonorariosApi.cs:80`:                summary = HonorariosEnricher.Run(mapFieldsPath, docType ?? "", configPath);
+- `src/Commands/Inspect/ObjectsPattern.cs:1014`:            public bool UseHonorarios { get; set; } = true;
+- `src/Commands/Inspect/ObjectsPattern.cs:119`:            Console.Error.WriteLine($"{CMagenta}  HONORARIOS : {_lastHonorariosSummary}{CReset}");
+- `src/Commands/Inspect/ObjectsPattern.cs:1273`:                    options.UseHonorarios = true;
+- `src/Commands/Inspect/ObjectsPattern.cs:1278`:                    options.UseHonorarios = false;
+- `src/Commands/Inspect/ObjectsPattern.cs:20`:using Obj.Honorarios;
+- `src/Commands/Inspect/ObjectsPattern.cs:3559`:            ApplyHonorariosDerivedFields(options, orderedA, fieldsA, values);
+- `src/Commands/Inspect/ObjectsPattern.cs:3562`:            PrintHonorariosSummary(options, values);
+- `src/Commands/Inspect/ObjectsPattern.cs:3816`:            var isRequerimentoPattern = DocumentValidationRules.IsDocMatch(detectDocKey, DocumentValidationRules.DocKeyRequerimentoHonorarios);
+- `src/Commands/Inspect/ObjectsPattern.cs:3934`:                ApplyHonorariosDerivedFields(options, orderedA, fieldsA, values);
+- `src/Commands/Inspect/ObjectsPattern.cs:3936`:                ApplyHonorariosDerivedFields(options, orderedA, fieldsA, values);
+- `src/Commands/Inspect/ObjectsPattern.cs:3941`:                    PrintHonorariosSummary(options, values);
+- `src/Commands/Inspect/ObjectsPattern.cs:45`:        private static string _lastHonorariosSummary = "off";
+- `src/Commands/Inspect/ObjectsPattern.cs:4897`:            HonorariosBackfill.ApplyProfissaoAsEspecialidade(values);
+- `src/Commands/Inspect/ObjectsPattern.cs:5140`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPattern.cs:5222`:        private static void ApplyHonorariosDerivedFields(
+- `src/Commands/Inspect/ObjectsPattern.cs:5228`:            if (!options.UseHonorarios)
+- `src/Commands/Inspect/ObjectsPattern.cs:5238`:                var backfill = HonorariosBackfill.Apply(values, options.PatternsPath);
+- `src/Commands/Inspect/ObjectsPattern.cs:5394`:        private static bool IsPeritoNameFromCatalog(string? value, PeritoCatalog? catalog, out double confidence)
+- `src/Commands/Inspect/ObjectsPattern.cs:5460`:        private static bool IsValueValidForField(string field, string value, PeritoCatalog? catalog, out string reason)
+- `src/Commands/Inspect/ObjectsPattern.cs:5482`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPattern.cs:5575`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPattern.cs:5584`:        private static void PrintHonorariosSummary(MatchOptions options, Dictionary<string, string> values)
+- `src/Commands/Inspect/ObjectsPattern.cs:5586`:            if (!options.UseHonorarios)
+- `src/Commands/Inspect/ObjectsPattern.cs:5592`:                var backfill = HonorariosBackfill.Apply(snapshot, options.PatternsPath);
+- `src/Commands/Inspect/ObjectsPattern.cs:5593`:                var summary = backfill.Summary ?? new HonorariosSummary();
+- `src/Commands/Inspect/ObjectsPattern.cs:5598`:                    _lastHonorariosSummary = summaryText;
+- `src/Commands/Inspect/ObjectsPattern.cs:5602`:                        _lastHonorariosSummary = summaryText + " errors=" + string.Join(", ", summary.Errors);
+- `src/Commands/Inspect/ObjectsPattern.cs:5608`:                _lastHonorariosSummary = summaryText;
+- `src/Commands/Inspect/ObjectsPattern.cs:5612`:                    _lastHonorariosSummary = summaryText + " errors=" + string.Join(", ", summary.Errors);
+- `src/Commands/Inspect/ObjectsPattern.cs:5618`:                _lastHonorariosSummary = "erro=" + ex.Message;
+- `src/Commands/Inspect/ObjectsPattern.cs:5968`:                ApplyHonorariosDerivedFields(options, orderedA, fieldsA, values);
+- `src/Commands/Inspect/ObjectsPattern.cs:5970`:                PrintHonorariosSummary(options, values);
+- `src/Commands/Inspect/ObjectsPattern.cs:71`:            _lastHonorariosSummary = "off";
+- `src/Commands/Inspect/ObjectsPattern.cs:7976`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:13`:using Obj.Honorarios;
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2307`:        private static void AddHonorariosCandidates(
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2320`:                var summary = HonorariosEnricher.Run(mapFieldsPath, docType, null);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2331`:                        Message = $"Honorarios status: {side.Status}"
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2336`:                AddHonorariosField(candidates, "ESPECIALIDADE", side.Especialidade, docType);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2337`:                AddHonorariosField(candidates, "ESPECIE_DA_PERICIA", side.EspecieDaPericia, docType);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2349`:        private static void AddHonorariosField(
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2827`:            var catalog = TryLoadPeritoCatalog(errors);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2903`:        private static PeritoCatalog? TryLoadPeritoCatalog(List<PipelineError> errors)
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2905`:            var catalog = ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2920`:            PeritoCatalog catalog,
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2956`:            PeritoCatalog catalog,
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:2988`:            PeritoCatalog catalog,
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3036`:        private static Dictionary<string, FinalFieldValue> ComputeHonorariosDerivedFields(
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3088`:            HonorariosSummary? summary;
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3091`:                summary = HonorariosEnricher.RunFromValues(values, "HONORARIOS_DERIVED", null);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3118`:                    Message = "Honorarios sem retorno."
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3129`:                    Message = $"Honorarios status: {side.Status}"
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3134`:            var baseEspecialidade = PickHonorariosEvidence(especialidade, perito, cpf);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3135`:            var baseValor = PickHonorariosEvidence(valorJz, baseEspecialidade ?? especialidade, perito, cpf);
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3195`:        private static FinalFieldValue? PickHonorariosEvidence(params FinalFieldValue[] candidates)
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3341`:            var catalog = TryLoadPeritoCatalogSilent();
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3439`:        private static PeritoCatalog? TryLoadPeritoCatalogSilent()
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3441`:            return ValidatorContext.GetPeritoCatalog();
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:3443`:        private static bool PassesPrimaryDocValidator(FinalizeDocument doc, PeritoCatalog? catalog, out string reason)
+- `src/Commands/Inspect/ObjectsPipeline.Finalize.cs:483`:            var honorariosDerived = ComputeHonorariosDerivedFields(documents, options.Strict, errors);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1049`:            if (pipelineOptions.HonorariosEnabled)
+- `src/Commands/Inspect/ObjectsPipeline.cs:1056`:                result.Honorarios = HonorariosEnricher.Run(result.MapFields?.JsonPath, ResolveConfigPath());
+- `src/Commands/Inspect/ObjectsPipeline.cs:1057`:                if (result.Honorarios != null)
+- `src/Commands/Inspect/ObjectsPipeline.cs:1059`:                    WriteDebugJson(debugDir, "06_honorarios.json", result.Honorarios);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1060`:                    WriteModuleJson(debugDir, "honorarios", "output", "result.json", result.Honorarios);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1063`:                        ApplyHonorariosToMapFields(result.MapFields.JsonPath, result.Honorarios, result.MapFields.Errors);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1356`:            if (result.Honorarios != null)
+- `src/Commands/Inspect/ObjectsPipeline.cs:1359`:                PrintHonorarios("pdf_a", result.Honorarios.PdfA);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1360`:                PrintHonorarios("pdf_b", result.Honorarios.PdfB);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1361`:                if (result.Honorarios.Errors.Count > 0)
+- `src/Commands/Inspect/ObjectsPipeline.cs:1364`:                    foreach (var err in result.Honorarios.Errors)
+- `src/Commands/Inspect/ObjectsPipeline.cs:1409`:        private static void PrintHonorarios(string label, HonorariosSide? side)
+- `src/Commands/Inspect/ObjectsPipeline.cs:18`:using Obj.Honorarios;
+- `src/Commands/Inspect/ObjectsPipeline.cs:1903`:        private static void ApplyHonorariosToMapFields(string mapFieldsPath, HonorariosSummary honorarios, List<string> errors)
+- `src/Commands/Inspect/ObjectsPipeline.cs:1919`:                ApplyHonorariosSide(root, "pdf_a", honorarios.PdfA);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1920`:                ApplyHonorariosSide(root, "pdf_b", honorarios.PdfB);
+- `src/Commands/Inspect/ObjectsPipeline.cs:1930`:        private static void ApplyHonorariosSide(JsonObject root, string sideKey, HonorariosSide? side)
+- `src/Commands/Inspect/ObjectsPipeline.cs:2530`:            if (DocumentValidationRules.IsDocMatch(docHint, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsPipeline.cs:273`:            public bool HonorariosEnabled { get; set; } = true;
+- `src/Commands/Inspect/ObjectsPipeline.cs:2797`:                var requerimentoInputKey = DocumentValidationRules.MapDocKeyToConsolidationInput(DocumentValidationRules.DocKeyRequerimentoHonorarios);
+- `src/Commands/Inspect/ObjectsPipeline.cs:2833`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsPipeline.cs:2845`:            if (DocumentValidationRules.IsDocMatch(key, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsPipeline.cs:3422`:                        TitleKey = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3425`:                        MatchedKeyword = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3462`:                        TitleKey = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3465`:                        MatchedKeyword = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3519`:                        TitleKey = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:3522`:                        MatchedKeyword = DocumentValidationRules.DocKeyRequerimentoHonorarios,
+- `src/Commands/Inspect/ObjectsPipeline.cs:414`:                        requerimento = GetKeywordsForDocType(DocumentValidationRules.DocKeyRequerimentoHonorarios),
+- `src/Commands/Inspect/ObjectsPipeline.cs:52`:            public HonorariosSummary? Honorarios { get; set; }
+- `src/Commands/Inspect/ObjectsPipeline.cs:878`:                if (DocumentValidationRules.IsDocMatch(docTypeA, DocumentValidationRules.DocKeyRequerimentoHonorarios))
+- `src/Commands/Inspect/ObjectsTextOpsExtractFields.cs:175`:            PeritoCatalog? peritoCatalog = null;
+- `src/Commands/Inspect/ObjectsTextOpsExtractFields.cs:176`:            HonorariosTable? honorariosTable = null;
+- `src/Commands/Inspect/ObjectsTextOpsExtractFields.cs:179`:                honorariosTable = new HonorariosTable(cfg.Reference.Honorarios, cfg.BaseDir);
+- `src/Commands/Inspect/ObjectsTextOpsExtractFields.cs:181`:                    peritoCatalog = PeritoCatalog.Load(cfg.BaseDir, cfg.Reference.PeritosCatalogPaths);
+- `src/Commands/Inspect/ObjectsTextOpsExtractFields.cs:532`:        private static void ApplyDerivedEspecie(List<FieldExtractResult> results, PeritoCatalog peritoCatalog, HonorariosTable honorariosTable)
+- `src/Commands/Inspect/ObjectsTextOpsExtractFields.cs:570`:        private static void ApplyEspecialidadeFormat(List<FieldExtractResult> results, HonorariosTable honorariosTable)
+
+## Próximo passo de fusão (sem apagar código)
+1. Criar Facade única de validação em `modules/ValidatorModule` para substituir chamadas diretas espalhadas.
+2. Criar Facade única de honorários em `modules/HonorariosModule` para substituir chamadas diretas espalhadas.
+3. Migrar chamadas por blocos pequenos, compilando e testando a cada bloco.
+4. Manter wrappers de compatibilidade até zerar referências externas diretas.

@@ -1,0 +1,2679 @@
+﻿{
+  "Label": "front_head",
+  "PdfA": "tjpb_certidao_conselho_model.pdf",
+  "PdfB": "2021084964.pdf",
+  "PageA": 1,
+  "PageB": 23,
+  "ObjA": 7,
+  "ObjB": 476,
+  "Backoff": 2,
+  "MinSim": 0.12,
+  "Band": 2,
+  "MinLenRatio": 0.2,
+  "LenPenalty": 0.4,
+  "AnchorMinSim": 0,
+  "AnchorMinLenRatio": 0,
+  "GapPenalty": -0.2,
+  "Anchors": [
+    {
+      "AIndex": 6,
+      "BIndex": 3,
+      "Score": 0.5978947368421053,
+      "Kind": "anchor",
+      "A": {
+        "Index": 7,
+        "StartOp": 9,
+        "EndOp": 11,
+        "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+        "Pattern": "WWW1WWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Guarabira",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 8,
+      "BIndex": 5,
+      "Score": 0.581978021978022,
+      "Kind": "anchor",
+      "A": {
+        "Index": 9,
+        "StartOp": 14,
+        "EndOp": 14,
+        "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 6,
+        "StartOp": 6,
+        "EndOp": 6,
+        "Text": "Tratam os autos de pedido de reserva orçamentária de honorários periciais em favor do Perito",
+        "Pattern": "WWWWWWWWWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    }
+  ],
+  "BlocksA": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "ESTA DO DA PARAÍBA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "PO DE R JUDICIÁRIO",
+      "Pattern": "WW1W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "TRIBU NA LDE JUSTIÇA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Assessoria do Conselho da Magistratura",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 6,
+      "Text": "PEDI DO DE",
+      "Pattern": "11WWW",
+      "MaxTokenLen": 2,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 7,
+      "EndOp": 8,
+      "Text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 24,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 9,
+      "EndOp": 11,
+      "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+      "Pattern": "WWW1WWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 12,
+      "EndOp": 13,
+      "Text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "13.2009.815.2001.",
+      "Pattern": "W",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "Certidão",
+      "Pattern": "W",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "Certifico,",
+      "Pattern": "W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "outrossim, queos integrantes do Egrégio",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Conselho da Magistratura, em sessão ordinária hoje realizada, apreciandoo processo acima",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "identificado, proferirama seguinte decisão:",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "RETIRADODE PAUTAPARA MELHOR TRAMITAÇÃO.",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "Presidiua sessão, com voto, o Excelentíssimo Senhor",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "Desembargador Márcio Murilo da Cunha Ramos — Presidente.",
+      "Pattern": "WWWWWW1W",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "Relator: Excelentíssimo Senhor",
+      "Pattern": "WWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "Desembargador João Benedito da Silva.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Ausente, justificadamente, o representante do Ministério",
+      "Pattern": "WW1WWW",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "Público Estadual.",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 29,
+      "EndOp": 30,
+      "Text": "elho da Magistratura, Sala de Sessões \"Des. Manoel",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 31,
+      "EndOp": 31,
+      "Text": "Fonsêca Xavier de Andrade' do TT",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 33,
+      "EndOp": 33,
+      "Text": "stiça do Estado da Paraíba, em João Pessoa, no dia",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 34,
+      "EndOp": 34,
+      "Text": "12 de julho de 2019.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 35,
+      "EndOp": 35,
+      "Text": "PS. 11",
+      "Pattern": "WW",
+      "MaxTokenLen": 3,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "BlocksB": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "TRIBU nal de Ju stiça do ESTA do da Paraíba",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "Diretoria Especial",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2021.084.964",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Guarabira",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessado: Felipe Queiroga Gadelha – Perito Grafocopista",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "Tratam os autos de pedido de reserva orçamentária de honorários periciais em favor do Perito",
+      "Pattern": "WWWWWWWWWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "grafocopista Felipe Queiroga Gadelha, CPF 021.205.144-02, no valor de R$ 370, 00 (trezentos e",
+      "Pattern": "WWWWWWWWWWWWW1",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "setenta reais)) ) , pela realização de perícia nos autos da Ação nº 0800877-54.2020.8.15.0181,",
+      "Pattern": "WW1WWWWWWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "movida por José de Araújo Sobrinho, CPF 329.089.207-78, em face do BANCO DO BRASIL S.A.,",
+      "Pattern": "WWWWWWWWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "CNPJ 00.000.000/0200-36, perante a 2ª Vara Mista da Comarca de Guarabira.",
+      "Pattern": "WWW1WWWWWWW",
+      "MaxTokenLen": 19,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "A Resolução nº 09/2017, deste TRIBU nal, de 21 de junho de 2017, modificada pela Resolução nº",
+      "Pattern": "1WWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "12, de 10 de março de 2021, publicada no Diário da Ju stiça Eletrônico deste ESTA do, do dia 11",
+      "Pattern": "WWWWWWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "imediato, disciplinou, no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os",
+      "Pattern": "WWWWWWWWWWWWW1WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "procedimentos relativos ao pagamento dos honorários periciais, nos casos em que a parte goze",
+      "Pattern": "WWWWWWWWWWW1WW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "da gratuidade da ju stiça.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "Em seu art. 5º, ressalvou que o juiz, ao fixar os honorários, poderá ultrapassar o limite fixado na",
+      "Pattern": "WWWWWW1WWWWWWW1WWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "tabela, anexo da Resolução, em até 05 (cinco) vezes, desde que de forma fundamentada e",
+      "Pattern": "WWWWWWWWWWWWWW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "atendendo ao grau de especialização do perito, à complexidade da matéria, o lugar eo tempo",
+      "Pattern": "WWWWWWW1WWW1WWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "exigidos para a pr ESTA ção do serviço, ficando, nesse caso, o pagamento condicionado à",
+      "Pattern": "WW1WWWWWWWW1WW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "aprovação pelo Cons elho da Magistratura.",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "Laudo anexado às fls. 10/21, dos presentes autos.",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "Analisando os autos do processo em referência, verifica-se que o feito se encontra devidamente",
+      "Pattern": "WWWWWWWWW1WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "instruído e obedece às normas legais previstas na Resolução 09/2017, ou seja, constam no",
+      "Pattern": "W1WWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "presente feito: (1) número do processo ordinário; (2) nome e CPF das partes; (3) valor dos",
+      "Pattern": "WWWWWWWWW1WWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "honorários finais; (4) endereço, telefone, inscrição no INSS, número da conta bancária do perito;",
+      "Pattern": "WWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "(5) declaração judicial de reconhecimento do direito à Ju stiça Gratuita; (6) natureza e",
+      "Pattern": "WWWWWWW1WWWWW1",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "característica da atividade desempenhada pelo auxiliar do Juízo.",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "Documento 6 página 1 assinado, do processo nº 2021084964, nos termos da Lei 11.419. ADME.54763.45261.34959.11160-3",
+      "Pattern": "W1W1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 29,
+      "StartOp": 29,
+      "EndOp": 29,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 05/07/2021 11: 39",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "Alignments": [
+    {
+      "AIndex": 0,
+      "BIndex": 0,
+      "Score": 0.41860465116279066,
+      "Kind": "variable",
+      "A": {
+        "Index": 1,
+        "StartOp": 1,
+        "EndOp": 1,
+        "Text": "ESTA DO DA PARAÍBA",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 7,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 1,
+        "StartOp": 1,
+        "EndOp": 1,
+        "Text": "TRIBU nal de Ju stiça do ESTA do da Paraíba",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 7,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 1,
+      "BIndex": 1,
+      "Score": 0.1833333333333333,
+      "Kind": "variable",
+      "A": {
+        "Index": 2,
+        "StartOp": 2,
+        "EndOp": 2,
+        "Text": "PO DE R JUDICIÁRIO",
+        "Pattern": "WW1W",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 2,
+        "StartOp": 2,
+        "EndOp": 2,
+        "Text": "Diretoria Especial",
+        "Pattern": "WW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 2,
+      "BIndex": 2,
+      "Score": 0.25217391304347825,
+      "Kind": "variable",
+      "A": {
+        "Index": 3,
+        "StartOp": 3,
+        "EndOp": 3,
+        "Text": "TRIBU NA LDE JUSTIÇA",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 7,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 3,
+        "StartOp": 3,
+        "EndOp": 3,
+        "Text": "Processo nº 2021.084.964",
+        "Pattern": "WWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 3,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Assessoria do Conselho da Magistratura",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 4,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 5,
+        "StartOp": 5,
+        "EndOp": 6,
+        "Text": "PEDI DO DE",
+        "Pattern": "11WWW",
+        "MaxTokenLen": 2,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 5,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 6,
+        "StartOp": 7,
+        "EndOp": 8,
+        "Text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 24,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 6,
+      "BIndex": 3,
+      "Score": 0.5978947368421053,
+      "Kind": "variable",
+      "A": {
+        "Index": 7,
+        "StartOp": 9,
+        "EndOp": 11,
+        "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+        "Pattern": "WWW1WWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Guarabira",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 4,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 5,
+        "StartOp": 5,
+        "EndOp": 5,
+        "Text": "Interessado: Felipe Queiroga Gadelha – Perito Grafocopista",
+        "Pattern": "WWWW1WW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 7,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 8,
+        "StartOp": 12,
+        "EndOp": 13,
+        "Text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+        "Pattern": "WWWWWWWWWWWWW",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 8,
+      "BIndex": 5,
+      "Score": 0.581978021978022,
+      "Kind": "variable",
+      "A": {
+        "Index": 9,
+        "StartOp": 14,
+        "EndOp": 14,
+        "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 6,
+        "StartOp": 6,
+        "EndOp": 6,
+        "Text": "Tratam os autos de pedido de reserva orçamentária de honorários periciais em favor do Perito",
+        "Pattern": "WWWWWWWWWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 6,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 7,
+        "StartOp": 7,
+        "EndOp": 7,
+        "Text": "grafocopista Felipe Queiroga Gadelha, CPF 021.205.144-02, no valor de R$ 370, 00 (trezentos e",
+        "Pattern": "WWWWWWWWWWWWW1",
+        "MaxTokenLen": 15,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 9,
+      "BIndex": 7,
+      "Score": 0.5417204301075269,
+      "Kind": "variable",
+      "A": {
+        "Index": 10,
+        "StartOp": 15,
+        "EndOp": 15,
+        "Text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+        "Pattern": "WWWWWWWWWWW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 8,
+        "StartOp": 8,
+        "EndOp": 8,
+        "Text": "setenta reais)) ) , pela realização de perícia nos autos da Ação nº 0800877-54.2020.8.15.0181,",
+        "Pattern": "WW1WWWWWWWWWW",
+        "MaxTokenLen": 26,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 10,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 11,
+        "StartOp": 16,
+        "EndOp": 16,
+        "Text": "13.2009.815.2001.",
+        "Pattern": "W",
+        "MaxTokenLen": 17,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 11,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 12,
+        "StartOp": 17,
+        "EndOp": 17,
+        "Text": "Certidão",
+        "Pattern": "W",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 12,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 13,
+        "StartOp": 18,
+        "EndOp": 18,
+        "Text": "Certifico,",
+        "Pattern": "W",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 13,
+      "BIndex": 8,
+      "Score": 0.14186046511627912,
+      "Kind": "variable",
+      "A": {
+        "Index": 14,
+        "StartOp": 19,
+        "EndOp": 19,
+        "Text": "outrossim, queos integrantes do Egrégio",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 9,
+        "StartOp": 9,
+        "EndOp": 9,
+        "Text": "movida por José de Araújo Sobrinho, CPF 329.089.207-78, em face do BANCO DO BRASIL S.A.,",
+        "Pattern": "WWWWWWWWWWWWWWW",
+        "MaxTokenLen": 15,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 14,
+      "BIndex": 9,
+      "Score": 0.24090909090909088,
+      "Kind": "variable",
+      "A": {
+        "Index": 15,
+        "StartOp": 20,
+        "EndOp": 20,
+        "Text": "Conselho da Magistratura, em sessão ordinária hoje realizada, apreciandoo processo acima",
+        "Pattern": "WWWWWWWWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 10,
+        "StartOp": 10,
+        "EndOp": 10,
+        "Text": "CNPJ 00.000.000/0200-36, perante a 2ª Vara Mista da Comarca de Guarabira.",
+        "Pattern": "WWW1WWWWWWW",
+        "MaxTokenLen": 19,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 15,
+      "BIndex": 10,
+      "Score": 0.2186813186813187,
+      "Kind": "variable",
+      "A": {
+        "Index": 16,
+        "StartOp": 21,
+        "EndOp": 21,
+        "Text": "identificado, proferirama seguinte decisão:",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 11,
+        "StartOp": 11,
+        "EndOp": 11,
+        "Text": "A Resolução nº 09/2017, deste TRIBU nal, de 21 de junho de 2017, modificada pela Resolução nº",
+        "Pattern": "1WWWWWWWWWWWWWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 16,
+      "BIndex": 11,
+      "Score": 0.24105263157894735,
+      "Kind": "variable",
+      "A": {
+        "Index": 17,
+        "StartOp": 22,
+        "EndOp": 22,
+        "Text": "RETIRADODE PAUTAPARA MELHOR TRAMITAÇÃO.",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 12,
+        "StartOp": 12,
+        "EndOp": 12,
+        "Text": "12, de 10 de março de 2021, publicada no Diário da Ju stiça Eletrônico deste ESTA do, do dia 11",
+        "Pattern": "WWWWWWWWWWWWWWWWWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 17,
+      "BIndex": 12,
+      "Score": 0.30206185567010313,
+      "Kind": "variable",
+      "A": {
+        "Index": 18,
+        "StartOp": 23,
+        "EndOp": 23,
+        "Text": "Presidiua sessão, com voto, o Excelentíssimo Senhor",
+        "Pattern": "WWWW1WW",
+        "MaxTokenLen": 14,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 13,
+        "StartOp": 13,
+        "EndOp": 13,
+        "Text": "imediato, disciplinou, no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os",
+        "Pattern": "WWWWWWWWWWWWW1WWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 18,
+      "BIndex": 13,
+      "Score": 0.35,
+      "Kind": "variable",
+      "A": {
+        "Index": 19,
+        "StartOp": 24,
+        "EndOp": 24,
+        "Text": "Desembargador Márcio Murilo da Cunha Ramos — Presidente.",
+        "Pattern": "WWWWWW1W",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 14,
+        "StartOp": 14,
+        "EndOp": 14,
+        "Text": "procedimentos relativos ao pagamento dos honorários periciais, nos casos em que a parte goze",
+        "Pattern": "WWWWWWWWWWW1WW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 19,
+      "BIndex": 14,
+      "Score": 0.21333333333333335,
+      "Kind": "variable",
+      "A": {
+        "Index": 20,
+        "StartOp": 25,
+        "EndOp": 25,
+        "Text": "Relator: Excelentíssimo Senhor",
+        "Pattern": "WWW",
+        "MaxTokenLen": 14,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 15,
+        "StartOp": 15,
+        "EndOp": 15,
+        "Text": "da gratuidade da ju stiça.",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 20,
+      "BIndex": 15,
+      "Score": 0.2541666666666666,
+      "Kind": "variable",
+      "A": {
+        "Index": 21,
+        "StartOp": 26,
+        "EndOp": 26,
+        "Text": "Desembargador João Benedito da Silva.",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 16,
+        "StartOp": 16,
+        "EndOp": 16,
+        "Text": "Em seu art. 5º, ressalvou que o juiz, ao fixar os honorários, poderá ultrapassar o limite fixado na",
+        "Pattern": "WWWWWW1WWWWWWW1WWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 16,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 17,
+        "StartOp": 17,
+        "EndOp": 17,
+        "Text": "tabela, anexo da Resolução, em até 05 (cinco) vezes, desde que de forma fundamentada e",
+        "Pattern": "WWWWWWWWWWWWWW1",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 17,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 18,
+        "StartOp": 18,
+        "EndOp": 18,
+        "Text": "atendendo ao grau de especialização do perito, à complexidade da matéria, o lugar eo tempo",
+        "Pattern": "WWWWWWW1WWW1WWW",
+        "MaxTokenLen": 14,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 21,
+      "BIndex": 18,
+      "Score": 0.29166666666666663,
+      "Kind": "variable",
+      "A": {
+        "Index": 22,
+        "StartOp": 27,
+        "EndOp": 27,
+        "Text": "Ausente, justificadamente, o representante do Ministério",
+        "Pattern": "WW1WWW",
+        "MaxTokenLen": 17,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 19,
+        "StartOp": 19,
+        "EndOp": 19,
+        "Text": "exigidos para a pr ESTA ção do serviço, ficando, nesse caso, o pagamento condicionado à",
+        "Pattern": "WW1WWWWWWWW1WW1",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 22,
+      "BIndex": 19,
+      "Score": 0.3121951219512195,
+      "Kind": "variable",
+      "A": {
+        "Index": 23,
+        "StartOp": 28,
+        "EndOp": 28,
+        "Text": "Público Estadual.",
+        "Pattern": "WW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 20,
+        "StartOp": 20,
+        "EndOp": 20,
+        "Text": "aprovação pelo Cons elho da Magistratura.",
+        "Pattern": "WWWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 23,
+      "BIndex": 20,
+      "Score": 0.358,
+      "Kind": "variable",
+      "A": {
+        "Index": 24,
+        "StartOp": 29,
+        "EndOp": 30,
+        "Text": "elho da Magistratura, Sala de Sessões \"Des. Manoel",
+        "Pattern": "WWWWWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 21,
+        "StartOp": 21,
+        "EndOp": 21,
+        "Text": "Laudo anexado às fls. 10/21, dos presentes autos.",
+        "Pattern": "WWWWWWWW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 24,
+      "BIndex": 21,
+      "Score": 0.2285714285714286,
+      "Kind": "variable",
+      "A": {
+        "Index": 25,
+        "StartOp": 31,
+        "EndOp": 31,
+        "Text": "Fonsêca Xavier de Andrade' do TT",
+        "Pattern": "WWWWWW",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 22,
+        "StartOp": 22,
+        "EndOp": 22,
+        "Text": "Analisando os autos do processo em referência, verifica-se que o feito se encontra devidamente",
+        "Pattern": "WWWWWWWWW1WWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 25,
+      "BIndex": 22,
+      "Score": 0.34942528735632183,
+      "Kind": "variable",
+      "A": {
+        "Index": 26,
+        "StartOp": 33,
+        "EndOp": 33,
+        "Text": "stiça do Estado da Paraíba, em João Pessoa, no dia",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 23,
+        "StartOp": 23,
+        "EndOp": 23,
+        "Text": "instruído e obedece às normas legais previstas na Resolução 09/2017, ou seja, constam no",
+        "Pattern": "W1WWWWWWWWWWWW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 23,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 24,
+        "StartOp": 24,
+        "EndOp": 24,
+        "Text": "presente feito: (1) número do processo ordinário; (2) nome e CPF das partes; (3) valor dos",
+        "Pattern": "WWWWWWWWW1WWWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 24,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 25,
+        "StartOp": 25,
+        "EndOp": 25,
+        "Text": "honorários finais; (4) endereço, telefone, inscrição no INSS, número da conta bancária do perito;",
+        "Pattern": "WWWWWWWWWWWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 26,
+      "BIndex": 25,
+      "Score": 0.19186046511627902,
+      "Kind": "variable",
+      "A": {
+        "Index": 27,
+        "StartOp": 34,
+        "EndOp": 34,
+        "Text": "12 de julho de 2019.",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 5,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 26,
+        "StartOp": 26,
+        "EndOp": 26,
+        "Text": "(5) declaração judicial de reconhecimento do direito à Ju stiça Gratuita; (6) natureza e",
+        "Pattern": "WWWWWWW1WWWWW1",
+        "MaxTokenLen": 14,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 26,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 27,
+        "StartOp": 27,
+        "EndOp": 27,
+        "Text": "característica da atividade desempenhada pelo auxiliar do Juízo.",
+        "Pattern": "WWWWWWWW",
+        "MaxTokenLen": 14,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 27,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 28,
+        "StartOp": 28,
+        "EndOp": 28,
+        "Text": "Documento 6 página 1 assinado, do processo nº 2021084964, nos termos da Lei 11.419. ADME.54763.45261.34959.11160-3",
+        "Pattern": "W1W1WWWWWWWWWWW",
+        "MaxTokenLen": 30,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 28,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 29,
+        "StartOp": 29,
+        "EndOp": 29,
+        "Text": "Robson de Lima Cananea [419.454.334-34] em 05/07/2021 11: 39",
+        "Pattern": "WWWWWWWWW",
+        "MaxTokenLen": 16,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 27,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 28,
+        "StartOp": 35,
+        "EndOp": 35,
+        "Text": "PS. 11",
+        "Pattern": "WW",
+        "MaxTokenLen": 3,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    }
+  ],
+  "VariableBlocksA": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "ESTA DO DA PARAÍBA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "PO DE R JUDICIÁRIO",
+      "Pattern": "WW1W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "TRIBU NA LDE JUSTIÇA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Assessoria do Conselho da Magistratura",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 6,
+      "Text": "PEDI DO DE",
+      "Pattern": "11WWW",
+      "MaxTokenLen": 2,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 7,
+      "EndOp": 8,
+      "Text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 24,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 9,
+      "EndOp": 11,
+      "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+      "Pattern": "WWW1WWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 12,
+      "EndOp": 13,
+      "Text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "13.2009.815.2001.",
+      "Pattern": "W",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "Certidão",
+      "Pattern": "W",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "Certifico,",
+      "Pattern": "W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "outrossim, queos integrantes do Egrégio",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Conselho da Magistratura, em sessão ordinária hoje realizada, apreciandoo processo acima",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "identificado, proferirama seguinte decisão:",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "RETIRADODE PAUTAPARA MELHOR TRAMITAÇÃO.",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "Presidiua sessão, com voto, o Excelentíssimo Senhor",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "Desembargador Márcio Murilo da Cunha Ramos — Presidente.",
+      "Pattern": "WWWWWW1W",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "Relator: Excelentíssimo Senhor",
+      "Pattern": "WWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "Desembargador João Benedito da Silva.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Ausente, justificadamente, o representante do Ministério",
+      "Pattern": "WW1WWW",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "Público Estadual.",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 29,
+      "EndOp": 30,
+      "Text": "elho da Magistratura, Sala de Sessões \"Des. Manoel",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 31,
+      "EndOp": 31,
+      "Text": "Fonsêca Xavier de Andrade' do TT",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 33,
+      "EndOp": 33,
+      "Text": "stiça do Estado da Paraíba, em João Pessoa, no dia",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 34,
+      "EndOp": 34,
+      "Text": "12 de julho de 2019.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 35,
+      "EndOp": 35,
+      "Text": "PS. 11",
+      "Pattern": "WW",
+      "MaxTokenLen": 3,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "VariableBlocksB": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "TRIBU nal de Ju stiça do ESTA do da Paraíba",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "Diretoria Especial",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2021.084.964",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Guarabira",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessado: Felipe Queiroga Gadelha – Perito Grafocopista",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "Tratam os autos de pedido de reserva orçamentária de honorários periciais em favor do Perito",
+      "Pattern": "WWWWWWWWWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "grafocopista Felipe Queiroga Gadelha, CPF 021.205.144-02, no valor de R$ 370, 00 (trezentos e",
+      "Pattern": "WWWWWWWWWWWWW1",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "setenta reais)) ) , pela realização de perícia nos autos da Ação nº 0800877-54.2020.8.15.0181,",
+      "Pattern": "WW1WWWWWWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "movida por José de Araújo Sobrinho, CPF 329.089.207-78, em face do BANCO DO BRASIL S.A.,",
+      "Pattern": "WWWWWWWWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "CNPJ 00.000.000/0200-36, perante a 2ª Vara Mista da Comarca de Guarabira.",
+      "Pattern": "WWW1WWWWWWW",
+      "MaxTokenLen": 19,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "A Resolução nº 09/2017, deste TRIBU nal, de 21 de junho de 2017, modificada pela Resolução nº",
+      "Pattern": "1WWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "12, de 10 de março de 2021, publicada no Diário da Ju stiça Eletrônico deste ESTA do, do dia 11",
+      "Pattern": "WWWWWWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "imediato, disciplinou, no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os",
+      "Pattern": "WWWWWWWWWWWWW1WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "procedimentos relativos ao pagamento dos honorários periciais, nos casos em que a parte goze",
+      "Pattern": "WWWWWWWWWWW1WW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "da gratuidade da ju stiça.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "Em seu art. 5º, ressalvou que o juiz, ao fixar os honorários, poderá ultrapassar o limite fixado na",
+      "Pattern": "WWWWWW1WWWWWWW1WWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "tabela, anexo da Resolução, em até 05 (cinco) vezes, desde que de forma fundamentada e",
+      "Pattern": "WWWWWWWWWWWWWW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "atendendo ao grau de especialização do perito, à complexidade da matéria, o lugar eo tempo",
+      "Pattern": "WWWWWWW1WWW1WWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "exigidos para a pr ESTA ção do serviço, ficando, nesse caso, o pagamento condicionado à",
+      "Pattern": "WW1WWWWWWWW1WW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "aprovação pelo Cons elho da Magistratura.",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "Laudo anexado às fls. 10/21, dos presentes autos.",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "Analisando os autos do processo em referência, verifica-se que o feito se encontra devidamente",
+      "Pattern": "WWWWWWWWW1WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "instruído e obedece às normas legais previstas na Resolução 09/2017, ou seja, constam no",
+      "Pattern": "W1WWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "presente feito: (1) número do processo ordinário; (2) nome e CPF das partes; (3) valor dos",
+      "Pattern": "WWWWWWWWW1WWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "honorários finais; (4) endereço, telefone, inscrição no INSS, número da conta bancária do perito;",
+      "Pattern": "WWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "(5) declaração judicial de reconhecimento do direito à Ju stiça Gratuita; (6) natureza e",
+      "Pattern": "WWWWWWW1WWWWW1",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "característica da atividade desempenhada pelo auxiliar do Juízo.",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "Documento 6 página 1 assinado, do processo nº 2021084964, nos termos da Lei 11.419. ADME.54763.45261.34959.11160-3",
+      "Pattern": "W1W1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 29,
+      "StartOp": 29,
+      "EndOp": 29,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 05/07/2021 11: 39",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "FixedPairs": [],
+  "RangeA": {
+    "StartOp": 1,
+    "EndOp": 35,
+    "HasValue": true
+  },
+  "RangeB": {
+    "StartOp": 1,
+    "EndOp": 29,
+    "HasValue": true
+  },
+  "Extraction": {
+    "status": "ok",
+    "doc_key": "certidao_conselho",
+    "doc_type": "CERTIDAO_CM",
+    "map_path": "C:\\git\\operpdf-textopsalign\\modules\\PatternModules\\registry\\alignrange_fields\\tjpb_certidao.yml",
+    "band": "front_head",
+    "parsed": {
+      "pdf_a": {
+        "values": {
+          "PROCESSO_ADMINISTRATIVO": "",
+          "PROCESSO_JUDICIAL": "0000423-45.2019.815.0000",
+          "COMARCA": "Comarca da Capital",
+          "VARA": "",
+          "VALOR_ARBITRADO_CM": "",
+          "DATA_ARBITRADO_FINAL": "",
+          "ADIANTAMENTO": "",
+          "PARCELA": "",
+          "PERCENTUAL": ""
+        },
+        "fields": {
+          "PROCESSO_ADMINISTRATIVO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PROCESSO_JUDICIAL": {
+            "ValueRaw": "0000423-45.2019.815.0000",
+            "Value": "0000423-45.2019.815.0000",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "OK",
+            "BBox": null
+          },
+          "COMARCA": {
+            "ValueRaw": "Comarca da Capital",
+            "Value": "Comarca da Capital",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "OK",
+            "BBox": null
+          },
+          "VARA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_CM": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "DATA_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "ADIANTAMENTO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PARCELA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PERCENTUAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_JZ": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          }
+        }
+      },
+      "pdf_b": {
+        "values": {
+          "PROCESSO_ADMINISTRATIVO": "2021.084.964",
+          "PROCESSO_JUDICIAL": "0800877-54.2020.8.15.0181",
+          "COMARCA": "Guarabira",
+          "VARA": "2ª Vara Mista",
+          "VALOR_ARBITRADO_CM": "",
+          "DATA_ARBITRADO_FINAL": "",
+          "ADIANTAMENTO": "",
+          "PARCELA": "",
+          "PERCENTUAL": ""
+        },
+        "fields": {
+          "PROCESSO_ADMINISTRATIVO": {
+            "ValueRaw": "2021.084.964",
+            "Value": "2021.084.964",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "OK",
+            "BBox": null
+          },
+          "PROCESSO_JUDICIAL": {
+            "ValueRaw": "0800877-54.2020.8.15.0181",
+            "Value": "0800877-54.2020.8.15.0181",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "OK",
+            "BBox": null
+          },
+          "COMARCA": {
+            "ValueRaw": "Guarabira",
+            "Value": "Guarabira",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "OK",
+            "BBox": null
+          },
+          "VARA": {
+            "ValueRaw": "2ª Vara Mista",
+            "Value": "2ª Vara Mista",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "OK",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_CM": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "DATA_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "ADIANTAMENTO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PARCELA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PERCENTUAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op29",
+            "Obj": 476,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_JZ": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          }
+        }
+      }
+    },
+    "pipeline": {
+      "step_modules": {
+        "1_detection_selection": "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+        "2_alignment": "Obj.Align.ObjectsTextOpsDiff",
+        "3_1_prepare": "ObjectsTextOpsAlign + DocumentValidationRules",
+        "3_2_crop": "ObjectsTextOpsAlign.BuildValueFullFromBlocks",
+        "3_3_yaml_parser": "Obj.Commands.ObjectsMapFields",
+        "3_4_honorarios": "Obj.Honorarios.HonorariosFacade",
+        "3_5_validator": "Obj.ValidatorModule.ValidatorFacade",
+        "4_output": "ObjectsTextOpsAlign + JsonSerializer"
+      },
+      "merge_policy": "single_band",
+      "values_origin_note": "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento do módulo de honorários."
+    },
+    "value_flow": {
+      "pdf_a": {
+        "PROCESSO_ADMINISTRATIVO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROCESSO_JUDICIAL": {
+          "parser": "0000423-45.2019.815.0000",
+          "derived_candidate": "",
+          "final": "0000423-45.2019.815.0000",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "COMARCA": {
+          "parser": "Comarca da Capital",
+          "derived_candidate": "",
+          "final": "Comarca da Capital",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "VARA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROMOVENTE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROMOVIDO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "CPF_PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIALIDADE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIE_DA_PERICIA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_JZ": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_FINAL": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "FATOR": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_TABELADO_ANEXO_I": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        }
+      },
+      "pdf_b": {
+        "PROCESSO_ADMINISTRATIVO": {
+          "parser": "2021.084.964",
+          "derived_candidate": "",
+          "final": "2021.084.964",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "PROCESSO_JUDICIAL": {
+          "parser": "0800877-54.2020.8.15.0181",
+          "derived_candidate": "",
+          "final": "0800877-54.2020.8.15.0181",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "COMARCA": {
+          "parser": "Guarabira",
+          "derived_candidate": "",
+          "final": "Guarabira",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "VARA": {
+          "parser": "2ª Vara Mista",
+          "derived_candidate": "",
+          "final": "2ª Vara Mista",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "PROMOVENTE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROMOVIDO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "CPF_PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIALIDADE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIE_DA_PERICIA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_JZ": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_FINAL": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "FATOR": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_TABELADO_ANEXO_I": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        }
+      }
+    },
+    "validator": {
+      "enabled": true,
+      "module": "Obj.ValidatorModule.ValidatorFacade",
+      "scope": "target_b_only(model_a_reference)",
+      "ok": false,
+      "ok_pair": false,
+      "ok_a": false,
+      "ok_b": false,
+      "reason": "missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM",
+      "reason_pair": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM",
+      "reason_a": "missing:PROCESSO_ADMINISTRATIVO",
+      "reason_b": "missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM"
+    },
+    "honorarios": {
+      "enabled": true,
+      "module": "Obj.Honorarios.HonorariosFacade",
+      "apply_a": true,
+      "apply_b": true,
+      "pdf_a": {
+        "doc_type": "CERTIDAO_CM",
+        "derived_valor": "",
+        "derived_values": {},
+        "status": "missing_especialidade",
+        "source": "values",
+        "especialidade": "",
+        "especialidade_source": "fields",
+        "especie_da_pericia": "",
+        "valor_field": "",
+        "valor_raw": "",
+        "fator": "",
+        "entry_id": "",
+        "area": "",
+        "perito_name_source": "",
+        "perito_cpf_source": "",
+        "derivations": [],
+        "valor_tabelado_anexo_i": "",
+        "valor_normalized": "",
+        "confidence": 0
+      },
+      "pdf_b": {
+        "doc_type": "CERTIDAO_CM",
+        "derived_valor": "",
+        "derived_values": {},
+        "status": "missing_especialidade",
+        "source": "values",
+        "especialidade": "",
+        "especialidade_source": "fields",
+        "especie_da_pericia": "",
+        "valor_field": "",
+        "valor_raw": "",
+        "fator": "",
+        "entry_id": "",
+        "area": "",
+        "perito_name_source": "",
+        "perito_cpf_source": "",
+        "derivations": [],
+        "valor_tabelado_anexo_i": "",
+        "valor_normalized": "",
+        "confidence": 0
+      }
+    }
+  },
+  "ReturnInfo": {
+    "schema_version": "operpdf.return.v1",
+    "command": "textopsalign",
+    "output_mode": "All",
+    "return_enabled": true,
+    "io_file": "C:\\git\\operpdf-textopsalign\\io\\find1_certidao_Q29.json",
+    "generated_at_utc": "2026-02-19T04:03:46.9355697Z"
+  },
+  "ReturnView": {
+    "mode": "All",
+    "selected_rule": "fixed + variable + gap_a + gap_b",
+    "counts": {
+      "all": 37,
+      "selected": 37,
+      "all_by_kind": {
+        "variable": 20,
+        "gap_b": 8,
+        "gap_a": 9
+      },
+      "selected_by_kind": {
+        "variable": 20,
+        "gap_b": 8,
+        "gap_a": 9
+      }
+    },
+    "selected_alignment_indexes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "selected_preview_top20": [
+      {
+        "n": 1,
+        "kind": "variable",
+        "score": 0.41860465116279066,
+        "a_index": 1,
+        "b_index": 1,
+        "a_op_range": "op1",
+        "b_op_range": "op1",
+        "a_text": "ESTA DO DA PARAÍBA",
+        "b_text": "TRIBU nal de Ju stiça do ESTA do da Paraíba"
+      },
+      {
+        "n": 2,
+        "kind": "variable",
+        "score": 0.1833333333333333,
+        "a_index": 2,
+        "b_index": 2,
+        "a_op_range": "op2",
+        "b_op_range": "op2",
+        "a_text": "PO DE R JUDICIÁRIO",
+        "b_text": "Diretoria Especial"
+      },
+      {
+        "n": 3,
+        "kind": "variable",
+        "score": 0.25217391304347825,
+        "a_index": 3,
+        "b_index": 3,
+        "a_op_range": "op3",
+        "b_op_range": "op3",
+        "a_text": "TRIBU NA LDE JUSTIÇA",
+        "b_text": "Processo nº 2021.084.964"
+      },
+      {
+        "n": 4,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 4,
+        "b_index": 0,
+        "a_op_range": "op4",
+        "b_op_range": "",
+        "a_text": "Assessoria do Conselho da Magistratura",
+        "b_text": ""
+      },
+      {
+        "n": 5,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 5,
+        "b_index": 0,
+        "a_op_range": "op5-op6",
+        "b_op_range": "",
+        "a_text": "PEDI DO DE",
+        "b_text": ""
+      },
+      {
+        "n": 6,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 6,
+        "b_index": 0,
+        "a_op_range": "op7-op8",
+        "b_op_range": "",
+        "a_text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+        "b_text": ""
+      },
+      {
+        "n": 7,
+        "kind": "variable",
+        "score": 0.5978947368421053,
+        "a_index": 7,
+        "b_index": 4,
+        "a_op_range": "op9-op11",
+        "b_op_range": "op4",
+        "a_text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+        "b_text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Guarabira"
+      },
+      {
+        "n": 8,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 5,
+        "a_op_range": "",
+        "b_op_range": "op5",
+        "a_text": "",
+        "b_text": "Interessado: Felipe Queiroga Gadelha – Perito Grafocopista"
+      },
+      {
+        "n": 9,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 8,
+        "b_index": 0,
+        "a_op_range": "op12-op13",
+        "b_op_range": "",
+        "a_text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+        "b_text": ""
+      },
+      {
+        "n": 10,
+        "kind": "variable",
+        "score": 0.581978021978022,
+        "a_index": 9,
+        "b_index": 6,
+        "a_op_range": "op14",
+        "b_op_range": "op6",
+        "a_text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+        "b_text": "Tratam os autos de pedido de reserva orçamentária de honorários periciais em favor do Perito"
+      },
+      {
+        "n": 11,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 7,
+        "a_op_range": "",
+        "b_op_range": "op7",
+        "a_text": "",
+        "b_text": "grafocopista Felipe Queiroga Gadelha, CPF 021.205.144-02, no valor de R$ 370, 00 (trezentos e"
+      },
+      {
+        "n": 12,
+        "kind": "variable",
+        "score": 0.5417204301075269,
+        "a_index": 10,
+        "b_index": 8,
+        "a_op_range": "op15",
+        "b_op_range": "op8",
+        "a_text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+        "b_text": "setenta reais)) ) , pela realização de perícia nos autos da Ação nº 0800877-54.2020.8.15.0181,"
+      },
+      {
+        "n": 13,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 11,
+        "b_index": 0,
+        "a_op_range": "op16",
+        "b_op_range": "",
+        "a_text": "13.2009.815.2001.",
+        "b_text": ""
+      },
+      {
+        "n": 14,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 12,
+        "b_index": 0,
+        "a_op_range": "op17",
+        "b_op_range": "",
+        "a_text": "Certidão",
+        "b_text": ""
+      },
+      {
+        "n": 15,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 13,
+        "b_index": 0,
+        "a_op_range": "op18",
+        "b_op_range": "",
+        "a_text": "Certifico,",
+        "b_text": ""
+      },
+      {
+        "n": 16,
+        "kind": "variable",
+        "score": 0.14186046511627912,
+        "a_index": 14,
+        "b_index": 9,
+        "a_op_range": "op19",
+        "b_op_range": "op9",
+        "a_text": "outrossim, queos integrantes do Egrégio",
+        "b_text": "movida por José de Araújo Sobrinho, CPF 329.089.207-78, em face do BANCO DO BRASIL S.A.,"
+      },
+      {
+        "n": 17,
+        "kind": "variable",
+        "score": 0.24090909090909088,
+        "a_index": 15,
+        "b_index": 10,
+        "a_op_range": "op20",
+        "b_op_range": "op10",
+        "a_text": "Conselho da Magistratura, em sessão ordinária hoje realizada, apreciandoo processo acima",
+        "b_text": "CNPJ 00.000.000/0200-36, perante a 2ª Vara Mista da Comarca de Guarabira."
+      },
+      {
+        "n": 18,
+        "kind": "variable",
+        "score": 0.2186813186813187,
+        "a_index": 16,
+        "b_index": 11,
+        "a_op_range": "op21",
+        "b_op_range": "op11",
+        "a_text": "identificado, proferirama seguinte decisão:",
+        "b_text": "A Resolução nº 09/2017, deste TRIBU nal, de 21 de junho de 2017, modificada pela Resolução nº"
+      },
+      {
+        "n": 19,
+        "kind": "variable",
+        "score": 0.24105263157894735,
+        "a_index": 17,
+        "b_index": 12,
+        "a_op_range": "op22",
+        "b_op_range": "op12",
+        "a_text": "RETIRADODE PAUTAPARA MELHOR TRAMITAÇÃO.",
+        "b_text": "12, de 10 de março de 2021, publicada no Diário da Ju stiça Eletrônico deste ESTA do, do dia 11"
+      },
+      {
+        "n": 20,
+        "kind": "variable",
+        "score": 0.30206185567010313,
+        "a_index": 18,
+        "b_index": 13,
+        "a_op_range": "op23",
+        "b_op_range": "op13",
+        "a_text": "Presidiua sessão, com voto, o Excelentíssimo Senhor",
+        "b_text": "imediato, disciplinou, no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os"
+      }
+    ],
+    "extraction_summary": {
+      "status": "ok",
+      "doc_key": "certidao_conselho",
+      "doc_type": "CERTIDAO_CM",
+      "band": "front_head",
+      "fields_non_empty_a": 2,
+      "fields_non_empty_b": 4,
+      "validator_ok": false,
+      "validator_reason": "missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM",
+      "honorarios_apply_a": true,
+      "honorarios_apply_b": true
+    }
+  }
+}

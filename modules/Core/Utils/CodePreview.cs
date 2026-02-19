@@ -48,11 +48,21 @@ namespace Obj.Utils
             },
             ["textopsvar"] = new[]
             {
-                "modules/TextOpsRanges/*"
+                "src/Commands/Inspect/ObjectsTextOpsAlign.cs",
+                "modules/Align/*",
+                "modules/TextOpsRanges/*",
+                "modules/HonorariosModule/*",
+                "modules/ValidatorModule/*",
+                "modules/ValidationCore/*"
             },
             ["textopsfixed"] = new[]
             {
-                "modules/TextOpsRanges/*"
+                "src/Commands/Inspect/ObjectsTextOpsAlign.cs",
+                "modules/Align/*",
+                "modules/TextOpsRanges/*",
+                "modules/HonorariosModule/*",
+                "modules/ValidatorModule/*",
+                "modules/ValidationCore/*"
             },
             ["textopsdiff"] = new[]
             {
@@ -62,7 +72,10 @@ namespace Obj.Utils
             {
                 "src/Commands/Inspect/ObjectsTextOpsAlign.cs",
                 "modules/Align/*",
-                "modules/TextOpsRanges/*"
+                "modules/TextOpsRanges/*",
+                "modules/HonorariosModule/*",
+                "modules/ValidatorModule/*",
+                "modules/ValidationCore/*"
             },
             ["objdiff"] = new[]
             {

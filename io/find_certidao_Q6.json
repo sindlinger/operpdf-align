@@ -1,0 +1,2645 @@
+﻿{
+  "Label": "front_head",
+  "PdfA": "tjpb_certidao_conselho_model.pdf",
+  "PdfB": "2020090382.pdf",
+  "PageA": 1,
+  "PageB": 17,
+  "ObjA": 7,
+  "ObjB": 256,
+  "Backoff": 2,
+  "MinSim": 0.12,
+  "Band": 2,
+  "MinLenRatio": 0.2,
+  "LenPenalty": 0.4,
+  "AnchorMinSim": 0,
+  "AnchorMinLenRatio": 0,
+  "GapPenalty": -0.2,
+  "Anchors": [
+    {
+      "AIndex": 6,
+      "BIndex": 3,
+      "Score": 0.59,
+      "Kind": "anchor",
+      "A": {
+        "Index": 7,
+        "StartOp": 9,
+        "EndOp": 11,
+        "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+        "Pattern": "WWW1WWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Requerente: Juízo da 9ª Vara Cível da Comarca de Campina Grande",
+        "Pattern": "WWWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 8,
+      "BIndex": 14,
+      "Score": 0.47096774193548396,
+      "Kind": "anchor",
+      "A": {
+        "Index": 9,
+        "StartOp": 14,
+        "EndOp": 14,
+        "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 15,
+        "StartOp": 15,
+        "EndOp": 15,
+        "Text": "relativos ao pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da",
+        "Pattern": "WWWWWWWWWW1WWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    }
+  ],
+  "BlocksA": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "ESTA DO DA PARAÍBA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "PO DE R JUDICIÁRIO",
+      "Pattern": "WW1W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "TRIBU NA LDE JUSTIÇA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Assessoria do Conselho da Magistratura",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 6,
+      "Text": "PEDI DO DE",
+      "Pattern": "11WWW",
+      "MaxTokenLen": 2,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 7,
+      "EndOp": 8,
+      "Text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 24,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 9,
+      "EndOp": 11,
+      "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+      "Pattern": "WWW1WWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 12,
+      "EndOp": 13,
+      "Text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "13.2009.815.2001.",
+      "Pattern": "W",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "Certidão",
+      "Pattern": "W",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "Certifico,",
+      "Pattern": "W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "outrossim, queos integrantes do Egrégio",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Conselho da Magistratura, em sessão ordinária hoje realizada, apreciandoo processo acima",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "identificado, proferirama seguinte decisão:",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "RETIRADODE PAUTAPARA MELHOR TRAMITAÇÃO.",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "Presidiua sessão, com voto, o Excelentíssimo Senhor",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "Desembargador Márcio Murilo da Cunha Ramos — Presidente.",
+      "Pattern": "WWWWWW1W",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "Relator: Excelentíssimo Senhor",
+      "Pattern": "WWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "Desembargador João Benedito da Silva.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Ausente, justificadamente, o representante do Ministério",
+      "Pattern": "WW1WWW",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "Público Estadual.",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 29,
+      "EndOp": 30,
+      "Text": "elho da Magistratura, Sala de Sessões \"Des. Manoel",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 31,
+      "EndOp": 31,
+      "Text": "Fonsêca Xavier de Andrade' do TT",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 33,
+      "EndOp": 33,
+      "Text": "stiça do Estado da Paraíba, em João Pessoa, no dia",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 34,
+      "EndOp": 34,
+      "Text": "12 de julho de 2019.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 35,
+      "EndOp": 35,
+      "Text": "PS. 11",
+      "Pattern": "WW",
+      "MaxTokenLen": 3,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "BlocksB": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "TRIBU nal de Ju stiça do ESTA do da Paraíba",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "Diretoria Especial",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2020.090.382",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 9ª Vara Cível da Comarca de Campina Grande",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessado: ANTÔNIO NELBI FERNANDES",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "Os presentes autos versam sobre solicitação de pagamento de honorários periciais no valor de",
+      "Pattern": "WWWWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "1, 5 (um e meio) salário-mínimo, para suportar o encargo relativo a despesa decorrente de",
+      "Pattern": "W1W1WWWW1WW1WWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "honorários do perito nomeado, ANTÔNIO NELBI FERNANDES, para realização de perícia nos",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "autos de Indenização por Dano Material, Indenização por Dano Moral nº 0000141-",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "46.2010.8.15.0011, movida perante o Juízo da 9ª Vara Cível da Comarca de Campina Grande,",
+      "Pattern": "WWW1WWWWWWWWWW",
+      "MaxTokenLen": 18,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "por AMOS DINIZ FERREIRA, em face de FABIO KENEDY ALMEIDA TRIGUEIRO, HOSPITAL",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "CAMPINA GRANDE",
+      "Pattern": "WW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "Cumpre esclarecer que a Resolução 09/2017, deste TRIBU nal, de 21 de junho de 2017, disciplinou,",
+      "Pattern": "WWW1WWWWWWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os procedimentos",
+      "Pattern": "WWWWWWWWWWW1WWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "relativos ao pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da",
+      "Pattern": "WWWWWWWWWW1WWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "ju stiça.",
+      "Pattern": "WW",
+      "MaxTokenLen": 6,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "Em julho de 2020, a então Diretora de Economia e Finanças, por delegação da Presidência deste",
+      "Pattern": "WWWW1WWWW1WWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "TRIBU nal, converteu à apreciação do pedido em diligência, com remessa do processo à Diretoria",
+      "Pattern": "WWW1WWWWWWWWW1W",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "do Fórum da Comarca de Campina Grande, a fim de que fosse adequado aos termos da",
+      "Pattern": "WWWWWWW1WWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Resolução 09/2017, deste TRIBU nal, com a indicação, inclusive, do endereço eletrônico",
+      "Pattern": "WWWWWW1WWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "https: //www.tjpb.jus.br/servicos/peritos-eleiloeiros/formularios, para acesso ao modelo",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 59,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "disponibilizado por esta Corte, tendo os autos sido devolvidos, somente agora, sem atendimento",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "da diligência requerida, apesar das diligências empreendidas pela Diretoria do Fórum Afonso",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "Campos, através de malotes digitais, com códigos de rastreabilidade números 81520203246797 e",
+      "Pattern": "WWWWWWWWWWW1",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "81520213637408, datados de 20/08/2020 e 20/04/2021, respectivamente.",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "Documento 11 página 1 assinado, do processo nº 2020090382, nos termos da Lei 11.419. ADME.11081.62008.50261.50690-9",
+      "Pattern": "WWW1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 09/05/2021 14: 07",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "Alignments": [
+    {
+      "AIndex": 0,
+      "BIndex": 0,
+      "Score": 0.41860465116279066,
+      "Kind": "variable",
+      "A": {
+        "Index": 1,
+        "StartOp": 1,
+        "EndOp": 1,
+        "Text": "ESTA DO DA PARAÍBA",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 7,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 1,
+        "StartOp": 1,
+        "EndOp": 1,
+        "Text": "TRIBU nal de Ju stiça do ESTA do da Paraíba",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 7,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 1,
+      "BIndex": 1,
+      "Score": 0.1833333333333333,
+      "Kind": "variable",
+      "A": {
+        "Index": 2,
+        "StartOp": 2,
+        "EndOp": 2,
+        "Text": "PO DE R JUDICIÁRIO",
+        "Pattern": "WW1W",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 2,
+        "StartOp": 2,
+        "EndOp": 2,
+        "Text": "Diretoria Especial",
+        "Pattern": "WW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 2,
+      "BIndex": 2,
+      "Score": 0.25217391304347825,
+      "Kind": "variable",
+      "A": {
+        "Index": 3,
+        "StartOp": 3,
+        "EndOp": 3,
+        "Text": "TRIBU NA LDE JUSTIÇA",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 7,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 3,
+        "StartOp": 3,
+        "EndOp": 3,
+        "Text": "Processo nº 2020.090.382",
+        "Pattern": "WWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 3,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Assessoria do Conselho da Magistratura",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 4,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 5,
+        "StartOp": 5,
+        "EndOp": 6,
+        "Text": "PEDI DO DE",
+        "Pattern": "11WWW",
+        "MaxTokenLen": 2,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 5,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 6,
+        "StartOp": 7,
+        "EndOp": 8,
+        "Text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 24,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 6,
+      "BIndex": 3,
+      "Score": 0.59,
+      "Kind": "variable",
+      "A": {
+        "Index": 7,
+        "StartOp": 9,
+        "EndOp": 11,
+        "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+        "Pattern": "WWW1WWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Requerente: Juízo da 9ª Vara Cível da Comarca de Campina Grande",
+        "Pattern": "WWWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 4,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 5,
+        "StartOp": 5,
+        "EndOp": 5,
+        "Text": "Interessado: ANTÔNIO NELBI FERNANDES",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 5,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 6,
+        "StartOp": 6,
+        "EndOp": 6,
+        "Text": "Os presentes autos versam sobre solicitação de pagamento de honorários periciais no valor de",
+        "Pattern": "WWWWWWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 7,
+      "BIndex": 6,
+      "Score": 0.22758620689655165,
+      "Kind": "variable",
+      "A": {
+        "Index": 8,
+        "StartOp": 12,
+        "EndOp": 13,
+        "Text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+        "Pattern": "WWWWWWWWWWWWW",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 7,
+        "StartOp": 7,
+        "EndOp": 7,
+        "Text": "1, 5 (um e meio) salário-mínimo, para suportar o encargo relativo a despesa decorrente de",
+        "Pattern": "W1W1WWWW1WW1WWW",
+        "MaxTokenLen": 15,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 7,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 8,
+        "StartOp": 8,
+        "EndOp": 8,
+        "Text": "honorários do perito nomeado, ANTÔNIO NELBI FERNANDES, para realização de perícia nos",
+        "Pattern": "WWWWWWWWWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 8,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 9,
+        "StartOp": 9,
+        "EndOp": 9,
+        "Text": "autos de Indenização por Dano Material, Indenização por Dano Moral nº 0000141-",
+        "Pattern": "WWWWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 9,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 10,
+        "StartOp": 10,
+        "EndOp": 10,
+        "Text": "46.2010.8.15.0011, movida perante o Juízo da 9ª Vara Cível da Comarca de Campina Grande,",
+        "Pattern": "WWW1WWWWWWWWWW",
+        "MaxTokenLen": 18,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 10,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 11,
+        "StartOp": 11,
+        "EndOp": 11,
+        "Text": "por AMOS DINIZ FERREIRA, em face de FABIO KENEDY ALMEIDA TRIGUEIRO, HOSPITAL",
+        "Pattern": "WWWWWWWWWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 11,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 12,
+        "StartOp": 12,
+        "EndOp": 12,
+        "Text": "CAMPINA GRANDE",
+        "Pattern": "WW",
+        "MaxTokenLen": 7,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 12,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 13,
+        "StartOp": 13,
+        "EndOp": 13,
+        "Text": "Cumpre esclarecer que a Resolução 09/2017, deste TRIBU nal, de 21 de junho de 2017, disciplinou,",
+        "Pattern": "WWW1WWWWWWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 13,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 14,
+        "StartOp": 14,
+        "EndOp": 14,
+        "Text": "no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os procedimentos",
+        "Pattern": "WWWWWWWWWWW1WWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 8,
+      "BIndex": 14,
+      "Score": 0.47096774193548396,
+      "Kind": "variable",
+      "A": {
+        "Index": 9,
+        "StartOp": 14,
+        "EndOp": 14,
+        "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 15,
+        "StartOp": 15,
+        "EndOp": 15,
+        "Text": "relativos ao pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da",
+        "Pattern": "WWWWWWWWWW1WWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 9,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 10,
+        "StartOp": 15,
+        "EndOp": 15,
+        "Text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+        "Pattern": "WWWWWWWWWWW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 10,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 11,
+        "StartOp": 16,
+        "EndOp": 16,
+        "Text": "13.2009.815.2001.",
+        "Pattern": "W",
+        "MaxTokenLen": 17,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 11,
+      "BIndex": 15,
+      "Score": 0.42222222222222217,
+      "Kind": "variable",
+      "A": {
+        "Index": 12,
+        "StartOp": 17,
+        "EndOp": 17,
+        "Text": "Certidão",
+        "Pattern": "W",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 16,
+        "StartOp": 16,
+        "EndOp": 16,
+        "Text": "ju stiça.",
+        "Pattern": "WW",
+        "MaxTokenLen": 6,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 16,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 17,
+        "StartOp": 17,
+        "EndOp": 17,
+        "Text": "Em julho de 2020, a então Diretora de Economia e Finanças, por delegação da Presidência deste",
+        "Pattern": "WWWW1WWWW1WWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 12,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 13,
+        "StartOp": 18,
+        "EndOp": 18,
+        "Text": "Certifico,",
+        "Pattern": "W",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 13,
+      "BIndex": 17,
+      "Score": 0.23369565217391303,
+      "Kind": "variable",
+      "A": {
+        "Index": 14,
+        "StartOp": 19,
+        "EndOp": 19,
+        "Text": "outrossim, queos integrantes do Egrégio",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 18,
+        "StartOp": 18,
+        "EndOp": 18,
+        "Text": "TRIBU nal, converteu à apreciação do pedido em diligência, com remessa do processo à Diretoria",
+        "Pattern": "WWW1WWWWWWWWW1W",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 14,
+      "BIndex": 18,
+      "Score": 0.24090909090909088,
+      "Kind": "variable",
+      "A": {
+        "Index": 15,
+        "StartOp": 20,
+        "EndOp": 20,
+        "Text": "Conselho da Magistratura, em sessão ordinária hoje realizada, apreciandoo processo acima",
+        "Pattern": "WWWWWWWWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 19,
+        "StartOp": 19,
+        "EndOp": 19,
+        "Text": "do Fórum da Comarca de Campina Grande, a fim de que fosse adequado aos termos da",
+        "Pattern": "WWWWWWW1WWWWWWWW",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 15,
+      "BIndex": 19,
+      "Score": 0.21764705882352942,
+      "Kind": "variable",
+      "A": {
+        "Index": 16,
+        "StartOp": 21,
+        "EndOp": 21,
+        "Text": "identificado, proferirama seguinte decisão:",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 20,
+        "StartOp": 20,
+        "EndOp": 20,
+        "Text": "Resolução 09/2017, deste TRIBU nal, com a indicação, inclusive, do endereço eletrônico",
+        "Pattern": "WWWWWW1WWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 16,
+      "BIndex": 20,
+      "Score": 0.2310344827586207,
+      "Kind": "variable",
+      "A": {
+        "Index": 17,
+        "StartOp": 22,
+        "EndOp": 22,
+        "Text": "RETIRADODE PAUTAPARA MELHOR TRAMITAÇÃO.",
+        "Pattern": "WWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 21,
+        "StartOp": 21,
+        "EndOp": 21,
+        "Text": "https: //www.tjpb.jus.br/servicos/peritos-eleiloeiros/formularios, para acesso ao modelo",
+        "Pattern": "WWWWWW",
+        "MaxTokenLen": 59,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 17,
+      "BIndex": 21,
+      "Score": 0.3376344086021505,
+      "Kind": "variable",
+      "A": {
+        "Index": 18,
+        "StartOp": 23,
+        "EndOp": 23,
+        "Text": "Presidiua sessão, com voto, o Excelentíssimo Senhor",
+        "Pattern": "WWWW1WW",
+        "MaxTokenLen": 14,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 22,
+        "StartOp": 22,
+        "EndOp": 22,
+        "Text": "disponibilizado por esta Corte, tendo os autos sido devolvidos, somente agora, sem atendimento",
+        "Pattern": "WWWWWWWWWWWWW",
+        "MaxTokenLen": 15,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 18,
+      "BIndex": 22,
+      "Score": 0.24615384615384617,
+      "Kind": "variable",
+      "A": {
+        "Index": 19,
+        "StartOp": 24,
+        "EndOp": 24,
+        "Text": "Desembargador Márcio Murilo da Cunha Ramos — Presidente.",
+        "Pattern": "WWWWWW1W",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 23,
+        "StartOp": 23,
+        "EndOp": 23,
+        "Text": "da diligência requerida, apesar das diligências empreendidas pela Diretoria do Fórum Afonso",
+        "Pattern": "WWWWWWWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 19,
+      "BIndex": 23,
+      "Score": 0.19673913043478258,
+      "Kind": "variable",
+      "A": {
+        "Index": 20,
+        "StartOp": 25,
+        "EndOp": 25,
+        "Text": "Relator: Excelentíssimo Senhor",
+        "Pattern": "WWW",
+        "MaxTokenLen": 14,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 24,
+        "StartOp": 24,
+        "EndOp": 24,
+        "Text": "Campos, através de malotes digitais, com códigos de rastreabilidade números 81520203246797 e",
+        "Pattern": "WWWWWWWWWWW1",
+        "MaxTokenLen": 15,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": -1,
+      "BIndex": 24,
+      "Score": 0,
+      "Kind": "gap_a",
+      "A": null,
+      "B": {
+        "Index": 25,
+        "StartOp": 25,
+        "EndOp": 25,
+        "Text": "81520213637408, datados de 20/08/2020 e 20/04/2021, respectivamente.",
+        "Pattern": "WWWW1WW",
+        "MaxTokenLen": 16,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 20,
+      "BIndex": 25,
+      "Score": 0.2201754385964912,
+      "Kind": "variable",
+      "A": {
+        "Index": 21,
+        "StartOp": 26,
+        "EndOp": 26,
+        "Text": "Desembargador João Benedito da Silva.",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 26,
+        "StartOp": 26,
+        "EndOp": 26,
+        "Text": "Documento 11 página 1 assinado, do processo nº 2020090382, nos termos da Lei 11.419. ADME.11081.62008.50261.50690-9",
+        "Pattern": "WWW1WWWWWWWWWWW",
+        "MaxTokenLen": 30,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 21,
+      "BIndex": 26,
+      "Score": 0.26833333333333337,
+      "Kind": "variable",
+      "A": {
+        "Index": 22,
+        "StartOp": 27,
+        "EndOp": 27,
+        "Text": "Ausente, justificadamente, o representante do Ministério",
+        "Pattern": "WW1WWW",
+        "MaxTokenLen": 17,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 27,
+        "StartOp": 27,
+        "EndOp": 27,
+        "Text": "Robson de Lima Cananea [419.454.334-34] em 09/05/2021 14: 07",
+        "Pattern": "WWWWWWWWW",
+        "MaxTokenLen": 16,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 22,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 23,
+        "StartOp": 28,
+        "EndOp": 28,
+        "Text": "Público Estadual.",
+        "Pattern": "WW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 23,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 24,
+        "StartOp": 29,
+        "EndOp": 30,
+        "Text": "elho da Magistratura, Sala de Sessões \"Des. Manoel",
+        "Pattern": "WWWWWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 24,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 25,
+        "StartOp": 31,
+        "EndOp": 31,
+        "Text": "Fonsêca Xavier de Andrade' do TT",
+        "Pattern": "WWWWWW",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 25,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 26,
+        "StartOp": 33,
+        "EndOp": 33,
+        "Text": "stiça do Estado da Paraíba, em João Pessoa, no dia",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 8,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 26,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 27,
+        "StartOp": 34,
+        "EndOp": 34,
+        "Text": "12 de julho de 2019.",
+        "Pattern": "WWWWW",
+        "MaxTokenLen": 5,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    },
+    {
+      "AIndex": 27,
+      "BIndex": -1,
+      "Score": 0,
+      "Kind": "gap_b",
+      "A": {
+        "Index": 28,
+        "StartOp": 35,
+        "EndOp": 35,
+        "Text": "PS. 11",
+        "Pattern": "WW",
+        "MaxTokenLen": 3,
+        "OpsLabel": "Tj"
+      },
+      "B": null
+    }
+  ],
+  "VariableBlocksA": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "ESTA DO DA PARAÍBA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "PO DE R JUDICIÁRIO",
+      "Pattern": "WW1W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "TRIBU NA LDE JUSTIÇA",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Assessoria do Conselho da Magistratura",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 6,
+      "Text": "PEDI DO DE",
+      "Pattern": "11WWW",
+      "MaxTokenLen": 2,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 7,
+      "EndOp": 8,
+      "Text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 24,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 9,
+      "EndOp": 11,
+      "Text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+      "Pattern": "WWW1WWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 12,
+      "EndOp": 13,
+      "Text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "13.2009.815.2001.",
+      "Pattern": "W",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "Certidão",
+      "Pattern": "W",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "Certifico,",
+      "Pattern": "W",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "outrossim, queos integrantes do Egrégio",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Conselho da Magistratura, em sessão ordinária hoje realizada, apreciandoo processo acima",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "identificado, proferirama seguinte decisão:",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "RETIRADODE PAUTAPARA MELHOR TRAMITAÇÃO.",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "Presidiua sessão, com voto, o Excelentíssimo Senhor",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "Desembargador Márcio Murilo da Cunha Ramos — Presidente.",
+      "Pattern": "WWWWWW1W",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "Relator: Excelentíssimo Senhor",
+      "Pattern": "WWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "Desembargador João Benedito da Silva.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Ausente, justificadamente, o representante do Ministério",
+      "Pattern": "WW1WWW",
+      "MaxTokenLen": 17,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "Público Estadual.",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 29,
+      "EndOp": 30,
+      "Text": "elho da Magistratura, Sala de Sessões \"Des. Manoel",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 31,
+      "EndOp": 31,
+      "Text": "Fonsêca Xavier de Andrade' do TT",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 33,
+      "EndOp": 33,
+      "Text": "stiça do Estado da Paraíba, em João Pessoa, no dia",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 34,
+      "EndOp": 34,
+      "Text": "12 de julho de 2019.",
+      "Pattern": "WWWWW",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 35,
+      "EndOp": 35,
+      "Text": "PS. 11",
+      "Pattern": "WW",
+      "MaxTokenLen": 3,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "VariableBlocksB": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "TRIBU nal de Ju stiça do ESTA do da Paraíba",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "Diretoria Especial",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2020.090.382",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 9ª Vara Cível da Comarca de Campina Grande",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessado: ANTÔNIO NELBI FERNANDES",
+      "Pattern": "WWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "Os presentes autos versam sobre solicitação de pagamento de honorários periciais no valor de",
+      "Pattern": "WWWWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "1, 5 (um e meio) salário-mínimo, para suportar o encargo relativo a despesa decorrente de",
+      "Pattern": "W1W1WWWW1WW1WWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "honorários do perito nomeado, ANTÔNIO NELBI FERNANDES, para realização de perícia nos",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "autos de Indenização por Dano Material, Indenização por Dano Moral nº 0000141-",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "46.2010.8.15.0011, movida perante o Juízo da 9ª Vara Cível da Comarca de Campina Grande,",
+      "Pattern": "WWW1WWWWWWWWWW",
+      "MaxTokenLen": 18,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "por AMOS DINIZ FERREIRA, em face de FABIO KENEDY ALMEIDA TRIGUEIRO, HOSPITAL",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "CAMPINA GRANDE",
+      "Pattern": "WW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "Cumpre esclarecer que a Resolução 09/2017, deste TRIBU nal, de 21 de junho de 2017, disciplinou,",
+      "Pattern": "WWW1WWWWWWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os procedimentos",
+      "Pattern": "WWWWWWWWWWW1WWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "relativos ao pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da",
+      "Pattern": "WWWWWWWWWW1WWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "ju stiça.",
+      "Pattern": "WW",
+      "MaxTokenLen": 6,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "Em julho de 2020, a então Diretora de Economia e Finanças, por delegação da Presidência deste",
+      "Pattern": "WWWW1WWWW1WWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "TRIBU nal, converteu à apreciação do pedido em diligência, com remessa do processo à Diretoria",
+      "Pattern": "WWW1WWWWWWWWW1W",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "do Fórum da Comarca de Campina Grande, a fim de que fosse adequado aos termos da",
+      "Pattern": "WWWWWWW1WWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Resolução 09/2017, deste TRIBU nal, com a indicação, inclusive, do endereço eletrônico",
+      "Pattern": "WWWWWW1WWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "https: //www.tjpb.jus.br/servicos/peritos-eleiloeiros/formularios, para acesso ao modelo",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 59,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "disponibilizado por esta Corte, tendo os autos sido devolvidos, somente agora, sem atendimento",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "da diligência requerida, apesar das diligências empreendidas pela Diretoria do Fórum Afonso",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "Campos, através de malotes digitais, com códigos de rastreabilidade números 81520203246797 e",
+      "Pattern": "WWWWWWWWWWW1",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "81520213637408, datados de 20/08/2020 e 20/04/2021, respectivamente.",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "Documento 11 página 1 assinado, do processo nº 2020090382, nos termos da Lei 11.419. ADME.11081.62008.50261.50690-9",
+      "Pattern": "WWW1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 09/05/2021 14: 07",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "FixedPairs": [],
+  "RangeA": {
+    "StartOp": 1,
+    "EndOp": 35,
+    "HasValue": true
+  },
+  "RangeB": {
+    "StartOp": 1,
+    "EndOp": 27,
+    "HasValue": true
+  },
+  "Extraction": {
+    "status": "ok",
+    "doc_key": "certidao_conselho",
+    "doc_type": "CERTIDAO_CM",
+    "map_path": "/mnt/c/git/operpdf-textopsalign/modules/PatternModules/registry/alignrange_fields/tjpb_certidao.yml",
+    "band": "front_head",
+    "parsed": {
+      "pdf_a": {
+        "values": {
+          "PROCESSO_ADMINISTRATIVO": "",
+          "PROCESSO_JUDICIAL": "0000423-45.2019.815.0000",
+          "COMARCA": "Comarca da Capital",
+          "VARA": "",
+          "VALOR_ARBITRADO_CM": "",
+          "DATA_ARBITRADO_FINAL": "",
+          "ADIANTAMENTO": "",
+          "PARCELA": "",
+          "PERCENTUAL": ""
+        },
+        "fields": {
+          "PROCESSO_ADMINISTRATIVO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PROCESSO_JUDICIAL": {
+            "ValueRaw": "0000423-45.2019.815.0000",
+            "Value": "0000423-45.2019.815.0000",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "OK",
+            "BBox": null
+          },
+          "COMARCA": {
+            "ValueRaw": "Comarca da Capital",
+            "Value": "Comarca da Capital",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "OK",
+            "BBox": null
+          },
+          "VARA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_CM": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "DATA_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "ADIANTAMENTO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PARCELA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PERCENTUAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op35",
+            "Obj": 7,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_JZ": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          }
+        }
+      },
+      "pdf_b": {
+        "values": {
+          "PROCESSO_ADMINISTRATIVO": "2020.090.382",
+          "PROCESSO_JUDICIAL": "",
+          "COMARCA": "Campina Grande",
+          "VARA": "9ª Vara Cível",
+          "VALOR_ARBITRADO_CM": "",
+          "DATA_ARBITRADO_FINAL": "",
+          "ADIANTAMENTO": "",
+          "PARCELA": "",
+          "PERCENTUAL": ""
+        },
+        "fields": {
+          "PROCESSO_ADMINISTRATIVO": {
+            "ValueRaw": "2020.090.382",
+            "Value": "2020.090.382",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "OK",
+            "BBox": null
+          },
+          "PROCESSO_JUDICIAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "COMARCA": {
+            "ValueRaw": "Campina Grande",
+            "Value": "Campina Grande",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "OK",
+            "BBox": null
+          },
+          "VARA": {
+            "ValueRaw": "9ª Vara Cível",
+            "Value": "9ª Vara Cível",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "OK",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_CM": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "DATA_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "ADIANTAMENTO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PARCELA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PERCENTUAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "OpRange": "op1-op27",
+            "Obj": 256,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_JZ": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          }
+        }
+      }
+    },
+    "pipeline": {
+      "step_modules": {
+        "1_detection_selection": "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+        "2_alignment": "Obj.Align.ObjectsTextOpsDiff",
+        "3_1_prepare": "ObjectsTextOpsAlign + DocumentValidationRules",
+        "3_2_crop": "ObjectsTextOpsAlign.BuildValueFullFromBlocks",
+        "3_3_yaml_parser": "Obj.Commands.ObjectsMapFields",
+        "3_4_honorarios": "Obj.Honorarios.HonorariosFacade",
+        "3_5_validator": "Obj.ValidatorModule.ValidatorFacade",
+        "4_output": "ObjectsTextOpsAlign + JsonSerializer"
+      },
+      "merge_policy": "single_band",
+      "values_origin_note": "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento do módulo de honorários."
+    },
+    "value_flow": {
+      "pdf_a": {
+        "PROCESSO_ADMINISTRATIVO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROCESSO_JUDICIAL": {
+          "parser": "0000423-45.2019.815.0000",
+          "derived_candidate": "",
+          "final": "0000423-45.2019.815.0000",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "COMARCA": {
+          "parser": "Comarca da Capital",
+          "derived_candidate": "",
+          "final": "Comarca da Capital",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "VARA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROMOVENTE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROMOVIDO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "CPF_PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIALIDADE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIE_DA_PERICIA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_JZ": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_FINAL": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "FATOR": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_TABELADO_ANEXO_I": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        }
+      },
+      "pdf_b": {
+        "PROCESSO_ADMINISTRATIVO": {
+          "parser": "2020.090.382",
+          "derived_candidate": "",
+          "final": "2020.090.382",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "PROCESSO_JUDICIAL": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "COMARCA": {
+          "parser": "Campina Grande",
+          "derived_candidate": "",
+          "final": "Campina Grande",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "VARA": {
+          "parser": "9ª Vara Cível",
+          "derived_candidate": "",
+          "final": "9ª Vara Cível",
+          "applied": false,
+          "decision": "mantido_parser"
+        },
+        "PROMOVENTE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PROMOVIDO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "CPF_PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIALIDADE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "ESPECIE_DA_PERICIA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_JZ": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_ARBITRADO_FINAL": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "FATOR": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_TABELADO_ANEXO_I": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        }
+      }
+    },
+    "validator": {
+      "enabled": true,
+      "module": "Obj.ValidatorModule.ValidatorFacade",
+      "scope": "target_b_only(model_a_reference)",
+      "ok": false,
+      "ok_pair": false,
+      "ok_a": false,
+      "ok_b": false,
+      "reason": "missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM",
+      "reason_pair": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM",
+      "reason_a": "missing:PROCESSO_ADMINISTRATIVO",
+      "reason_b": "missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM"
+    },
+    "honorarios": {
+      "enabled": true,
+      "module": "Obj.Honorarios.HonorariosFacade",
+      "apply_a": true,
+      "apply_b": true,
+      "pdf_a": {
+        "doc_type": "CERTIDAO_CM",
+        "derived_valor": "",
+        "derived_values": {},
+        "status": "missing_especialidade",
+        "source": "values",
+        "especialidade": "",
+        "especialidade_source": "fields",
+        "especie_da_pericia": "",
+        "valor_field": "",
+        "valor_raw": "",
+        "fator": "",
+        "entry_id": "",
+        "area": "",
+        "perito_name_source": "",
+        "perito_cpf_source": "",
+        "derivations": [],
+        "valor_tabelado_anexo_i": "",
+        "valor_normalized": "",
+        "confidence": 0
+      },
+      "pdf_b": {
+        "doc_type": "CERTIDAO_CM",
+        "derived_valor": "",
+        "derived_values": {},
+        "status": "missing_especialidade",
+        "source": "values",
+        "especialidade": "",
+        "especialidade_source": "fields",
+        "especie_da_pericia": "",
+        "valor_field": "",
+        "valor_raw": "",
+        "fator": "",
+        "entry_id": "",
+        "area": "",
+        "perito_name_source": "",
+        "perito_cpf_source": "",
+        "derivations": [],
+        "valor_tabelado_anexo_i": "",
+        "valor_normalized": "",
+        "confidence": 0
+      }
+    }
+  },
+  "ReturnInfo": {
+    "schema_version": "operpdf.return.v1",
+    "command": "textopsalign",
+    "output_mode": "All",
+    "return_enabled": true,
+    "io_file": "/mnt/c/git/operpdf-textopsalign/io/find_certidao_Q6.json",
+    "generated_at_utc": "2026-02-19T04:00:25.0280164Z"
+  },
+  "ReturnView": {
+    "mode": "All",
+    "selected_rule": "fixed + variable + gap_a + gap_b",
+    "counts": {
+      "all": 39,
+      "selected": 39,
+      "all_by_kind": {
+        "variable": 16,
+        "gap_b": 12,
+        "gap_a": 11
+      },
+      "selected_by_kind": {
+        "variable": 16,
+        "gap_b": 12,
+        "gap_a": 11
+      }
+    },
+    "selected_alignment_indexes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "selected_preview_top20": [
+      {
+        "n": 1,
+        "kind": "variable",
+        "score": 0.41860465116279066,
+        "a_index": 1,
+        "b_index": 1,
+        "a_op_range": "op1",
+        "b_op_range": "op1",
+        "a_text": "ESTA DO DA PARAÍBA",
+        "b_text": "TRIBU nal de Ju stiça do ESTA do da Paraíba"
+      },
+      {
+        "n": 2,
+        "kind": "variable",
+        "score": 0.1833333333333333,
+        "a_index": 2,
+        "b_index": 2,
+        "a_op_range": "op2",
+        "b_op_range": "op2",
+        "a_text": "PO DE R JUDICIÁRIO",
+        "b_text": "Diretoria Especial"
+      },
+      {
+        "n": 3,
+        "kind": "variable",
+        "score": 0.25217391304347825,
+        "a_index": 3,
+        "b_index": 3,
+        "a_op_range": "op3",
+        "b_op_range": "op3",
+        "a_text": "TRIBU NA LDE JUSTIÇA",
+        "b_text": "Processo nº 2020.090.382"
+      },
+      {
+        "n": 4,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 4,
+        "b_index": 0,
+        "a_op_range": "op4",
+        "b_op_range": "",
+        "a_text": "Assessoria do Conselho da Magistratura",
+        "b_text": ""
+      },
+      {
+        "n": 5,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 5,
+        "b_index": 0,
+        "a_op_range": "op5-op6",
+        "b_op_range": "",
+        "a_text": "PEDI DO DE",
+        "b_text": ""
+      },
+      {
+        "n": 6,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 6,
+        "b_index": 0,
+        "a_op_range": "op7-op8",
+        "b_op_range": "",
+        "a_text": "PROVIDÊNCIASN° 0000423-45.2019.815.0000 (Tramitou como",
+        "b_text": ""
+      },
+      {
+        "n": 7,
+        "kind": "variable",
+        "score": 0.59,
+        "a_index": 7,
+        "b_index": 4,
+        "a_op_range": "op9-op11",
+        "b_op_range": "op4",
+        "a_text": "ADM-E n° 2018198741)) ) . Requerente: Exma. Sra. Dra. Renata da Câmara Pires",
+        "b_text": "Requerente: Juízo da 9ª Vara Cível da Comarca de Campina Grande"
+      },
+      {
+        "n": 8,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 5,
+        "a_op_range": "",
+        "b_op_range": "op5",
+        "a_text": "",
+        "b_text": "Interessado: ANTÔNIO NELBI FERNANDES"
+      },
+      {
+        "n": 9,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 6,
+        "a_op_range": "",
+        "b_op_range": "op6",
+        "a_text": "",
+        "b_text": "Os presentes autos versam sobre solicitação de pagamento de honorários periciais no valor de"
+      },
+      {
+        "n": 10,
+        "kind": "variable",
+        "score": 0.22758620689655165,
+        "a_index": 8,
+        "b_index": 7,
+        "a_op_range": "op12-op13",
+        "b_op_range": "op7",
+        "a_text": "Belmont, Juiz de Direito da 8.° Vara Cível da Comarca da Capital, Assunto:",
+        "b_text": "1, 5 (um e meio) salário-mínimo, para suportar o encargo relativo a despesa decorrente de"
+      },
+      {
+        "n": 11,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 8,
+        "a_op_range": "",
+        "b_op_range": "op8",
+        "a_text": "",
+        "b_text": "honorários do perito nomeado, ANTÔNIO NELBI FERNANDES, para realização de perícia nos"
+      },
+      {
+        "n": 12,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 9,
+        "a_op_range": "",
+        "b_op_range": "op9",
+        "a_text": "",
+        "b_text": "autos de Indenização por Dano Material, Indenização por Dano Moral nº 0000141-"
+      },
+      {
+        "n": 13,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 10,
+        "a_op_range": "",
+        "b_op_range": "op10",
+        "a_text": "",
+        "b_text": "46.2010.8.15.0011, movida perante o Juízo da 9ª Vara Cível da Comarca de Campina Grande,"
+      },
+      {
+        "n": 14,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 11,
+        "a_op_range": "",
+        "b_op_range": "op11",
+        "a_text": "",
+        "b_text": "por AMOS DINIZ FERREIRA, em face de FABIO KENEDY ALMEIDA TRIGUEIRO, HOSPITAL"
+      },
+      {
+        "n": 15,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 12,
+        "a_op_range": "",
+        "b_op_range": "op12",
+        "a_text": "",
+        "b_text": "CAMPINA GRANDE"
+      },
+      {
+        "n": 16,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 13,
+        "a_op_range": "",
+        "b_op_range": "op13",
+        "a_text": "",
+        "b_text": "Cumpre esclarecer que a Resolução 09/2017, deste TRIBU nal, de 21 de junho de 2017, disciplinou,"
+      },
+      {
+        "n": 17,
+        "kind": "gap_a",
+        "score": 0,
+        "a_index": 0,
+        "b_index": 14,
+        "a_op_range": "",
+        "b_op_range": "op14",
+        "a_text": "",
+        "b_text": "no âmbito da Ju stiça ESTA dual da Paraíba de primeiro e segundo graus, os procedimentos"
+      },
+      {
+        "n": 18,
+        "kind": "variable",
+        "score": 0.47096774193548396,
+        "a_index": 9,
+        "b_index": 15,
+        "a_op_range": "op14",
+        "b_op_range": "op15",
+        "a_text": "Solicitação de pagamento de honorários periciaisà Perita Engenheira Marta Liane",
+        "b_text": "relativos ao pagamento dos honorários periciais, nos casos em que a parte goze da gratuidade da"
+      },
+      {
+        "n": 19,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 10,
+        "b_index": 0,
+        "a_op_range": "op15",
+        "b_op_range": "",
+        "a_text": "de Almeida Ramalho Loureiro, por perícia realizada no Processo n° 0028841-",
+        "b_text": ""
+      },
+      {
+        "n": 20,
+        "kind": "gap_b",
+        "score": 0,
+        "a_index": 11,
+        "b_index": 0,
+        "a_op_range": "op16",
+        "b_op_range": "",
+        "a_text": "13.2009.815.2001.",
+        "b_text": ""
+      }
+    ],
+    "extraction_summary": {
+      "status": "ok",
+      "doc_key": "certidao_conselho",
+      "doc_type": "CERTIDAO_CM",
+      "band": "front_head",
+      "fields_non_empty_a": 2,
+      "fields_non_empty_b": 3,
+      "validator_ok": false,
+      "validator_reason": "missing_one_of:VALOR_ARBITRADO_CM|DATA_AUTORIZACAO_CM",
+      "honorarios_apply_a": true,
+      "honorarios_apply_b": true
+    }
+  }
+}
