@@ -781,6 +781,67 @@ namespace Obj.Commands
             if (stepOutputSave && string.IsNullOrWhiteSpace(stepOutputDir))
                 stepOutputDir = Path.Combine("outputs", "pipeline_steps");
 
+            var despachoCandidateCache = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
+
+            List<int> GetDespachoCandidatePages(string pdfPath)
+            {
+                if (string.IsNullOrWhiteSpace(pdfPath) || !File.Exists(pdfPath))
+                    return new List<int>();
+                if (despachoCandidateCache.TryGetValue(pdfPath, out var cached))
+                    return cached;
+
+                var pages = new List<int>();
+                void AddPage(int candidatePage)
+                {
+                    if (candidatePage > 0 && !pages.Contains(candidatePage))
+                        pages.Add(candidatePage);
+                }
+
+                try
+                {
+                    var hit = BookmarkDetector.Detect(pdfPath);
+                    if (hit.Found)
+                        AddPage(hit.Page);
+                }
+                catch
+                {
+                    // keep probing other detectors
+                }
+                try
+                {
+                    var hit = ContentsPrefixDetector.Detect(pdfPath);
+                    if (hit.Found)
+                        AddPage(hit.Page);
+                }
+                catch
+                {
+                    // keep probing other detectors
+                }
+                try
+                {
+                    var hit = HeaderLabelDetector.Detect(pdfPath);
+                    if (hit.Found)
+                        AddPage(hit.Page);
+                }
+                catch
+                {
+                    // keep probing other detectors
+                }
+                try
+                {
+                    var hit = LargestContentsDetector.Detect(pdfPath);
+                    if (hit.Found)
+                        AddPage(hit.Page);
+                }
+                catch
+                {
+                    // keep probing other detectors
+                }
+
+                despachoCandidateCache[pdfPath] = pages;
+                return pages;
+            }
+
             int PickPageOrDefault(string path)
             {
                 var p = ResolvePage(path, trace: !ReturnUtils.IsEnabled());
@@ -823,13 +884,6 @@ namespace Obj.Commands
                 var docKey = DocumentValidationRules.ResolveDocKeyForDetection(roiDoc);
                 if (!string.Equals(docKey, "despacho", StringComparison.OrdinalIgnoreCase))
                     return false;
-                var p1 = ResolvePage(pdfPath, trace: !ReturnUtils.IsEnabled());
-                if (p1 <= 0)
-                    return false;
-
-                var o1 = PickObjForPage(pdfPath, p1);
-                if (o1 <= 0)
-                    return false;
 
                 var totalPages = 0;
                 try
@@ -842,21 +896,72 @@ namespace Obj.Commands
                     totalPages = 0;
                 }
 
-                var p2 = p1 + 1;
-                var o2 = 0;
-                if (totalPages > 0 && p2 <= totalPages)
-                    o2 = PickObjForPage(pdfPath, p2);
-
-                if (back && p2 > 0 && o2 > 0)
+                var candidates = new List<int>(GetDespachoCandidatePages(pdfPath));
+                if (candidates.Count == 0)
                 {
-                    page = p2;
-                    obj = o2;
+                    var fallbackPage = ResolvePage(pdfPath, trace: !ReturnUtils.IsEnabled());
+                    if (fallbackPage > 0)
+                        candidates.Add(fallbackPage);
+                }
+                if (candidates.Count == 0)
+                    return false;
+
+                var objByPage = new Dictionary<int, int>();
+                int GetObj(int candidatePage)
+                {
+                    if (candidatePage <= 0)
+                        return 0;
+                    if (objByPage.TryGetValue(candidatePage, out var cachedObj))
+                        return cachedObj;
+                    var resolvedObj = PickObjForPage(pdfPath, candidatePage);
+                    objByPage[candidatePage] = resolvedObj;
+                    return resolvedObj;
+                }
+
+                var frontPage = 0;
+                var frontObj = 0;
+                var backPage = 0;
+                var backObj = 0;
+                foreach (var candidatePage in candidates)
+                {
+                    var candidateObj = GetObj(candidatePage);
+                    if (candidateObj <= 0)
+                        continue;
+
+                    if (frontObj <= 0)
+                    {
+                        frontPage = candidatePage;
+                        frontObj = candidateObj;
+                    }
+
+                    var nextPage = candidatePage + 1;
+                    if (totalPages > 0 && nextPage <= totalPages)
+                    {
+                        var nextObj = GetObj(nextPage);
+                        if (nextObj > 0)
+                        {
+                            frontPage = candidatePage;
+                            frontObj = candidateObj;
+                            backPage = nextPage;
+                            backObj = nextObj;
+                            break;
+                        }
+                    }
+                }
+
+                if (frontObj <= 0)
+                    return false;
+
+                if (back && backPage > 0 && backObj > 0)
+                {
+                    page = backPage;
+                    obj = backObj;
                     reason = "despacho_back_auto";
                     return true;
                 }
 
-                page = p1;
-                obj = o1;
+                page = frontPage;
+                obj = frontObj;
                 reason = "despacho_front_auto";
                 return true;
             }
