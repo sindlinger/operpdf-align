@@ -1017,6 +1017,34 @@ namespace Obj.Commands
                 if (!ReturnUtils.IsEnabled() && sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
                     Console.WriteLine($"Despacho route B: p{localPageB} o{localObjB} ({sourceB})");
                 var roleB = DetectInputRole(bPath);
+                var isDespachoDoc = DocumentValidationRules.IsDocMatch(docKey, "despacho");
+                var hasBackASelection = false;
+                var hasBackBSelection = false;
+                var backPageASelection = 0;
+                var backPageBSelection = 0;
+                var backObjASelection = 0;
+                var backObjBSelection = 0;
+                var backSourceASelection = "";
+                var backSourceBSelection = "";
+                if (isDespachoDoc)
+                {
+                    hasBackASelection = TryResolveDespachoSelection(aPath, docKey, true, out backPageASelection, out backObjASelection, out backSourceASelection);
+                    hasBackBSelection = TryResolveDespachoSelection(bPath, docKey, true, out backPageBSelection, out backObjBSelection, out backSourceBSelection);
+                }
+                var backAResolved = hasBackASelection &&
+                                    backPageASelection > 0 &&
+                                    backObjASelection > 0 &&
+                                    backSourceASelection.Contains("back", StringComparison.OrdinalIgnoreCase);
+                var backBResolved = hasBackBSelection &&
+                                    backPageBSelection > 0 &&
+                                    backObjBSelection > 0 &&
+                                    backSourceBSelection.Contains("back", StringComparison.OrdinalIgnoreCase);
+                var pairA = backAResolved
+                    ? $"front=page={localPageA} obj={localObjA} source={sourceA} | back=page={backPageASelection} obj={backObjASelection} source={backSourceASelection}"
+                    : $"front=page={localPageA} obj={localObjA} source={sourceA} | back=nao_resolvido";
+                var pairB = backBResolved
+                    ? $"front=page={localPageB} obj={localObjB} source={sourceB} | back=page={backPageBSelection} obj={backObjBSelection} source={backSourceBSelection}"
+                    : $"front=page={localPageB} obj={localObjB} source={sourceB} | back=nao_resolvido";
                 var stageOutputs = new List<Dictionary<string, object>>();
                 void EmitStage(int step, string status, IDictionary<string, object>? payload = null, string? stageKey = null, string? stageLabel = null)
                 {
@@ -1038,22 +1066,43 @@ namespace Obj.Commands
                     ["ops"] = string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase)),
                     ["params"] = $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"
                 };
+                if (isDespachoDoc)
+                {
+                    step1Payload["pair_a"] = pairA;
+                    step1Payload["pair_b"] = pairB;
+                    step1Payload["sel_back_a"] = backAResolved
+                        ? $"page={backPageASelection} obj={backObjASelection} source={backSourceASelection}"
+                        : "nao_resolvido";
+                    step1Payload["sel_back_b"] = backBResolved
+                        ? $"page={backPageBSelection} obj={backObjBSelection} source={backSourceBSelection}"
+                        : "nao_resolvido";
+                }
                 EmitStage(1, "ok", step1Payload);
                 if (!ReturnUtils.IsEnabled())
                 {
-                    PrintPipelineStep(
-                        "passo 1/4 - detecção e seleção de objetos",
-                        "passo 2/4 - alinhamento",
+                    var step1Lines = new List<(string Key, string Value)>
+                    {
                         ("modulo", "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker"),
                         ("role_a", roleA),
                         ("role_b", roleB),
                         ("pdf_a", Path.GetFileName(aPath)),
                         ("pdf_b", Path.GetFileName(bPath)),
                         ("sel_a", $"page={localPageA} obj={localObjA} source={sourceA}"),
-                        ("sel_b", $"page={localPageB} obj={localObjB} source={sourceB}"),
-                        ("band", sideLabel),
-                        ("ops", string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))),
-                        ("params", $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}")
+                        ("sel_b", $"page={localPageB} obj={localObjB} source={sourceB}")
+                    };
+                    if (isDespachoDoc)
+                    {
+                        step1Lines.Add(("pair_a", pairA));
+                        step1Lines.Add(("pair_b", pairB));
+                    }
+                    step1Lines.Add(("band", sideLabel));
+                    step1Lines.Add(("ops", string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))));
+                    step1Lines.Add(("params", $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"));
+
+                    PrintPipelineStep(
+                        "passo 1/4 - detecção e seleção de objetos",
+                        "passo 2/4 - alinhamento",
+                        step1Lines.ToArray()
                     );
                 }
                 if (!ReturnUtils.IsEnabled())
@@ -1120,10 +1169,6 @@ namespace Obj.Commands
                 var autoDualDespacho = DocumentValidationRules.IsDocMatch(docKey, "despacho") && !useBack && !sideSpecified;
                 if (autoDualDespacho)
                 {
-                    var hasBackA = TryResolveDespachoSelection(aPath, docKey, true, out var backPageA, out var backObjA, out var backSourceA);
-                    var hasBackB = TryResolveDespachoSelection(bPath, docKey, true, out var backPageB, out var backObjB, out var backSourceB);
-                    var backAResolved = hasBackA && backPageA > 0 && backObjA > 0 && backSourceA.Contains("back", StringComparison.OrdinalIgnoreCase);
-                    var backBResolved = hasBackB && backPageB > 0 && backObjB > 0 && backSourceB.Contains("back", StringComparison.OrdinalIgnoreCase);
                     if (backAResolved && backBResolved)
                     {
                         if (!ReturnUtils.IsEnabled())
@@ -1132,16 +1177,16 @@ namespace Obj.Commands
                                 "passo 2b/4 - alinhamento da segunda página (back_tail)",
                                 "passo 3/4 - extração combinada front_head + back_tail",
                                 ("modulo", "Obj.Align.ObjectsTextOpsDiff"),
-                                ("sel_back_a", $"page={backPageA} obj={backObjA} source={backSourceA}"),
-                                ("sel_back_b", $"page={backPageB} obj={backObjB} source={backSourceB}")
+                                ("sel_back_a", $"page={backPageASelection} obj={backObjASelection} source={backSourceASelection}"),
+                                ("sel_back_b", $"page={backPageBSelection} obj={backObjBSelection} source={backSourceBSelection}")
                             );
                         }
 
                         backReport = ObjectsTextOpsDiff.ComputeAlignDebugForSelection(
                             aPath,
                             bPath,
-                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageA, Obj = backObjA },
-                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageB, Obj = backObjB },
+                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageASelection, Obj = backObjASelection },
+                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageBSelection, Obj = backObjBSelection },
                             opFilter,
                             backoff,
                             "back_tail",
