@@ -67,6 +67,7 @@ namespace Obj.Align
             public AlignDebugRange RangeA { get; set; } = new AlignDebugRange();
             public AlignDebugRange RangeB { get; set; } = new AlignDebugRange();
             public object? Extraction { get; set; }
+            public List<Dictionary<string, object>>? PipelineStages { get; set; }
             public Dictionary<string, object>? ReturnInfo { get; set; }
             public Dictionary<string, object>? ReturnView { get; set; }
         }

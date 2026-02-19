@@ -34,6 +34,9 @@ namespace Obj.Commands
             FixedOnly
         }
 
+        private const int PipelineFirstStep = 1;
+        private const int PipelineLastStep = 8;
+
         private static string Colorize(string text, string color)
         {
             if (string.IsNullOrEmpty(text))
@@ -54,6 +57,206 @@ namespace Obj.Commands
             if (!string.IsNullOrWhiteSpace(nextStep))
                 Console.WriteLine($"  {Colorize("usa no próximo:", AnsiWarn)} {nextStep}");
             Console.WriteLine();
+        }
+
+        private static string ResolveStageKey(int step)
+        {
+            return step switch
+            {
+                1 => "detection_selection",
+                2 => "alignment",
+                3 => "extraction",
+                4 => "honorarios",
+                5 => "repairer",
+                6 => "validator",
+                7 => "probe",
+                8 => "output",
+                _ => $"step_{step}"
+            };
+        }
+
+        private static string ResolveStageLabel(int step)
+        {
+            return step switch
+            {
+                1 => "detecção e seleção",
+                2 => "alinhamento",
+                3 => "extração",
+                4 => "honorários",
+                5 => "reparador",
+                6 => "validador",
+                7 => "probe",
+                8 => "persistência e resumo",
+                _ => $"etapa {step}"
+            };
+        }
+
+        private static bool TryParseRunRange(string? raw, out int fromStep, out int toStep)
+        {
+            fromStep = PipelineFirstStep;
+            toStep = PipelineLastStep;
+
+            var t = (raw ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(t))
+                return false;
+
+            t = t.Replace("..", "-", StringComparison.Ordinal)
+                .Replace(":", "-", StringComparison.Ordinal)
+                .Replace("_", "-", StringComparison.Ordinal);
+
+            var parts = t.Split('-', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (parts.Length == 0 || parts.Length > 2)
+                return false;
+
+            if (parts.Length == 1)
+            {
+                if (!int.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var only))
+                    return false;
+                if (only < PipelineFirstStep || only > PipelineLastStep)
+                    return false;
+                fromStep = PipelineFirstStep;
+                toStep = only;
+                return true;
+            }
+
+            if (!int.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var start))
+                return false;
+            if (!int.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var end))
+                return false;
+
+            if (start < PipelineFirstStep || start > PipelineLastStep)
+                return false;
+            if (end < PipelineFirstStep || end > PipelineLastStep)
+                return false;
+            if (start > end)
+                return false;
+
+            fromStep = start;
+            toStep = end;
+            return true;
+        }
+
+        private static Dictionary<string, object> BuildStageOutput(
+            int step,
+            string status,
+            IDictionary<string, object>? payload = null,
+            string? stageKey = null,
+            string? stageLabel = null)
+        {
+            var output = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["step"] = step,
+                ["stage_key"] = string.IsNullOrWhiteSpace(stageKey) ? ResolveStageKey(step) : stageKey!,
+                ["stage"] = string.IsNullOrWhiteSpace(stageLabel) ? ResolveStageLabel(step) : stageLabel!,
+                ["status"] = string.IsNullOrWhiteSpace(status) ? "ok" : status,
+                ["timestamp_utc"] = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
+                ["payload"] = payload != null
+                    ? new Dictionary<string, object>(payload, StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            };
+            return output;
+        }
+
+        private static void EmitStageOutput(
+            List<Dictionary<string, object>> sink,
+            Dictionary<string, object> stageOutput,
+            bool echoJson,
+            int displayFromStep,
+            int displayToStep)
+        {
+            sink.Add(stageOutput);
+            if (!echoJson || ReturnUtils.IsEnabled())
+                return;
+
+            if (!stageOutput.TryGetValue("step", out var stepObj))
+                return;
+            if (!TryGetInt(stepObj, out var step))
+                return;
+            if (step < displayFromStep || step > displayToStep)
+                return;
+
+            var stageLabel = stageOutput.TryGetValue("stage", out var stageObj) ? stageObj?.ToString() ?? "" : "";
+            Console.WriteLine(Colorize($"[STEP_OUTPUT] {step} - {stageLabel}", AnsiInfo));
+            var json = JsonSerializer.Serialize(
+                stageOutput,
+                new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
+            Console.WriteLine(json);
+            Console.WriteLine();
+        }
+
+        private static bool TryGetInt(object? value, out int parsed)
+        {
+            parsed = 0;
+            if (value == null)
+                return false;
+            if (value is int i)
+            {
+                parsed = i;
+                return true;
+            }
+            if (value is long l && l >= int.MinValue && l <= int.MaxValue)
+            {
+                parsed = (int)l;
+                return true;
+            }
+            return int.TryParse(value.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out parsed);
+        }
+
+        private static string SanitizeFileToken(string? raw)
+        {
+            var value = TextNormalization.NormalizeWhitespace(raw ?? "");
+            if (string.IsNullOrWhiteSpace(value))
+                return "step";
+            var invalid = Path.GetInvalidFileNameChars();
+            var sb = new StringBuilder(value.Length);
+            foreach (var ch in value)
+            {
+                if (invalid.Contains(ch) || char.IsWhiteSpace(ch))
+                    sb.Append('_');
+                else
+                    sb.Append(ch);
+            }
+            return sb.ToString();
+        }
+
+        private static void SaveStageOutputs(
+            string outputDir,
+            string baseA,
+            string baseB,
+            List<Dictionary<string, object>> stageOutputs)
+        {
+            if (string.IsNullOrWhiteSpace(outputDir) || stageOutputs == null || stageOutputs.Count == 0)
+                return;
+
+            Directory.CreateDirectory(outputDir);
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            var prefix = $"{baseA}__{baseB}";
+            for (var i = 0; i < stageOutputs.Count; i++)
+            {
+                var stage = stageOutputs[i];
+                var step = stage.TryGetValue("step", out var stepObj) && TryGetInt(stepObj, out var pStep)
+                    ? pStep
+                    : (i + 1);
+                var key = stage.TryGetValue("stage_key", out var keyObj) ? keyObj?.ToString() ?? "stage" : "stage";
+                var file = $"{prefix}__step{step:D2}_{SanitizeFileToken(key)}.json";
+                var path = Path.Combine(outputDir, file);
+                var json = JsonSerializer.Serialize(stage, options);
+                File.WriteAllText(path, json, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+            }
+
+            var combinedPath = Path.Combine(outputDir, $"{prefix}__pipeline_steps.json");
+            var combinedJson = JsonSerializer.Serialize(stageOutputs, options);
+            File.WriteAllText(combinedPath, combinedJson, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+            if (!ReturnUtils.IsEnabled())
+                Console.WriteLine("Arquivos das etapas salvos em: " + outputDir);
         }
 
         private static string ShortText(string? text, int max = 140)
@@ -209,6 +412,41 @@ namespace Obj.Commands
                 ["final"] = finalValue,
                 ["applied"] = applied,
                 ["decision"] = decision
+            };
+        }
+
+        private static Dictionary<string, object> BuildTrackedValueFlow(
+            IEnumerable<string> trackedFields,
+            IDictionary<string, string> parserValues,
+            IDictionary<string, string> finalValues,
+            IDictionary<string, string>? derivedValues,
+            IDictionary<string, ObjectsMapFields.CompactFieldOutput> fields)
+        {
+            var flow = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            foreach (var field in trackedFields)
+            {
+                var fieldFlow = BuildFieldFlow(parserValues, finalValues, derivedValues, field);
+                if (fields.TryGetValue(field, out var meta) && meta != null)
+                {
+                    fieldFlow["source"] = meta.Source ?? "";
+                    fieldFlow["module"] = string.IsNullOrWhiteSpace(meta.Module) ? "parser" : meta.Module;
+                    fieldFlow["status"] = meta.Status ?? "";
+                    fieldFlow["op_range"] = meta.OpRange ?? "";
+                    fieldFlow["obj"] = meta.Obj;
+                }
+                flow[field] = fieldFlow;
+            }
+            return flow;
+        }
+
+        private static Dictionary<string, object> BuildSkippedModulePayload(string module, string reason)
+        {
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["enabled"] = false,
+                ["module"] = module ?? "",
+                ["status"] = "skipped",
+                ["reason"] = reason ?? ""
             };
         }
 
@@ -487,7 +725,7 @@ namespace Obj.Commands
             Console.OutputEncoding = Encoding.UTF8;
             if (!ReturnUtils.IsEnabled())
                 PrintStage("iniciando o modo de detecção");
-            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack, out var sideSpecified, out var allowStack, out var probeEnabled, out var probeFile, out var probePage, out var probeSide, out var probeMaxFields))
+            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack, out var sideSpecified, out var allowStack, out var probeEnabled, out var probeFile, out var probePage, out var probeSide, out var probeMaxFields, out var runFromStep, out var runToStep, out var stepOutputEcho, out var stepOutputSave, out var stepOutputDir))
             {
                 ShowHelp();
                 return;
@@ -522,6 +760,26 @@ namespace Obj.Commands
             var defaults = ObjectsTextOpsDiff.LoadObjDefaults();
             if (string.IsNullOrWhiteSpace(docKey))
                 docKey = defaults?.Doc ?? "tjpb_despacho";
+
+            runFromStep = Math.Max(PipelineFirstStep, Math.Min(PipelineLastStep, runFromStep));
+            runToStep = Math.Max(PipelineFirstStep, Math.Min(PipelineLastStep, runToStep));
+            if (runFromStep > runToStep)
+            {
+                Console.WriteLine($"Faixa de execução inválida: {runFromStep}-{runToStep}");
+                return;
+            }
+            if (runFromStep > PipelineFirstStep && !ReturnUtils.IsEnabled())
+            {
+                Console.WriteLine($"Aviso: dependências internas serão executadas desde a etapa {PipelineFirstStep}; exibição filtrada para {runFromStep}-{runToStep}.");
+            }
+            if (runToStep < 2 && !ReturnUtils.IsEnabled())
+            {
+                Console.WriteLine("Aviso: para gerar relatório de alinhamento/extração, a execução mínima efetiva é até a etapa 2.");
+            }
+            if (runToStep < PipelineLastStep)
+                stepOutputEcho = true;
+            if (stepOutputSave && string.IsNullOrWhiteSpace(stepOutputDir))
+                stepOutputDir = Path.Combine("outputs", "pipeline_steps");
 
             int PickPageOrDefault(string path)
             {
@@ -654,8 +912,28 @@ namespace Obj.Commands
                 if (!ReturnUtils.IsEnabled() && sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
                     Console.WriteLine($"Despacho route B: p{localPageB} o{localObjB} ({sourceB})");
                 var roleB = DetectInputRole(bPath);
+                var stageOutputs = new List<Dictionary<string, object>>();
+                void EmitStage(int step, string status, IDictionary<string, object>? payload = null, string? stageKey = null, string? stageLabel = null)
+                {
+                    var output = BuildStageOutput(step, status, payload, stageKey, stageLabel);
+                    EmitStageOutput(stageOutputs, output, stepOutputEcho, runFromStep, runToStep);
+                }
 
                 var sideLabel = useBack ? "back_tail" : "front_head";
+                var step1Payload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["module"] = "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+                    ["role_a"] = roleA,
+                    ["role_b"] = roleB,
+                    ["pdf_a"] = Path.GetFileName(aPath),
+                    ["pdf_b"] = Path.GetFileName(bPath),
+                    ["sel_a"] = $"page={localPageA} obj={localObjA} source={sourceA}",
+                    ["sel_b"] = $"page={localPageB} obj={localObjB} source={sourceB}",
+                    ["band"] = sideLabel,
+                    ["ops"] = string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase)),
+                    ["params"] = $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"
+                };
+                EmitStage(1, "ok", step1Payload);
                 if (!ReturnUtils.IsEnabled())
                 {
                     PrintPipelineStep(
@@ -809,12 +1087,25 @@ namespace Obj.Commands
                     }
                 }
 
+                var variableCount = report.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
+                var gapCount = report.Alignments.Count(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
+                var rangeA = report.RangeA?.HasValue == true ? $"op{report.RangeA.StartOp}-op{report.RangeA.EndOp}" : "(vazio)";
+                var rangeB = report.RangeB?.HasValue == true ? $"op{report.RangeB.StartOp}-op{report.RangeB.EndOp}" : "(vazio)";
+                var step2Payload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["module"] = "Obj.Align.ObjectsTextOpsDiff",
+                    ["anchors"] = report.Anchors.Count,
+                    ["pairs"] = report.Alignments.Count,
+                    ["fixed"] = report.FixedPairs.Count,
+                    ["variable"] = variableCount,
+                    ["gaps"] = gapCount,
+                    ["range_a"] = rangeA,
+                    ["range_b"] = rangeB,
+                    ["auto_dual_back"] = autoDualDespacho && backReport != null
+                };
+                EmitStage(2, "ok", step2Payload);
                 if (!ReturnUtils.IsEnabled())
                 {
-                    var variableCount = report.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
-                    var gapCount = report.Alignments.Count(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
-                    var rangeA = report.RangeA?.HasValue == true ? $"op{report.RangeA.StartOp}-op{report.RangeA.EndOp}" : "(vazio)";
-                    var rangeB = report.RangeB?.HasValue == true ? $"op{report.RangeB.StartOp}-op{report.RangeB.EndOp}" : "(vazio)";
                     PrintPipelineStep(
                         "passo 2/4 - saída do alinhamento",
                         "passo 3/4 - extração (usa op_range + value_full)",
@@ -836,46 +1127,92 @@ namespace Obj.Commands
                         PrintAlignmentList(report, alignTop, showDiff: true);
                 }
 
-                if (!ReturnUtils.IsEnabled())
-                    PrintStage("iniciando o modo de extração");
-                report.Extraction = BuildExtractionPayload(report, backReport, aPath, bPath, docKey, verbose: !ReturnUtils.IsEnabled());
                 Dictionary<string, object>? deferredProbePayload = null;
-                if (probeEnabled)
+                if (runToStep >= 3)
                 {
-                    var probeSideNormalized = (probeSide ?? "").Trim().ToLowerInvariant();
-                    var probeUseA = probeSideNormalized == "a" || probeSideNormalized == "pdf_a" || probeSideNormalized == "left";
-                    var sideKey = probeUseA ? "pdf_a" : "pdf_b";
-                    var effectiveProbeFile = string.IsNullOrWhiteSpace(probeFile) ? (probeUseA ? aPath : bPath) : probeFile;
-                    var effectiveProbePage = probePage > 0 ? probePage : (probeUseA ? report.PageA : report.PageB);
-                    var probeValues = ReadValuesForProbe(report.Extraction, sideKey);
-
                     if (!ReturnUtils.IsEnabled())
+                        PrintStage("iniciando o modo de extração");
+                    report.Extraction = BuildExtractionPayload(
+                        report,
+                        backReport,
+                        aPath,
+                        bPath,
+                        docKey,
+                        verbose: !ReturnUtils.IsEnabled(),
+                        maxPipelineStep: runToStep,
+                        onStepOutput: (step, stageKey, status, payload) =>
+                        {
+                            EmitStage(step, status, payload, stageKey, ResolveStageLabel(step));
+                        });
+                }
+                else
+                {
+                    report.Extraction = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                     {
-                        PrintPipelineStep(
-                            "passo 3.7/4 - probe pós-extração",
-                            "passo 4/4 - saída e resumo",
-                            ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
-                            ("probe_side", sideKey),
-                            ("probe_file", effectiveProbeFile),
-                            ("probe_page", effectiveProbePage.ToString(CultureInfo.InvariantCulture)),
-                            ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture))
-                        );
+                        ["status"] = "not_executed",
+                        ["reason"] = "run_to_step_below_extraction",
+                        ["run_to_step"] = runToStep
+                    };
+                    EmitStage(3, "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["reason"] = "run_to_step_below_extraction",
+                        ["run_to_step"] = runToStep
+                    });
+                }
+
+                if (runToStep >= 7)
+                {
+                    if (probeEnabled)
+                    {
+                        var probeSideNormalized = (probeSide ?? "").Trim().ToLowerInvariant();
+                        var probeUseA = probeSideNormalized == "a" || probeSideNormalized == "pdf_a" || probeSideNormalized == "left";
+                        var sideKey = probeUseA ? "pdf_a" : "pdf_b";
+                        var effectiveProbeFile = string.IsNullOrWhiteSpace(probeFile) ? (probeUseA ? aPath : bPath) : probeFile;
+                        var effectiveProbePage = probePage > 0 ? probePage : (probeUseA ? report.PageA : report.PageB);
+                        var probeValues = ReadValuesForProbe(report.Extraction, sideKey);
+
+                        if (!ReturnUtils.IsEnabled())
+                        {
+                            PrintPipelineStep(
+                                "passo 3.7/4 - probe pós-extração",
+                                "passo 4/4 - saída e resumo",
+                                ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
+                                ("probe_side", sideKey),
+                                ("probe_file", effectiveProbeFile),
+                                ("probe_page", effectiveProbePage.ToString(CultureInfo.InvariantCulture)),
+                                ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture))
+                            );
+                        }
+
+                        var probePayload = ExtractionProbeModule.Run(
+                            effectiveProbeFile,
+                            effectiveProbePage,
+                            probeValues,
+                            sideKey,
+                            probeMaxFields);
+
+                        AttachProbeToExtraction(report.Extraction, probePayload);
+                        deferredProbePayload = probePayload;
+                        EmitStage(7, "ok", new Dictionary<string, object>(probePayload, StringComparer.OrdinalIgnoreCase));
                     }
-
-                    var probePayload = ExtractionProbeModule.Run(
-                        effectiveProbeFile,
-                        effectiveProbePage,
-                        probeValues,
-                        sideKey,
-                        probeMaxFields);
-
-                    AttachProbeToExtraction(report.Extraction, probePayload);
-                    deferredProbePayload = probePayload;
+                    else
+                    {
+                        EmitStage(7, "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            ["reason"] = "probe_disabled"
+                        });
+                    }
                 }
                 var reportBaseA = Path.GetFileNameWithoutExtension(aPath);
                 var reportBaseB = Path.GetFileNameWithoutExtension(bPath);
                 report.ReturnInfo = BuildReturnInfo(outputMode, $"{reportBaseA}__{reportBaseB}__output_pipe.json");
                 report.ReturnView = BuildReturnView(report, outputMode);
+                report.PipelineStages = stageOutputs;
+                if (report.ReturnView != null)
+                {
+                    report.ReturnView["pipeline_stage_outputs"] = stageOutputs;
+                    report.ReturnView["run_range"] = $"{runFromStep}-{runToStep}";
+                }
                 reports.Add(report);
 
                 if (inputs.Count == 2)
@@ -922,12 +1259,38 @@ namespace Obj.Commands
                         Console.WriteLine("Arquivo extração salvo: " + extractionOutPath);
                     }
 
+                    EmitStage(8, "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["module"] = "ObjectsTextOpsAlign + JsonSerializer",
+                        ["output_mode"] = outputMode.ToString(),
+                        ["run_range"] = $"{runFromStep}-{runToStep}",
+                        ["align_out"] = string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath,
+                        ["return_enabled"] = ReturnUtils.IsEnabled(),
+                        ["partial_run"] = runToStep < PipelineLastStep
+                    });
+
+                    if (stepOutputSave)
+                        SaveStageOutputs(stepOutputDir, baseA, baseB, stageOutputs);
+
                     if (!ReturnUtils.IsEnabled())
                         PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
                     if (!ReturnUtils.IsEnabled())
                         PrintExtractionSummary(report.Extraction);
                     if (!ReturnUtils.IsEnabled() && deferredProbePayload != null)
                         PrintProbeSummary(deferredProbePayload);
+                }
+                else
+                {
+                    EmitStage(8, "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["module"] = "ObjectsTextOpsAlign + JsonSerializer",
+                        ["output_mode"] = outputMode.ToString(),
+                        ["run_range"] = $"{runFromStep}-{runToStep}",
+                        ["stack_mode"] = true,
+                        ["partial_run"] = runToStep < PipelineLastStep
+                    });
+                    if (stepOutputSave)
+                        SaveStageOutputs(stepOutputDir, reportBaseA, reportBaseB, stageOutputs);
                 }
             }
 
@@ -1300,9 +1663,16 @@ namespace Obj.Commands
             };
         }
 
-        private static object BuildExtractionPayload(ObjectsTextOpsDiff.AlignDebugReport report, string aPath, string bPath, string docKey, bool verbose = false)
+        private static object BuildExtractionPayload(
+            ObjectsTextOpsDiff.AlignDebugReport report,
+            string aPath,
+            string bPath,
+            string docKey,
+            bool verbose = false,
+            int maxPipelineStep = PipelineLastStep,
+            Action<int, string, string, Dictionary<string, object>>? onStepOutput = null)
         {
-            return BuildExtractionPayload(report, null, aPath, bPath, docKey, verbose);
+            return BuildExtractionPayload(report, null, aPath, bPath, docKey, verbose, maxPipelineStep, onStepOutput);
         }
 
         private static bool TryParseBandReport(
@@ -1363,8 +1733,17 @@ namespace Obj.Commands
             }
         }
 
-        private static object BuildExtractionPayload(ObjectsTextOpsDiff.AlignDebugReport report, ObjectsTextOpsDiff.AlignDebugReport? backReport, string aPath, string bPath, string docKey, bool verbose = false)
+        private static object BuildExtractionPayload(
+            ObjectsTextOpsDiff.AlignDebugReport report,
+            ObjectsTextOpsDiff.AlignDebugReport? backReport,
+            string aPath,
+            string bPath,
+            string docKey,
+            bool verbose = false,
+            int maxPipelineStep = PipelineLastStep,
+            Action<int, string, string, Dictionary<string, object>>? onStepOutput = null)
         {
+            var stepLimit = Math.Max(3, Math.Min(6, maxPipelineStep));
             var resolvedDoc = DocumentValidationRules.ResolveDocKeyForDetection(docKey);
             var outputDocType = DocumentValidationRules.MapDocKeyToOutputType(resolvedDoc);
             var bandFront = string.IsNullOrWhiteSpace(report.Label) ? "front_head" : report.Label.Trim();
@@ -1386,6 +1765,14 @@ namespace Obj.Commands
             }
             if (string.IsNullOrWhiteSpace(mapPath))
             {
+                onStepOutput?.Invoke(3, "extraction", "error", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["status"] = "map_not_found",
+                    ["doc_key"] = resolvedDoc,
+                    ["doc_type"] = outputDocType,
+                    ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
+                    ["map_path"] = ""
+                });
                 return new Dictionary<string, object>
                 {
                     ["status"] = "map_not_found",
@@ -1407,6 +1794,15 @@ namespace Obj.Commands
                         ("erro", string.IsNullOrWhiteSpace(frontError) ? "(sem detalhe)" : frontError)
                     );
                 }
+                onStepOutput?.Invoke(3, "extraction", "error", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["status"] = "extract_failed",
+                    ["doc_key"] = resolvedDoc,
+                    ["doc_type"] = outputDocType,
+                    ["band"] = bandFront,
+                    ["map_path"] = mapPath,
+                    ["error"] = frontError ?? ""
+                });
                 return new Dictionary<string, object>
                 {
                     ["status"] = "extract_failed",
@@ -1479,6 +1875,8 @@ namespace Obj.Commands
 
             var parserFieldsA = CloneFieldOutputs(fieldsA);
             var parserFieldsB = CloneFieldOutputs(fieldsB);
+            var parserValuesA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
+            var parserValuesB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
 
             if (verbose)
             {
@@ -1492,9 +1890,109 @@ namespace Obj.Commands
                     ("origem_values_b", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
                 );
             }
+            var step3Payload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["module"] = "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)",
+                ["doc_key"] = resolvedDoc,
+                ["doc_type"] = outputDocType,
+                ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
+                ["map_path"] = parsedFront.MapPath,
+                ["fields_a_non_empty"] = CountNonEmptyValues(valuesA),
+                ["fields_b_non_empty"] = CountNonEmptyValues(valuesB),
+                ["merge_policy"] = dualBand ? "front_head prioridade + fill de back_tail" : "single_band"
+            };
+            onStepOutput?.Invoke(3, "extraction", "ok", step3Payload);
 
             var beforeHonorariosA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeHonorariosB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
+            var trackedFields = new[]
+            {
+                "PROCESSO_ADMINISTRATIVO",
+                "PROCESSO_JUDICIAL",
+                "COMARCA",
+                "VARA",
+                "PROMOVENTE",
+                "PROMOVIDO",
+                "PERITO",
+                "CPF_PERITO",
+                "ESPECIALIDADE",
+                "ESPECIE_DA_PERICIA",
+                "VALOR_ARBITRADO_JZ",
+                "VALOR_ARBITRADO_FINAL",
+                "FATOR",
+                "VALOR_TABELADO_ANEXO_I"
+            };
+
+            Dictionary<string, object> BuildExtractionResult(
+                int executedUntilStep,
+                Dictionary<string, object>? honorariosPayload,
+                Dictionary<string, object>? repairerPayload,
+                Dictionary<string, object>? validatorPayload,
+                IDictionary<string, string>? derivedValuesA,
+                IDictionary<string, string>? derivedValuesB)
+            {
+                var flowA = BuildTrackedValueFlow(trackedFields, parserValuesA, valuesA, derivedValuesA, fieldsA);
+                var flowB = BuildTrackedValueFlow(trackedFields, parserValuesB, valuesB, derivedValuesB, fieldsB);
+                var runInfo = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["requested_max_step"] = maxPipelineStep,
+                    ["executed_until_step"] = executedUntilStep,
+                    ["stopped_before_step"] = executedUntilStep < 6 ? executedUntilStep + 1 : 0
+                };
+
+                return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["status"] = "ok",
+                    ["doc_key"] = resolvedDoc,
+                    ["doc_type"] = outputDocType,
+                    ["map_path"] = parsedFront.MapPath,
+                    ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
+                    ["parsed"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["pdf_a"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            ["values"] = valuesA,
+                            ["fields"] = fieldsA
+                        },
+                        ["pdf_b"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            ["values"] = valuesB,
+                            ["fields"] = fieldsB
+                        }
+                    },
+                    ["pipeline"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["step_modules"] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                        {
+                            ["1_detection_selection"] = "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+                            ["2_alignment"] = "Obj.Align.ObjectsTextOpsDiff",
+                            ["3_1_prepare"] = "ObjectsTextOpsAlign + DocumentValidationRules",
+                            ["3_2_crop"] = "ObjectsTextOpsAlign.BuildValueFullFromBlocks",
+                            ["3_3_yaml_parser"] = "Obj.Commands.ObjectsMapFields",
+                            ["3_4_honorarios"] = "Obj.Honorarios.HonorariosFacade",
+                            ["3_5_repairer"] = "Obj.ValidationCore.ValidationRepairer",
+                            ["3_6_validator"] = "Obj.ValidatorModule.ValidatorFacade",
+                            ["3_7_probe_optional"] = "Obj.RootProbe.ExtractionProbeModule",
+                            ["4_output"] = "ObjectsTextOpsAlign + JsonSerializer"
+                        },
+                        ["merge_policy"] = dualBand ? "front_head prioridade; back_tail preenche apenas campos vazios" : "single_band",
+                        ["values_origin_note"] = "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento dos módulos honorarios/repairer/validator, com trilha em parsed.*.fields.Source e parsed.*.fields.Module.",
+                        ["run"] = runInfo
+                    },
+                    ["value_flow"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["pdf_a"] = flowA,
+                        ["pdf_b"] = flowB
+                    },
+                    ["validator"] = validatorPayload ?? BuildSkippedModulePayload("Obj.ValidatorModule.ValidatorFacade", $"run_limit_step_{executedUntilStep}"),
+                    ["repairer"] = repairerPayload ?? BuildSkippedModulePayload("Obj.ValidationCore.ValidationRepairer", $"run_limit_step_{executedUntilStep}"),
+                    ["honorarios"] = honorariosPayload ?? BuildSkippedModulePayload("Obj.Honorarios.HonorariosFacade", $"run_limit_step_{executedUntilStep}")
+                };
+            }
+
+            if (stepLimit <= 3)
+                return BuildExtractionResult(3, null, null, null, null, null);
+
             HonorariosFacade.ApplyProfissaoAsEspecialidade(valuesA);
             HonorariosFacade.ApplyProfissaoAsEspecialidade(valuesB);
             var honorariosA = HonorariosFacade.ApplyBackfill(valuesA, outputDocType);
@@ -1525,6 +2023,28 @@ namespace Obj.Commands
                 );
             }
 
+            var honorariosPayload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["enabled"] = true,
+                ["module"] = "Obj.Honorarios.HonorariosFacade",
+                ["apply_a"] = true,
+                ["apply_b"] = true,
+                ["pdf_a"] = BuildHonorariosSnapshot(honorariosA),
+                ["pdf_b"] = BuildHonorariosSnapshot(honorariosB)
+            };
+            onStepOutput?.Invoke(4, "honorarios", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["module"] = "Obj.Honorarios.HonorariosFacade",
+                ["changed_keys_a"] = DescribeChangedKeys(beforeHonorariosA, valuesA),
+                ["changed_keys_b"] = DescribeChangedKeys(beforeHonorariosB, valuesB),
+                ["status_honorarios_a"] = honorariosA?.Summary?.PdfA?.Status ?? "",
+                ["status_honorarios_b"] = honorariosB?.Summary?.PdfA?.Status ?? "",
+                ["derived_valor_a"] = honorariosA?.DerivedValor ?? "",
+                ["derived_valor_b"] = honorariosB?.DerivedValor ?? ""
+            });
+            if (stepLimit <= 4)
+                return BuildExtractionResult(4, honorariosPayload, null, null, honorariosA?.DerivedValues, honorariosB?.DerivedValues);
+
             var catalog = ValidatorFacade.GetPeritoCatalog(null);
             var beforeRepairA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeRepairB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
@@ -1551,6 +2071,34 @@ namespace Obj.Commands
                     ("repair_legacy_mirror_b", repairB.LegacyMirrorMatchesCore ? "match" : "mismatch")
                 );
             }
+
+            var repairerPayload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["enabled"] = true,
+                ["module"] = "Obj.ValidationCore.ValidationRepairer",
+                ["apply_a"] = repairA.Applied,
+                ["apply_b"] = repairB.Applied,
+                ["ok_a"] = repairA.Ok,
+                ["ok_b"] = repairB.Ok,
+                ["reason_a"] = repairA.Reason,
+                ["reason_b"] = repairB.Reason,
+                ["changed_a"] = repairA.ChangedFields,
+                ["changed_b"] = repairB.ChangedFields,
+                ["legacy_mirror_a"] = repairA.LegacyMirrorMatchesCore,
+                ["legacy_mirror_b"] = repairB.LegacyMirrorMatchesCore
+            };
+            onStepOutput?.Invoke(5, "repairer", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["module"] = "Obj.ValidationCore.ValidationRepairer",
+                ["repair_apply_a"] = repairA.Applied,
+                ["repair_apply_b"] = repairB.Applied,
+                ["repair_ok_a"] = repairA.Ok,
+                ["repair_ok_b"] = repairB.Ok,
+                ["repair_reason_a"] = repairA.Reason ?? "",
+                ["repair_reason_b"] = repairB.Reason ?? ""
+            });
+            if (stepLimit <= 5)
+                return BuildExtractionResult(5, honorariosPayload, repairerPayload, null, honorariosA?.DerivedValues, honorariosB?.DerivedValues);
 
             var beforeValidatorA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeValidatorB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
@@ -1595,132 +2143,34 @@ namespace Obj.Commands
                 );
             }
 
-            var trackedFields = new[]
+            var validatorPayload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
-                "PROCESSO_ADMINISTRATIVO",
-                "PROCESSO_JUDICIAL",
-                "COMARCA",
-                "VARA",
-                "PROMOVENTE",
-                "PROMOVIDO",
-                "PERITO",
-                "CPF_PERITO",
-                "ESPECIALIDADE",
-                "ESPECIE_DA_PERICIA",
-                "VALOR_ARBITRADO_JZ",
-                "VALOR_ARBITRADO_FINAL",
-                "FATOR",
-                "VALOR_TABELADO_ANEXO_I"
+                ["enabled"] = true,
+                ["module"] = "Obj.ValidatorModule.ValidatorFacade",
+                ["scope"] = "target_b_only(model_a_reference)",
+                ["ok"] = ok,
+                ["ok_pair"] = okPair,
+                ["ok_a"] = okA,
+                ["ok_b"] = okB,
+                ["reason"] = reason,
+                ["reason_pair"] = reasonPair,
+                ["reason_a"] = reasonA ?? "",
+                ["reason_b"] = reasonB ?? ""
             };
-            var flowA = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            var flowB = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            foreach (var field in trackedFields)
+            onStepOutput?.Invoke(6, "validator", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
-                var fieldFlowA = BuildFieldFlow(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, field);
-                if (fieldsA.TryGetValue(field, out var metaA) && metaA != null)
-                {
-                    fieldFlowA["source"] = metaA.Source ?? "";
-                    fieldFlowA["module"] = string.IsNullOrWhiteSpace(metaA.Module) ? "parser" : metaA.Module;
-                    fieldFlowA["status"] = metaA.Status ?? "";
-                    fieldFlowA["op_range"] = metaA.OpRange ?? "";
-                    fieldFlowA["obj"] = metaA.Obj;
-                }
-                flowA[field] = fieldFlowA;
+                ["module"] = "Obj.ValidatorModule.ValidatorFacade",
+                ["ok"] = ok,
+                ["ok_pair"] = okPair,
+                ["ok_a"] = okA,
+                ["ok_b"] = okB,
+                ["reason"] = reason,
+                ["reason_pair"] = reasonPair,
+                ["policy_strict_money_a"] = policyChangedA,
+                ["policy_strict_money_b"] = policyChangedB
+            });
 
-                var fieldFlowB = BuildFieldFlow(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, field);
-                if (fieldsB.TryGetValue(field, out var metaB) && metaB != null)
-                {
-                    fieldFlowB["source"] = metaB.Source ?? "";
-                    fieldFlowB["module"] = string.IsNullOrWhiteSpace(metaB.Module) ? "parser" : metaB.Module;
-                    fieldFlowB["status"] = metaB.Status ?? "";
-                    fieldFlowB["op_range"] = metaB.OpRange ?? "";
-                    fieldFlowB["obj"] = metaB.Obj;
-                }
-                flowB[field] = fieldFlowB;
-            }
-
-            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-            {
-                ["status"] = "ok",
-                ["doc_key"] = resolvedDoc,
-                ["doc_type"] = outputDocType,
-                ["map_path"] = parsedFront.MapPath,
-                ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
-                ["parsed"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["pdf_a"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        ["values"] = valuesA,
-                        ["fields"] = fieldsA
-                    },
-                    ["pdf_b"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        ["values"] = valuesB,
-                        ["fields"] = fieldsB
-                    }
-                },
-                ["pipeline"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["step_modules"] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        ["1_detection_selection"] = "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
-                        ["2_alignment"] = "Obj.Align.ObjectsTextOpsDiff",
-                        ["3_1_prepare"] = "ObjectsTextOpsAlign + DocumentValidationRules",
-                        ["3_2_crop"] = "ObjectsTextOpsAlign.BuildValueFullFromBlocks",
-                        ["3_3_yaml_parser"] = "Obj.Commands.ObjectsMapFields",
-                        ["3_4_honorarios"] = "Obj.Honorarios.HonorariosFacade",
-                        ["3_5_repairer"] = "Obj.ValidationCore.ValidationRepairer",
-                        ["3_6_validator"] = "Obj.ValidatorModule.ValidatorFacade",
-                        ["3_7_probe_optional"] = "Obj.RootProbe.ExtractionProbeModule",
-                        ["4_output"] = "ObjectsTextOpsAlign + JsonSerializer"
-                    },
-                    ["merge_policy"] = dualBand ? "front_head prioridade; back_tail preenche apenas campos vazios" : "single_band",
-                    ["values_origin_note"] = "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento dos módulos honorarios/repairer/validator, com trilha em parsed.*.fields.Source e parsed.*.fields.Module."
-                },
-                ["value_flow"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["pdf_a"] = flowA,
-                    ["pdf_b"] = flowB
-                },
-                ["validator"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["enabled"] = true,
-                    ["module"] = "Obj.ValidatorModule.ValidatorFacade",
-                    ["scope"] = "target_b_only(model_a_reference)",
-                    ["ok"] = ok,
-                    ["ok_pair"] = okPair,
-                    ["ok_a"] = okA,
-                    ["ok_b"] = okB,
-                    ["reason"] = reason,
-                    ["reason_pair"] = reasonPair,
-                    ["reason_a"] = reasonA ?? "",
-                    ["reason_b"] = reasonB ?? ""
-                },
-                ["repairer"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["enabled"] = true,
-                    ["module"] = "Obj.ValidationCore.ValidationRepairer",
-                    ["apply_a"] = repairA.Applied,
-                    ["apply_b"] = repairB.Applied,
-                    ["ok_a"] = repairA.Ok,
-                    ["ok_b"] = repairB.Ok,
-                    ["reason_a"] = repairA.Reason,
-                    ["reason_b"] = repairB.Reason,
-                    ["changed_a"] = repairA.ChangedFields,
-                    ["changed_b"] = repairB.ChangedFields,
-                    ["legacy_mirror_a"] = repairA.LegacyMirrorMatchesCore,
-                    ["legacy_mirror_b"] = repairB.LegacyMirrorMatchesCore
-                },
-                ["honorarios"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                {
-                    ["enabled"] = true,
-                    ["module"] = "Obj.Honorarios.HonorariosFacade",
-                    ["apply_a"] = true,
-                    ["apply_b"] = true,
-                    ["pdf_a"] = BuildHonorariosSnapshot(honorariosA),
-                    ["pdf_b"] = BuildHonorariosSnapshot(honorariosB)
-                }
-            };
+            return BuildExtractionResult(6, honorariosPayload, repairerPayload, validatorPayload, honorariosA?.DerivedValues, honorariosB?.DerivedValues);
         }
 
         private static Dictionary<string, string> ReadValuesForProbe(object? extraction, string sideKey)
@@ -2065,7 +2515,12 @@ namespace Obj.Commands
             ref string probeFile,
             ref int probePage,
             ref string probeSide,
-            ref int probeMaxFields)
+            ref int probeMaxFields,
+            ref int runFromStep,
+            ref int runToStep,
+            ref bool stepOutputEcho,
+            ref bool stepOutputSave,
+            ref string stepOutputDir)
         {
             AddInputsFromEnv(inputs, "OBJ_TEXTOPSALIGN_INPUTS");
             AddOpFilterFromEnv(opFilter, "OBJ_TEXTOPSALIGN_OPS");
@@ -2174,6 +2629,24 @@ namespace Obj.Commands
                 probeMaxFields = Math.Max(0, envProbeMax);
                 probeEnabled = true;
             }
+
+            var envRun = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN");
+            if (!string.IsNullOrWhiteSpace(envRun) && TryParseRunRange(envRun, out var envFrom, out var envTo))
+            {
+                runFromStep = envFrom;
+                runToStep = envTo;
+            }
+
+            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_STEP_OUTPUT_ECHO", out var envStepEcho))
+                stepOutputEcho = envStepEcho;
+            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_STEP_OUTPUT_SAVE", out var envStepSave))
+                stepOutputSave = envStepSave;
+            var envStepDir = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_STEP_OUTPUT_DIR");
+            if (!string.IsNullOrWhiteSpace(envStepDir))
+            {
+                stepOutputDir = envStepDir.Trim();
+                stepOutputSave = true;
+            }
         }
 
         private static bool ParseOptions(
@@ -2209,7 +2682,12 @@ namespace Obj.Commands
             out string probeFile,
             out int probePage,
             out string probeSide,
-            out int probeMaxFields)
+            out int probeMaxFields,
+            out int runFromStep,
+            out int runToStep,
+            out bool stepOutputEcho,
+            out bool stepOutputSave,
+            out string stepOutputDir)
         {
             inputs = new List<string>();
             pageA = 0;
@@ -2243,6 +2721,11 @@ namespace Obj.Commands
             probePage = 0;
             probeSide = "b";
             probeMaxFields = 0;
+            runFromStep = PipelineFirstStep;
+            runToStep = PipelineLastStep;
+            stepOutputEcho = false;
+            stepOutputSave = false;
+            stepOutputDir = "";
 
             ApplyTextOpsAlignEnvDefaults(
                 ref inputs,
@@ -2276,13 +2759,26 @@ namespace Obj.Commands
                 ref probeFile,
                 ref probePage,
                 ref probeSide,
-                ref probeMaxFields);
+                ref probeMaxFields,
+                ref runFromStep,
+                ref runToStep,
+                ref stepOutputEcho,
+                ref stepOutputSave,
+                ref stepOutputDir);
 
             for (int i = 0; i < args.Length; i++)
             {
                 var arg = args[i];
                 if (arg == "--help" || arg == "-h")
                     return false;
+                if ((string.Equals(arg, "run", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "steps", StringComparison.OrdinalIgnoreCase))
+                    && i + 1 < args.Length
+                    && TryParseRunRange(args[i + 1], out runFromStep, out runToStep))
+                {
+                    i++;
+                    stepOutputEcho = true;
+                    continue;
+                }
 
                 if (string.Equals(arg, "--inputs", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
@@ -2421,6 +2917,69 @@ namespace Obj.Commands
                     allowStack = true;
                     continue;
                 }
+                if ((string.Equals(arg, "--run", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--steps", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
+                {
+                    var rawRange = args[++i] ?? "";
+                    if (!TryParseRunRange(rawRange, out runFromStep, out runToStep))
+                    {
+                        Console.WriteLine($"Faixa inválida para --run/--steps: {rawRange}. Use N ou N-M (1..8).");
+                        return false;
+                    }
+                    stepOutputEcho = true;
+                    continue;
+                }
+                if (arg.StartsWith("--run=", StringComparison.OrdinalIgnoreCase) || arg.StartsWith("--steps=", StringComparison.OrdinalIgnoreCase))
+                {
+                    var split = arg.Split('=', 2);
+                    var rawRange = split.Length == 2 ? split[1] : "";
+                    if (!TryParseRunRange(rawRange, out runFromStep, out runToStep))
+                    {
+                        Console.WriteLine($"Faixa inválida para --run/--steps: {rawRange}. Use N ou N-M (1..8).");
+                        return false;
+                    }
+                    stepOutputEcho = true;
+                    continue;
+                }
+                if (string.Equals(arg, "--step-output", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var mode = (args[++i] ?? "").Trim().ToLowerInvariant();
+                    if (mode is "echo" or "screen" or "stdout")
+                    {
+                        stepOutputEcho = true;
+                    }
+                    else if (mode is "save" or "file")
+                    {
+                        stepOutputSave = true;
+                    }
+                    else if (mode is "both" or "all")
+                    {
+                        stepOutputEcho = true;
+                        stepOutputSave = true;
+                    }
+                    else if (mode is "none" or "off")
+                    {
+                        stepOutputEcho = false;
+                        stepOutputSave = false;
+                    }
+                    continue;
+                }
+                if (string.Equals(arg, "--step-echo", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--show-step-output", StringComparison.OrdinalIgnoreCase))
+                {
+                    stepOutputEcho = true;
+                    continue;
+                }
+                if (string.Equals(arg, "--step-save", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--save-step-output", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--save-steps", StringComparison.OrdinalIgnoreCase))
+                {
+                    stepOutputSave = true;
+                    continue;
+                }
+                if ((string.Equals(arg, "--step-output-dir", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--steps-dir", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
+                {
+                    stepOutputDir = (args[++i] ?? "").Trim();
+                    if (!string.IsNullOrWhiteSpace(stepOutputDir))
+                        stepOutputSave = true;
+                    continue;
+                }
                 if (string.Equals(arg, "--probe", StringComparison.OrdinalIgnoreCase))
                 {
                     probeEnabled = true;
@@ -2486,8 +3045,9 @@ namespace Obj.Commands
 
         private static void ShowHelp()
         {
-            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--align] [--align-top N] [--out file] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
-            Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1");
+            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--align] [--align-top N] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
+            Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
+            Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
         }
 
         private static void WriteStackedOutput(string aPath, List<ObjectsTextOpsDiff.AlignDebugReport> reports, string outPath)
