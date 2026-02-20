@@ -193,6 +193,20 @@ namespace Obj.Align
         private static double ComputeAlignmentSimilarity(string a, string b)
         {
             var sim = ComputeSimilarity(a, b);
+            var helperKeyA = DetectAlignHelperKey(a);
+            var helperKeyB = DetectAlignHelperKey(b);
+            if (helperKeyA.Length > 0 && helperKeyB.Length > 0)
+            {
+                if (string.Equals(helperKeyA, helperKeyB, StringComparison.Ordinal))
+                    sim += 0.18;
+                else
+                    sim -= 0.24;
+            }
+            else if (helperKeyA.Length > 0 || helperKeyB.Length > 0)
+            {
+                sim -= 0.10;
+            }
+
             var labelA = AnalyzeLeadingFieldLabel(a);
             var labelB = AnalyzeLeadingFieldLabel(b);
 

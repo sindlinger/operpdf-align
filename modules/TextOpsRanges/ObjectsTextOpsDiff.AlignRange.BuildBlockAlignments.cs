@@ -23,6 +23,7 @@ namespace Obj.Align
             normA = blocksA.Select(b => NormalizeForSimilarity(b.Text ?? "")).ToList();
             normB = blocksB.Select(b => NormalizeForSimilarity(b.Text ?? "")).ToList();
             anchors = new List<AnchorPair>();
+            var helperAnchors = BuildAnchorPairsAlignHelper(normA, normB, minLenRatio);
 
             double autoMaxSim = 0.0;
             if (anchorMinSim > 0 || anchorMinLenRatio > 0)
@@ -41,6 +42,7 @@ namespace Obj.Align
                     : (anchorMode ? 0.08 : 0.3);
                 anchors = BuildAnchorPairsAuto(normA, normB, minLen, out autoMaxSim);
             }
+            anchors = MergeAnchorPairsWithHelper(anchors, helperAnchors);
 
             if (anchors.Count == 0)
             {
