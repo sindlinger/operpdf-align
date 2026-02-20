@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using DiffMatchPatch;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
@@ -22,10 +23,14 @@ namespace Obj.Commands
     internal static class ObjectsTextOpsAlign
     {
         private const string AnsiReset = "\u001b[0m";
-        private const string AnsiInfo = "\u001b[1;96m";
+        private const string AnsiCodexBlue = "\u001b[38;5;39m";
+        private const string AnsiClaudeOrange = "\u001b[38;5;214m";
+        private const string AnsiWhite = "\u001b[97m";
+        private const string AnsiInfo = AnsiCodexBlue;
         private const string AnsiOk = "\u001b[1;92m";
-        private const string AnsiWarn = "\u001b[1;93m";
+        private const string AnsiWarn = AnsiClaudeOrange;
         private const string AnsiErr = "\u001b[1;91m";
+        private const string AnsiSoft = "\u001b[38;5;246m";
 
         internal enum OutputMode
         {
@@ -53,10 +58,79 @@ namespace Obj.Commands
         {
             Console.WriteLine(Colorize($"[PIPELINE] {step}", AnsiInfo));
             foreach (var (key, value) in values)
-                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {value}");
+            {
+                var formattedValue = value ?? "";
+                if (string.Equals(key, "modulo", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(key, "module", StringComparison.OrdinalIgnoreCase))
+                    formattedValue = ColorizeModuleChain(formattedValue);
+                else if (string.Equals(key, "scope", StringComparison.OrdinalIgnoreCase))
+                    formattedValue = Colorize(formattedValue, AnsiCodexBlue);
+                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {formattedValue}");
+            }
             if (!string.IsNullOrWhiteSpace(nextStep))
-                Console.WriteLine($"  {Colorize("usa no próximo:", AnsiWarn)} {nextStep}");
+                Console.WriteLine($"  {Colorize("usa no próximo:", AnsiWarn)} {Colorize(nextStep, AnsiSoft)}");
             Console.WriteLine();
+        }
+
+        private static string ResolveModuleColor(string moduleName)
+        {
+            var norm = (moduleName ?? "").Trim().ToLowerInvariant();
+            if (norm.Length == 0)
+                return AnsiSoft;
+            if (norm.Contains("docdetector", StringComparison.Ordinal) ||
+                norm.Contains("finddespacho", StringComparison.Ordinal) ||
+                norm.Contains("contentsstreampicker", StringComparison.Ordinal))
+                return AnsiCodexBlue;
+            if (norm.Contains("align", StringComparison.Ordinal) || norm.Contains("textopsdiff", StringComparison.Ordinal))
+                return "\u001b[38;5;75m";
+            if (norm.Contains("objectsmapfields", StringComparison.Ordinal))
+                return "\u001b[38;5;44m";
+            if (norm.Contains("honorarios", StringComparison.Ordinal))
+                return "\u001b[38;5;71m";
+            if (norm.Contains("validationrepairer", StringComparison.Ordinal) || norm.Contains("repairer", StringComparison.Ordinal))
+                return "\u001b[38;5;141m";
+            if (norm.Contains("validator", StringComparison.Ordinal))
+                return "\u001b[38;5;203m";
+            if (norm.Contains("probe", StringComparison.Ordinal))
+                return "\u001b[38;5;111m";
+            if (norm.Contains("jsonserializer", StringComparison.Ordinal))
+                return "\u001b[38;5;250m";
+            return "\u001b[38;5;153m";
+        }
+
+        private static string ColorizeModuleChain(string moduleChain)
+        {
+            if (string.IsNullOrWhiteSpace(moduleChain))
+                return "";
+
+            var tokens = Regex.Split(moduleChain, "(\\s*[+|]\\s*)");
+            var sb = new StringBuilder(moduleChain.Length + 32);
+            foreach (var token in tokens)
+            {
+                if (string.IsNullOrEmpty(token))
+                    continue;
+
+                if (token.Contains('+') || token.Contains('|'))
+                {
+                    sb.Append(Colorize(token, AnsiSoft));
+                    continue;
+                }
+
+                var core = token.Trim();
+                if (core.Length == 0)
+                {
+                    sb.Append(token);
+                    continue;
+                }
+
+                var leading = token.Substring(0, token.IndexOf(core, StringComparison.Ordinal));
+                var trailing = token.Substring(token.IndexOf(core, StringComparison.Ordinal) + core.Length);
+                sb.Append(leading);
+                sb.Append(Colorize(core, ResolveModuleColor(core)));
+                sb.Append(trailing);
+            }
+
+            return sb.ToString();
         }
 
         private static string ResolveStageKey(int step)
@@ -269,7 +343,7 @@ namespace Obj.Commands
             return "\"" + t.Substring(0, max - 3) + "...\"";
         }
 
-        private static string DetectInputRole(string path)
+        private static string DetectInputRole(string path, bool preferTemplateForFirstInput = false)
         {
             if (string.IsNullOrWhiteSpace(path))
                 return "pdf_alvo_extracao";
@@ -302,7 +376,39 @@ namespace Obj.Commands
                 return "template_modelo";
             }
 
+            if (preferTemplateForFirstInput)
+                return "template_modelo";
+
             return "pdf_alvo_extracao";
+        }
+
+        private static bool IsTemplateRole(string? role)
+        {
+            return string.Equals(role?.Trim(), "template_modelo", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsTargetRole(string? role)
+        {
+            return string.Equals(role?.Trim(), "pdf_alvo_extracao", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string ResolveExtractionScopeTag(string? roleA, string? roleB)
+        {
+            if (IsTemplateRole(roleA) && IsTargetRole(roleB))
+                return "target_b_only(model_a_reference)";
+            if (IsTargetRole(roleA) && IsTemplateRole(roleB))
+                return "target_a_only(model_b_reference)";
+
+            // Fallback operacional: por convenção o primeiro input é referência/modelo e o
+            // segundo é o PDF alvo. Evita exibir extração do template em cenários ambíguos.
+            return "target_b_only(model_a_reference)";
+        }
+
+        private static string ResolveTargetSideFromScope(string scopeTag)
+        {
+            if (string.Equals(scopeTag, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase))
+                return "pdf_a";
+            return "pdf_b";
         }
 
         private static int CountNonEmptyValues(Dictionary<string, string>? values)
@@ -997,9 +1103,11 @@ namespace Obj.Commands
             }
 
             ResolveSelection(aPath, pageAUser, objAUser, pageA, objA, out pageA, out objA, out var sourceA);
+            var roleA = DetectInputRole(aPath, preferTemplateForFirstInput: true);
             if (!ReturnUtils.IsEnabled() && sourceA.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
-                Console.WriteLine($"Despacho route A: p{pageA} o{objA} ({sourceA})");
-            var roleA = DetectInputRole(aPath);
+            {
+                Console.WriteLine($"Despacho route A (referência/modelo): p{pageA} o{objA} ({sourceA})");
+            }
 
             var reports = new List<ObjectsTextOpsDiff.AlignDebugReport>();
             foreach (var rawB in inputs.Skip(1))
@@ -1014,9 +1122,15 @@ namespace Obj.Commands
                 int localPageA = pageA;
                 int localObjA = objA;
                 ResolveSelection(bPath, pageBUser, objBUser, pageB, objB, out var localPageB, out var localObjB, out var sourceB);
-                if (!ReturnUtils.IsEnabled() && sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
-                    Console.WriteLine($"Despacho route B: p{localPageB} o{localObjB} ({sourceB})");
                 var roleB = DetectInputRole(bPath);
+                if (!ReturnUtils.IsEnabled() && sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
+                {
+                    var routeScope = ResolveExtractionScopeTag(roleA, roleB);
+                    var sideLabelB = string.Equals(routeScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase)
+                        ? "Despacho route B (referência/modelo)"
+                        : "Despacho route B (alvo)";
+                    Console.WriteLine($"{sideLabelB}: p{localPageB} o{localObjB} ({sourceB})");
+                }
                 var isDespachoDoc = DocumentValidationRules.IsDocMatch(docKey, "despacho");
                 var hasBackASelection = false;
                 var hasBackBSelection = false;
@@ -1332,7 +1446,10 @@ namespace Obj.Commands
                     if (probeEnabled)
                     {
                         var probeSideNormalized = (probeSide ?? "").Trim().ToLowerInvariant();
-                        var probeUseA = probeSideNormalized == "a" || probeSideNormalized == "pdf_a" || probeSideNormalized == "left";
+                        var hasExplicitProbeSide = !string.IsNullOrWhiteSpace(probeSideNormalized);
+                        var probeUseA = hasExplicitProbeSide
+                            ? (probeSideNormalized == "a" || probeSideNormalized == "pdf_a" || probeSideNormalized == "left")
+                            : (IsTargetRole(roleA) && IsTemplateRole(roleB));
                         var sideKey = probeUseA ? "pdf_a" : "pdf_b";
                         var effectiveProbeFile = string.IsNullOrWhiteSpace(probeFile) ? (probeUseA ? aPath : bPath) : probeFile;
                         var effectiveProbePage = probePage > 0 ? probePage : (probeUseA ? report.PageA : report.PageB);
@@ -1737,8 +1854,11 @@ namespace Obj.Commands
                 ["doc_key"] = "",
                 ["doc_type"] = "",
                 ["band"] = "",
+                ["scope"] = "",
+                ["target_side"] = "",
                 ["fields_non_empty_a"] = 0,
                 ["fields_non_empty_b"] = 0,
+                ["fields_non_empty_target"] = 0,
                 ["validator_ok"] = false,
                 ["validator_reason"] = "",
                 ["honorarios_apply_a"] = false,
@@ -1762,8 +1882,20 @@ namespace Obj.Commands
                 if (root.TryGetProperty("band", out var bandEl))
                     summary["band"] = bandEl.GetString() ?? "";
 
+                if (root.TryGetProperty("pipeline", out var pipeline) && pipeline.ValueKind == JsonValueKind.Object)
+                {
+                    if (pipeline.TryGetProperty("scope", out var scopeEl))
+                        summary["scope"] = scopeEl.GetString() ?? "";
+                    if (pipeline.TryGetProperty("target_side", out var targetSideEl))
+                        summary["target_side"] = targetSideEl.GetString() ?? "";
+                }
+
                 summary["fields_non_empty_a"] = CountNonEmptyParsedValues(root, "pdf_a");
                 summary["fields_non_empty_b"] = CountNonEmptyParsedValues(root, "pdf_b");
+                var targetSide = summary["target_side"]?.ToString() ?? "";
+                summary["fields_non_empty_target"] = string.Equals(targetSide, "pdf_a", StringComparison.OrdinalIgnoreCase)
+                    ? CountNonEmptyParsedValues(root, "pdf_a")
+                    : CountNonEmptyParsedValues(root, "pdf_b");
 
                 if (root.TryGetProperty("validator", out var validator) && validator.ValueKind == JsonValueKind.Object)
                 {
@@ -1917,6 +2049,9 @@ namespace Obj.Commands
             var bandBack = string.IsNullOrWhiteSpace(backReport?.Label) ? "back_tail" : backReport!.Label.Trim();
             var mapPath = ResolveAlignRangeMapPath(resolvedDoc);
             var dualBand = backReport != null;
+            var extractionScope = ResolveExtractionScopeTag(report.RoleA, report.RoleB);
+            var targetSide = ResolveTargetSideFromScope(extractionScope);
+            var targetIsA = string.Equals(targetSide, "pdf_a", StringComparison.OrdinalIgnoreCase);
 
             if (verbose)
             {
@@ -1926,6 +2061,7 @@ namespace Obj.Commands
                     ("modulo", "ObjectsTextOpsAlign + DocumentValidationRules"),
                     ("doc_key", resolvedDoc),
                     ("doc_type", outputDocType),
+                    ("scope", extractionScope),
                     ("band", dualBand ? $"{bandFront}+{bandBack}" : bandFront),
                     ("map_path", string.IsNullOrWhiteSpace(mapPath) ? "(não encontrado)" : mapPath)
                 );
@@ -2047,25 +2183,46 @@ namespace Obj.Commands
 
             if (verbose)
             {
-                PrintPipelineStep(
-                    "passo 3.3/4 - parser do mapa YAML (ok)",
-                    "passo 3.4/4 - enriquecimento de honorários",
-                    ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
-                    ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
-                    ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
-                    ("origem_values_a", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
-                    ("origem_values_b", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
-                );
+                if (string.Equals(extractionScope, "pair_both", StringComparison.OrdinalIgnoreCase))
+                {
+                    PrintPipelineStep(
+                        "passo 3.3/4 - parser do mapa YAML (ok)",
+                        "passo 3.4/4 - enriquecimento de honorários",
+                        ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
+                        ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
+                        ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
+                        ("origem_values_a", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
+                        ("origem_values_b", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
+                    );
+                }
+                else
+                {
+                    var targetCount = targetIsA ? CountNonEmptyValues(valuesA) : CountNonEmptyValues(valuesB);
+                    PrintPipelineStep(
+                        "passo 3.3/4 - parser do mapa YAML (ok)",
+                        "passo 3.4/4 - enriquecimento de honorários",
+                        ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
+                        ("scope", extractionScope),
+                        ("target_side", targetSide),
+                        ("fields_target_non_empty", targetCount.ToString(CultureInfo.InvariantCulture)),
+                        ("origem_values_target", dualBand
+                            ? $"{targetSide}: merge front_head prioridade + fill de back_tail"
+                            : $"{targetSide}: parsed.{targetSide}.values <= parsed.{targetSide}.fields (source/op_range/obj)")
+                    );
+                }
             }
             var step3Payload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)",
                 ["doc_key"] = resolvedDoc,
                 ["doc_type"] = outputDocType,
+                ["scope"] = extractionScope,
+                ["target_side"] = targetSide,
                 ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
                 ["map_path"] = parsedFront.MapPath,
                 ["fields_a_non_empty"] = CountNonEmptyValues(valuesA),
                 ["fields_b_non_empty"] = CountNonEmptyValues(valuesB),
+                ["fields_target_non_empty"] = targetIsA ? CountNonEmptyValues(valuesA) : CountNonEmptyValues(valuesB),
                 ["merge_policy"] = dualBand ? "front_head prioridade + fill de back_tail" : "single_band"
             };
             onStepOutput?.Invoke(3, "extraction", "ok", step3Payload);
@@ -2104,8 +2261,56 @@ namespace Obj.Commands
                 {
                     ["requested_max_step"] = maxPipelineStep,
                     ["executed_until_step"] = executedUntilStep,
-                    ["stopped_before_step"] = executedUntilStep < 6 ? executedUntilStep + 1 : 0
+                    ["stopped_before_step"] = executedUntilStep < 6 ? executedUntilStep + 1 : 0,
+                    ["scope"] = extractionScope,
+                    ["target_side"] = targetSide
                 };
+
+                var parsedOutput = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                var valueFlowOutput = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                if (string.Equals(extractionScope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase))
+                {
+                    parsedOutput["pdf_b"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["values"] = valuesB,
+                        ["fields"] = fieldsB
+                    };
+                    parsedOutput["pdf_a_reference"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["role"] = "template_modelo",
+                        ["scope"] = "alignment_reference_only"
+                    };
+                    valueFlowOutput["pdf_b"] = flowB;
+                }
+                else if (string.Equals(extractionScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase))
+                {
+                    parsedOutput["pdf_a"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["values"] = valuesA,
+                        ["fields"] = fieldsA
+                    };
+                    parsedOutput["pdf_b_reference"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["role"] = "template_modelo",
+                        ["scope"] = "alignment_reference_only"
+                    };
+                    valueFlowOutput["pdf_a"] = flowA;
+                }
+                else
+                {
+                    parsedOutput["pdf_a"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["values"] = valuesA,
+                        ["fields"] = fieldsA
+                    };
+                    parsedOutput["pdf_b"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["values"] = valuesB,
+                        ["fields"] = fieldsB
+                    };
+                    valueFlowOutput["pdf_a"] = flowA;
+                    valueFlowOutput["pdf_b"] = flowB;
+                }
 
                 return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -2114,19 +2319,7 @@ namespace Obj.Commands
                     ["doc_type"] = outputDocType,
                     ["map_path"] = parsedFront.MapPath,
                     ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
-                    ["parsed"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        ["pdf_a"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                        {
-                            ["values"] = valuesA,
-                            ["fields"] = fieldsA
-                        },
-                        ["pdf_b"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                        {
-                            ["values"] = valuesB,
-                            ["fields"] = fieldsB
-                        }
-                    },
+                    ["parsed"] = parsedOutput,
                     ["pipeline"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                     {
                         ["step_modules"] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -2142,15 +2335,15 @@ namespace Obj.Commands
                             ["3_7_probe_optional"] = "Obj.RootProbe.ExtractionProbeModule",
                             ["4_output"] = "ObjectsTextOpsAlign + JsonSerializer"
                         },
+                        ["scope"] = extractionScope,
+                        ["target_side"] = targetSide,
                         ["merge_policy"] = dualBand ? "front_head prioridade; back_tail preenche apenas campos vazios" : "single_band",
-                        ["values_origin_note"] = "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento dos módulos honorarios/repairer/validator, com trilha em parsed.*.fields.Source e parsed.*.fields.Module.",
+                        ["values_origin_note"] = string.Equals(extractionScope, "pair_both", StringComparison.OrdinalIgnoreCase)
+                            ? "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento dos módulos honorarios/repairer/validator, com trilha em parsed.*.fields.Source e parsed.*.fields.Module."
+                            : $"Somente parsed.{targetSide}.values é considerado saída de extração; o lado de modelo/template fica como referência de alinhamento.",
                         ["run"] = runInfo
                     },
-                    ["value_flow"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                    {
-                        ["pdf_a"] = flowA,
-                        ["pdf_b"] = flowB
-                    },
+                    ["value_flow"] = valueFlowOutput,
                     ["validator"] = validatorPayload ?? BuildSkippedModulePayload("Obj.ValidatorModule.ValidatorFacade", $"run_limit_step_{executedUntilStep}"),
                     ["repairer"] = repairerPayload ?? BuildSkippedModulePayload("Obj.ValidationCore.ValidationRepairer", $"run_limit_step_{executedUntilStep}"),
                     ["honorarios"] = honorariosPayload ?? BuildSkippedModulePayload("Obj.Honorarios.HonorariosFacade", $"run_limit_step_{executedUntilStep}")
@@ -2202,6 +2395,8 @@ namespace Obj.Commands
             onStepOutput?.Invoke(4, "honorarios", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.Honorarios.HonorariosFacade",
+                ["scope"] = extractionScope,
+                ["target_side"] = targetSide,
                 ["changed_keys_a"] = DescribeChangedKeys(beforeHonorariosA, valuesA),
                 ["changed_keys_b"] = DescribeChangedKeys(beforeHonorariosB, valuesB),
                 ["status_honorarios_a"] = honorariosA?.Summary?.PdfA?.Status ?? "",
@@ -2257,6 +2452,8 @@ namespace Obj.Commands
             onStepOutput?.Invoke(5, "repairer", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.ValidationCore.ValidationRepairer",
+                ["scope"] = extractionScope,
+                ["target_side"] = targetSide,
                 ["repair_apply_a"] = repairA.Applied,
                 ["repair_apply_b"] = repairB.Applied,
                 ["repair_ok_a"] = repairA.Ok,
@@ -2276,14 +2473,22 @@ namespace Obj.Commands
             MarkModuleChanges(beforeValidatorA, valuesA, fieldsA, "validator");
             MarkModuleChanges(beforeValidatorB, valuesB, fieldsB, "validator");
             var okPair = okA && okB;
-            var ok = okB;
             var reasonParts = new List<string>();
             if (!string.IsNullOrWhiteSpace(reasonA))
                 reasonParts.Add($"A:{reasonA}");
             if (!string.IsNullOrWhiteSpace(reasonB))
                 reasonParts.Add($"B:{reasonB}");
             var reasonPair = reasonParts.Count == 0 ? "" : string.Join(" | ", reasonParts);
-            var reason = reasonB ?? "";
+            var ok = string.Equals(extractionScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase)
+                ? okA
+                : string.Equals(extractionScope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase)
+                    ? okB
+                    : okPair;
+            var reason = string.Equals(extractionScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase)
+                ? (reasonA ?? "")
+                : string.Equals(extractionScope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase)
+                    ? (reasonB ?? "")
+                    : reasonPair;
             if (verbose)
             {
                 PrintPipelineStep(
@@ -2314,7 +2519,7 @@ namespace Obj.Commands
             {
                 ["enabled"] = true,
                 ["module"] = "Obj.ValidatorModule.ValidatorFacade",
-                ["scope"] = "target_b_only(model_a_reference)",
+                ["scope"] = extractionScope,
                 ["ok"] = ok,
                 ["ok_pair"] = okPair,
                 ["ok_a"] = okA,
@@ -2327,6 +2532,8 @@ namespace Obj.Commands
             onStepOutput?.Invoke(6, "validator", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.ValidatorModule.ValidatorFacade",
+                ["scope"] = extractionScope,
+                ["target_side"] = targetSide,
                 ["ok"] = ok,
                 ["ok_pair"] = okPair,
                 ["ok_a"] = okA,
@@ -2444,15 +2651,35 @@ namespace Obj.Commands
                 var docKey = root.TryGetProperty("doc_key", out var docEl) ? docEl.GetString() ?? "" : "";
                 var docType = root.TryGetProperty("doc_type", out var typeEl) ? typeEl.GetString() ?? "" : "";
                 var band = root.TryGetProperty("band", out var bandEl) ? bandEl.GetString() ?? "" : "";
+                var scope = "";
+                var targetSide = "";
+                if (root.TryGetProperty("pipeline", out var pipeline) && pipeline.ValueKind == JsonValueKind.Object)
+                {
+                    if (pipeline.TryGetProperty("scope", out var scopeEl))
+                        scope = scopeEl.GetString() ?? "";
+                    if (pipeline.TryGetProperty("target_side", out var targetSideEl))
+                        targetSide = targetSideEl.GetString() ?? "";
+                }
 
                 Console.WriteLine(Colorize(
-                    $"[EXTRACTION] {(ok ? "OK" : "FAIL")} doc={docKey} type={docType} band={band}",
+                    $"[EXTRACTION] {(ok ? "OK" : "FAIL")} doc={docKey} type={docType} band={band} scope={scope}",
                     ok ? AnsiOk : AnsiErr));
 
                 if (root.TryGetProperty("parsed", out var parsed))
                 {
-                    PrintSideValues(parsed, "pdf_a", "VALORES A");
-                    PrintSideValues(parsed, "pdf_b", "VALORES B");
+                    if (string.Equals(scope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase))
+                    {
+                        PrintSideValues(parsed, "pdf_b", "VALORES EXTRAIDOS (PDF ALVO B)");
+                    }
+                    else if (string.Equals(scope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase))
+                    {
+                        PrintSideValues(parsed, "pdf_a", "VALORES EXTRAIDOS (PDF ALVO A)");
+                    }
+                    else
+                    {
+                        PrintSideValues(parsed, "pdf_a", "VALORES A");
+                        PrintSideValues(parsed, "pdf_b", "VALORES B");
+                    }
                 }
 
                 if (root.TryGetProperty("validator", out var validator))
@@ -2460,7 +2687,8 @@ namespace Obj.Commands
                     var vOk = validator.TryGetProperty("ok", out var vOkEl) && vOkEl.ValueKind == JsonValueKind.True;
                     var reason = validator.TryGetProperty("reason", out var reasonEl) ? reasonEl.GetString() ?? "" : "";
                     var color = vOk ? AnsiOk : AnsiErr;
-                    Console.WriteLine(Colorize($"[VALIDATOR] {vOk.ToString().ToLowerInvariant()} reason=\"{reason}\"", color));
+                    var sideLabel = string.IsNullOrWhiteSpace(targetSide) ? "" : $" side={targetSide}";
+                    Console.WriteLine(Colorize($"[VALIDATOR] {vOk.ToString().ToLowerInvariant()}{sideLabel} reason=\"{reason}\"", color));
                 }
                 Console.WriteLine();
             }
@@ -2514,8 +2742,8 @@ namespace Obj.Commands
                 }
 
                 var moduleDisplay = ResolveModuleDisplay(moduleTag);
-                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} \"{value}\"");
-                Console.WriteLine($"    origem={source} op={opRange} obj={obj} status={status} modulo={moduleDisplay}");
+                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize("\"" + value + "\"", AnsiWhite)}");
+                Console.WriteLine($"    origem={source} op={opRange} obj={obj} status={status} modulo={ColorizeModuleChain(moduleDisplay)}");
                 var adjustModule = ResolveLastAdjustmentModule(moduleTag);
 
                 if (!string.IsNullOrWhiteSpace(adjustModule))
