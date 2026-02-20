@@ -28,6 +28,21 @@ namespace Obj.Align
             public List<AlignHelperPhrase> Phrases { get; } = new List<AlignHelperPhrase>();
         }
 
+        private sealed class AlignHelperCertidaoHintsDoc
+        {
+            public List<string> HeaderHints { get; set; } = new List<string>();
+            public List<string> TitleHints { get; set; } = new List<string>();
+            public List<string> BodyHints { get; set; } = new List<string>();
+            public List<string> DateHints { get; set; } = new List<string>();
+        }
+
+        private sealed class AlignHelperDespachoTypeDoc
+        {
+            public List<string> AutorizacaoHints { get; set; } = new List<string>();
+            public List<string> GeorcHints { get; set; } = new List<string>();
+            public List<string> ConselhoHints { get; set; } = new List<string>();
+        }
+
         private sealed class AlignHelperHit
         {
             public int Index { get; set; }
@@ -364,16 +379,16 @@ namespace Obj.Align
                 // Keep lexicon with whatever could be loaded.
             }
 
+            var deserializer = new DeserializerBuilder()
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .IgnoreUnmatchedProperties()
+                .Build();
+
             try
             {
                 var rulesPath = PatternRegistry.FindFile("markers", "field_rules.yml");
                 if (!string.IsNullOrWhiteSpace(rulesPath) && File.Exists(rulesPath))
                 {
-                    var deserializer = new DeserializerBuilder()
-                        .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                        .IgnoreUnmatchedProperties()
-                        .Build();
-
                     var rules = deserializer.Deserialize<FieldRulesConfig>(File.ReadAllText(rulesPath));
                     if (rules != null)
                     {
@@ -394,6 +409,67 @@ namespace Obj.Align
                         AddRulePhrases(lexicon, "percentual", rules.Percentual);
                         AddRulePhrases(lexicon, "parcela", rules.Parcela);
                         AddRulePhrases(lexicon, "data", rules.Data);
+                    }
+                }
+            }
+            catch
+            {
+                // Keep lexicon with whatever could be loaded.
+            }
+
+            try
+            {
+                var prioritiesPath = PatternRegistry.FindFile("markers", "field_priorities.yml");
+                if (!string.IsNullOrWhiteSpace(prioritiesPath) && File.Exists(prioritiesPath))
+                {
+                    var priorities = deserializer.Deserialize<PrioritiesConfig>(File.ReadAllText(prioritiesPath));
+                    if (priorities != null)
+                    {
+                        AddHelperPhrases(lexicon, "processo_administrativo", BuildPriorityAnchors(priorities.ProcessoAdminLabels), 0.84, requirePrefix: true, allowSingleToken: true);
+                        AddHelperPhrases(lexicon, "perito", BuildPriorityAnchors(priorities.PeritoLabels), 0.86, requirePrefix: true, allowSingleToken: true);
+                        AddHelperPhrases(lexicon, "vara", BuildPriorityAnchors(priorities.VaraLabels), 0.84, requirePrefix: true, allowSingleToken: true);
+                        AddHelperPhrases(lexicon, "comarca", BuildPriorityAnchors(priorities.ComarcaLabels), 0.84, requirePrefix: true, allowSingleToken: true);
+                        AddHelperPhrases(lexicon, "promovente", BuildPriorityAnchors(priorities.PromoventeLabels), 0.89, requirePrefix: true, allowSingleToken: true);
+                        AddHelperPhrases(lexicon, "promovido", BuildPriorityAnchors(priorities.PromovidoLabels), 0.89, requirePrefix: true, allowSingleToken: true);
+                    }
+                }
+            }
+            catch
+            {
+                // Keep lexicon with whatever could be loaded.
+            }
+
+            try
+            {
+                var certidaoHintsPath = PatternRegistry.FindFile("markers", "certidao_hints.yml");
+                if (!string.IsNullOrWhiteSpace(certidaoHintsPath) && File.Exists(certidaoHintsPath))
+                {
+                    var hints = deserializer.Deserialize<AlignHelperCertidaoHintsDoc>(File.ReadAllText(certidaoHintsPath));
+                    if (hints != null)
+                    {
+                        AddHelperPhrases(lexicon, "valor_cm", hints.HeaderHints, 0.85, requirePrefix: false);
+                        AddHelperPhrases(lexicon, "valor_cm", hints.TitleHints, 0.86, requirePrefix: true, allowSingleToken: true);
+                        AddHelperPhrases(lexicon, "valor_cm", hints.BodyHints, 0.87, requirePrefix: false);
+                        AddHelperPhrases(lexicon, "data", hints.DateHints, 0.86, requirePrefix: false);
+                    }
+                }
+            }
+            catch
+            {
+                // Keep lexicon with whatever could be loaded.
+            }
+
+            try
+            {
+                var despachoTypePath = PatternRegistry.FindFile("markers", "despacho_type.yml");
+                if (!string.IsNullOrWhiteSpace(despachoTypePath) && File.Exists(despachoTypePath))
+                {
+                    var hints = deserializer.Deserialize<AlignHelperDespachoTypeDoc>(File.ReadAllText(despachoTypePath));
+                    if (hints != null)
+                    {
+                        AddHelperPhrases(lexicon, "valor_de", hints.AutorizacaoHints, 0.87, requirePrefix: false);
+                        AddHelperPhrases(lexicon, "valor_de", hints.GeorcHints, 0.87, requirePrefix: false);
+                        AddHelperPhrases(lexicon, "valor_cm", hints.ConselhoHints, 0.88, requirePrefix: false);
                     }
                 }
             }
@@ -440,7 +516,30 @@ namespace Obj.Align
             }
         }
 
-        private static void AddHelperPhrases(AlignHelperLexicon lexicon, string key, IEnumerable<string>? phrases, double baseWeight, bool requirePrefix)
+        private static IEnumerable<string> BuildPriorityAnchors(IEnumerable<string>? labels)
+        {
+            if (labels == null)
+                yield break;
+
+            foreach (var raw in labels)
+            {
+                var label = (raw ?? "").Trim();
+                if (label.Length == 0)
+                    continue;
+
+                yield return label;
+                if (!label.EndsWith(":", StringComparison.Ordinal))
+                    yield return label + ":";
+            }
+        }
+
+        private static void AddHelperPhrases(
+            AlignHelperLexicon lexicon,
+            string key,
+            IEnumerable<string>? phrases,
+            double baseWeight,
+            bool requirePrefix,
+            bool allowSingleToken = false)
         {
             if (lexicon == null || string.IsNullOrWhiteSpace(key) || phrases == null)
                 return;
@@ -457,7 +556,11 @@ namespace Obj.Align
 
                 var tokenCount = normalized.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
                 if (requirePrefix && tokenCount < 2)
-                    continue;
+                {
+                    // Single token anchors only for high-signal labels ("requerente", "promovido", etc.).
+                    if (!allowSingleToken || normalized.Length < 8)
+                        continue;
+                }
 
                 var compact = normalized.Replace(" ", "", StringComparison.Ordinal);
                 if (compact.Length < 3)
