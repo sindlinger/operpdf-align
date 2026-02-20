@@ -197,6 +197,10 @@ namespace Obj.Utils
             }
 
             var v = value.Trim();
+            var aliasResolved = ResolveTypedModelAliasToken(v);
+            if (!string.Equals(aliasResolved, v, StringComparison.Ordinal))
+                return aliasResolved;
+
             if (!v.Equals("@MODEL", StringComparison.OrdinalIgnoreCase))
                 return value;
 
@@ -211,6 +215,168 @@ namespace Obj.Utils
                 return envValue;
 
             return value;
+        }
+
+        private enum ModelAliasKind
+        {
+            Despacho,
+            Certidao,
+            Requerimento
+        }
+
+        private static string ResolveTypedModelAliasToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return token ?? "";
+
+            var t = token.Trim();
+            if (t.Equals("@M-DES", StringComparison.OrdinalIgnoreCase) ||
+                t.Equals("@M-DESPACHO", StringComparison.OrdinalIgnoreCase))
+            {
+                var values = ResolveTypedModelAlias(ModelAliasKind.Despacho);
+                return values.Count > 0 ? string.Join(",", values) : token;
+            }
+
+            if (t.Equals("@M-CER", StringComparison.OrdinalIgnoreCase) ||
+                t.Equals("@M-CERTIDAO", StringComparison.OrdinalIgnoreCase))
+            {
+                var values = ResolveTypedModelAlias(ModelAliasKind.Certidao);
+                return values.Count > 0 ? string.Join(",", values) : token;
+            }
+
+            if (t.Equals("@M-REQ", StringComparison.OrdinalIgnoreCase) ||
+                t.Equals("@M-REQUERIMENTO", StringComparison.OrdinalIgnoreCase))
+            {
+                var values = ResolveTypedModelAlias(ModelAliasKind.Requerimento);
+                return values.Count > 0 ? string.Join(",", values) : token;
+            }
+
+            return token;
+        }
+
+        private static List<string> ResolveTypedModelAlias(ModelAliasKind kind)
+        {
+            var files = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var dir in ResolveTypedModelDirs(kind))
+            {
+                if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir))
+                    continue;
+                foreach (var file in Directory.EnumerateFiles(dir, "*.pdf", SearchOption.AllDirectories)
+                    .OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
+                {
+                    if (!IsValidPdfFile(file))
+                        continue;
+                    if (seen.Add(file))
+                        files.Add(file);
+                }
+            }
+
+            return files;
+        }
+
+        private static IEnumerable<string> ResolveTypedModelDirs(ModelAliasKind kind)
+        {
+            var dirs = new List<string>();
+            var hasTypedDir = false;
+            void AddDirFromEnv(string envKey)
+            {
+                var raw = Environment.GetEnvironmentVariable(envKey);
+                if (string.IsNullOrWhiteSpace(raw))
+                    return;
+                var normalized = NormalizePathForCurrentOS(raw);
+                if (!string.IsNullOrWhiteSpace(normalized))
+                {
+                    dirs.Add(normalized);
+                    hasTypedDir = true;
+                }
+            }
+
+            void AddDirFromModelEnv(string envKey)
+            {
+                var raw = Environment.GetEnvironmentVariable(envKey);
+                if (string.IsNullOrWhiteSpace(raw))
+                    return;
+                var normalized = NormalizePathForCurrentOS(raw);
+                if (string.IsNullOrWhiteSpace(normalized))
+                    return;
+                try
+                {
+                    var full = Path.GetFullPath(normalized);
+                    var dir = Path.GetDirectoryName(full);
+                    if (!string.IsNullOrWhiteSpace(dir))
+                        dirs.Add(dir);
+                }
+                catch
+                {
+                    var dir = Path.GetDirectoryName(normalized);
+                    if (!string.IsNullOrWhiteSpace(dir))
+                        dirs.Add(dir);
+                }
+            }
+
+            switch (kind)
+            {
+                case ModelAliasKind.Despacho:
+                    AddDirFromEnv("OBJPDF_MODELS_DES_DIR");
+                    AddDirFromEnv("OBJPDF_MODELS_DESPACHO_DIR");
+                    AddDirFromEnv("OBJPDF_ALIAS_M_DES_DIR");
+                    if (!hasTypedDir)
+                        AddDirFromModelEnv("OBJPDF_MODEL_DESPACHO");
+                    break;
+                case ModelAliasKind.Certidao:
+                    AddDirFromEnv("OBJPDF_MODELS_CER_DIR");
+                    AddDirFromEnv("OBJPDF_MODELS_CERTIDAO_DIR");
+                    AddDirFromEnv("OBJPDF_ALIAS_M_CER_DIR");
+                    if (!hasTypedDir)
+                        AddDirFromModelEnv("OBJPDF_MODEL_CERTIDAO");
+                    break;
+                case ModelAliasKind.Requerimento:
+                    AddDirFromEnv("OBJPDF_MODELS_REQ_DIR");
+                    AddDirFromEnv("OBJPDF_MODELS_REQUERIMENTO_DIR");
+                    AddDirFromEnv("OBJPDF_ALIAS_M_REQ_DIR");
+                    if (!hasTypedDir)
+                        AddDirFromModelEnv("OBJPDF_MODEL_REQUERIMENTO");
+                    break;
+            }
+
+            try
+            {
+                var cwd = Directory.GetCurrentDirectory();
+                if (!string.IsNullOrWhiteSpace(cwd))
+                {
+                    var baseDir = Path.Combine(cwd, "models", "aliases");
+                    var localDir = kind switch
+                    {
+                        ModelAliasKind.Despacho => Path.Combine(baseDir, "despacho"),
+                        ModelAliasKind.Certidao => Path.Combine(baseDir, "certidao"),
+                        _ => Path.Combine(baseDir, "requerimento")
+                    };
+                    dirs.Add(localDir);
+                }
+            }
+            catch
+            {
+                // ignore cwd probing
+            }
+
+            var unique = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var raw in dirs)
+            {
+                if (string.IsNullOrWhiteSpace(raw))
+                    continue;
+                string full;
+                try
+                {
+                    full = Path.GetFullPath(raw);
+                }
+                catch
+                {
+                    full = raw;
+                }
+                if (unique.Add(full))
+                    yield return full;
+            }
         }
 
         private static string ResolveIndexVariable(string value)

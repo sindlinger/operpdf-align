@@ -343,6 +343,105 @@ namespace Obj.Commands
             return "\"" + t.Substring(0, max - 3) + "...\"";
         }
 
+        private static IEnumerable<string> ResolveKnownModelDirectories()
+        {
+            var rawDirs = new List<string>();
+
+            void AddFromEnv(string key)
+            {
+                var value = Environment.GetEnvironmentVariable(key);
+                if (!string.IsNullOrWhiteSpace(value))
+                    rawDirs.Add(value);
+            }
+
+            void AddDirOfModelEnv(string key)
+            {
+                var value = Environment.GetEnvironmentVariable(key);
+                if (string.IsNullOrWhiteSpace(value))
+                    return;
+                try
+                {
+                    var full = Path.GetFullPath(value);
+                    var dir = Path.GetDirectoryName(full);
+                    if (!string.IsNullOrWhiteSpace(dir))
+                        rawDirs.Add(dir);
+                }
+                catch
+                {
+                    var dir = Path.GetDirectoryName(value);
+                    if (!string.IsNullOrWhiteSpace(dir))
+                        rawDirs.Add(dir);
+                }
+            }
+
+            AddFromEnv("OBJPDF_MODELS_DES_DIR");
+            AddFromEnv("OBJPDF_MODELS_CER_DIR");
+            AddFromEnv("OBJPDF_MODELS_REQ_DIR");
+            AddFromEnv("OBJPDF_MODELS_DESPACHO_DIR");
+            AddFromEnv("OBJPDF_MODELS_CERTIDAO_DIR");
+            AddFromEnv("OBJPDF_MODELS_REQUERIMENTO_DIR");
+            AddFromEnv("OBJPDF_MODELS_DIR");
+            AddDirOfModelEnv("OBJPDF_MODEL_DESPACHO");
+            AddDirOfModelEnv("OBJPDF_MODEL_CERTIDAO");
+            AddDirOfModelEnv("OBJPDF_MODEL_REQUERIMENTO");
+            AddDirOfModelEnv("OBJPDF_MODEL");
+
+            try
+            {
+                var cwd = Directory.GetCurrentDirectory();
+                if (!string.IsNullOrWhiteSpace(cwd))
+                {
+                    rawDirs.Add(Path.Combine(cwd, "models", "aliases", "despacho"));
+                    rawDirs.Add(Path.Combine(cwd, "models", "aliases", "certidao"));
+                    rawDirs.Add(Path.Combine(cwd, "models", "aliases", "requerimento"));
+                    rawDirs.Add(Path.Combine(cwd, "models", "nossos"));
+                }
+            }
+            catch
+            {
+                // ignore cwd fallback
+            }
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var raw in rawDirs)
+            {
+                if (string.IsNullOrWhiteSpace(raw))
+                    continue;
+                string full;
+                try
+                {
+                    full = Path.GetFullPath(raw).Replace('\\', '/');
+                }
+                catch
+                {
+                    full = raw.Replace('\\', '/');
+                }
+
+                if (!full.EndsWith("/", StringComparison.Ordinal))
+                    full += "/";
+                if (seen.Add(full))
+                    yield return full;
+            }
+        }
+
+        private static bool IsPathUnderKnownModelDirectory(string fullPathNormalized)
+        {
+            if (string.IsNullOrWhiteSpace(fullPathNormalized))
+                return false;
+
+            var path = fullPathNormalized.Replace('\\', '/');
+            if (!path.EndsWith("/", StringComparison.Ordinal))
+                path += "/";
+
+            foreach (var modelDir in ResolveKnownModelDirectories())
+            {
+                if (path.StartsWith(modelDir, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
         private static string DetectInputRole(string path, bool preferTemplateForFirstInput = false)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -371,7 +470,8 @@ namespace Obj.Commands
                 name.Contains("model", StringComparison.Ordinal) ||
                 name.Contains("modelo", StringComparison.Ordinal) ||
                 name.Contains("anchor", StringComparison.Ordinal) ||
-                name.Contains("template", StringComparison.Ordinal))
+                name.Contains("template", StringComparison.Ordinal) ||
+                IsPathUnderKnownModelDirectory(full))
             {
                 return "template_modelo";
             }
@@ -843,20 +943,6 @@ namespace Obj.Commands
                 return;
             }
 
-            if (inputs.Count > 2 && !allowStack)
-            {
-                Console.WriteLine("Erro: múltiplos PDFs alvo na mesma execução foram bloqueados para isolamento.");
-                Console.WriteLine("Use exatamente 2 entradas (modelo + alvo) ou passe --allow-stack para liberar lote.");
-                return;
-            }
-
-            var aPath = inputs[0].Trim().Trim('"');
-            if (!File.Exists(aPath))
-            {
-                Console.WriteLine($"PDF nao encontrado: {aPath}");
-                return;
-            }
-
             if (opFilter.Count == 0)
             {
                 opFilter.Add("Tj");
@@ -1100,6 +1186,124 @@ namespace Obj.Commands
                 page = pageHint > 0 ? pageHint : PickPageOrDefault(pdfPath);
                 obj = objHint > 0 ? objHint : PickObjForPage(pdfPath, page);
                 source = "auto";
+            }
+
+            bool TryCollapseModelCandidatesForSingleTarget(out List<string> collapsedInputs)
+            {
+                collapsedInputs = new List<string>(inputs);
+                if (inputs.Count <= 2)
+                    return false;
+
+                var targetPath = inputs[^1].Trim().Trim('"');
+                if (!File.Exists(targetPath))
+                    return false;
+
+                var modelCandidates = inputs
+                    .Take(inputs.Count - 1)
+                    .Select(v => v.Trim().Trim('"'))
+                    .Where(v => !string.IsNullOrWhiteSpace(v))
+                    .ToList();
+
+                if (modelCandidates.Count == 0)
+                    return false;
+                if (modelCandidates.Any(v => !File.Exists(v)))
+                    return false;
+
+                var roleKinds = modelCandidates
+                    .Select(v => DetectInputRole(v))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                if (roleKinds.Count != 1 || !roleKinds.Contains("template_modelo", StringComparer.OrdinalIgnoreCase))
+                    return false;
+
+                ResolveSelection(targetPath, pageBUser, objBUser, pageB, objB, out var targetPage, out var targetObj, out var targetSource);
+                if (targetPage <= 0 || targetObj <= 0)
+                    return false;
+
+                var bestModel = "";
+                var bestScore = double.NegativeInfinity;
+                var trialRows = new List<string>();
+
+                foreach (var modelPath in modelCandidates)
+                {
+                    ResolveSelection(modelPath, pageAUser, objAUser, pageA, objA, out var modelPage, out var modelObj, out var modelSource);
+                    if (modelPage <= 0 || modelObj <= 0)
+                        continue;
+
+                    ObjectsTextOpsDiff.AlignDebugReport? trialReport = null;
+                    try
+                    {
+                        trialReport = ObjectsTextOpsDiff.ComputeAlignDebugForSelection(
+                            modelPath,
+                            targetPath,
+                            new ObjectsTextOpsDiff.PageObjSelection { Page = modelPage, Obj = modelObj },
+                            new ObjectsTextOpsDiff.PageObjSelection { Page = targetPage, Obj = targetObj },
+                            opFilter,
+                            backoff,
+                            "front_head",
+                            minSim,
+                            band,
+                            minLenRatio,
+                            lenPenalty,
+                            anchorMinSim,
+                            anchorMinLenRatio,
+                            gapPenalty);
+                    }
+                    catch
+                    {
+                        trialReport = null;
+                    }
+
+                    if (trialReport == null)
+                        continue;
+
+                    var anchorCount = trialReport.Anchors.Count;
+                    var fixedCount = trialReport.FixedPairs.Count;
+                    var variableCount = trialReport.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
+                    var gapCount = trialReport.Alignments.Count(p => string.Equals(p.Kind, "gap_a", StringComparison.OrdinalIgnoreCase) || string.Equals(p.Kind, "gap_b", StringComparison.OrdinalIgnoreCase));
+                    var trialScore = (anchorCount * 1000.0) + (variableCount * 20.0) + (fixedCount * 8.0) - (gapCount * 15.0);
+
+                    trialRows.Add($"{Path.GetFileName(modelPath)} anchors={anchorCount} fixed={fixedCount} variable={variableCount} gaps={gapCount} score={trialScore:F1} model_sel={modelSource} target_sel={targetSource}");
+
+                    if (trialScore > bestScore)
+                    {
+                        bestScore = trialScore;
+                        bestModel = modelPath;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(bestModel))
+                    return false;
+
+                if (!ReturnUtils.IsEnabled())
+                {
+                    Console.WriteLine("Seleção automática de modelo (alias por tipo):");
+                    foreach (var row in trialRows)
+                        Console.WriteLine("  " + row);
+                    Console.WriteLine($"Modelo escolhido: {Path.GetFileName(bestModel)}");
+                }
+
+                collapsedInputs = new List<string> { bestModel, targetPath };
+                return true;
+            }
+
+            if (inputs.Count > 2 && !allowStack)
+            {
+                if (!TryCollapseModelCandidatesForSingleTarget(out var collapsed))
+                {
+                    Console.WriteLine("Erro: múltiplos PDFs alvo na mesma execução foram bloqueados para isolamento.");
+                    Console.WriteLine("Use exatamente 2 entradas (modelo + alvo), passe --allow-stack, ou use alias @M-DES/@M-CER/@M-REQ com um único alvo.");
+                    return;
+                }
+
+                inputs = collapsed;
+            }
+
+            var aPath = inputs[0].Trim().Trim('"');
+            if (!File.Exists(aPath))
+            {
+                Console.WriteLine($"PDF nao encontrado: {aPath}");
+                return;
             }
 
             ResolveSelection(aPath, pageAUser, objAUser, pageA, objA, out pageA, out objA, out var sourceA);
@@ -3442,6 +3646,7 @@ namespace Obj.Commands
         {
             Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--align] [--align-top N] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
             Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
+            Console.WriteLine("aliases de modelo por tipo: @M-DES (despacho), @M-CER (certidao), @M-REQ (requerimento). Se houver múltiplos modelos no alias, o pipeline testa e escolhe o melhor para o alvo.");
             Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
         }
 
