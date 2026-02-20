@@ -20,10 +20,41 @@ namespace Obj.Align
             double anchorMinLenRatio = 0.0,
             double gapPenalty = -0.35)
         {
+            return BuildBlockAlignments(
+                blocksA,
+                blocksB,
+                out normA,
+                out normB,
+                out anchors,
+                out _,
+                minSim,
+                band,
+                minLenRatio,
+                lenPenalty,
+                anchorMinSim,
+                anchorMinLenRatio,
+                gapPenalty);
+        }
+
+        private static List<BlockAlignment> BuildBlockAlignments(
+            List<SelfBlock> blocksA,
+            List<SelfBlock> blocksB,
+            out List<string> normA,
+            out List<string> normB,
+            out List<AnchorPair> anchors,
+            out AlignHelperDiagnostics helperDiagnostics,
+            double minSim = 0.0,
+            int band = 0,
+            double minLenRatio = 0.05,
+            double lenPenalty = 0.0,
+            double anchorMinSim = 0.0,
+            double anchorMinLenRatio = 0.0,
+            double gapPenalty = -0.35)
+        {
             normA = blocksA.Select(b => NormalizeForSimilarity(b.Text ?? "")).ToList();
             normB = blocksB.Select(b => NormalizeForSimilarity(b.Text ?? "")).ToList();
             anchors = new List<AnchorPair>();
-            var helperAnchors = BuildAnchorPairsAlignHelper(normA, normB, minLenRatio);
+            var helperAnchors = BuildAnchorPairsAlignHelper(normA, normB, minLenRatio, out helperDiagnostics);
 
             double autoMaxSim = 0.0;
             if (anchorMinSim > 0 || anchorMinLenRatio > 0)
@@ -43,6 +74,11 @@ namespace Obj.Align
                 anchors = BuildAnchorPairsAuto(normA, normB, minLen, out autoMaxSim);
             }
             anchors = MergeAnchorPairsWithHelper(anchors, helperAnchors);
+            if (helperDiagnostics != null)
+            {
+                var mergedSet = new HashSet<(int A, int B)>(anchors.Select(v => (v.AIndex, v.BIndex)));
+                helperDiagnostics.UsedInFinalAnchors = helperAnchors.Count(v => mergedSet.Contains((v.AIndex, v.BIndex)));
+            }
 
             if (anchors.Count == 0)
             {

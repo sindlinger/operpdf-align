@@ -187,7 +187,23 @@ namespace Obj.Align
                 return 0.0;
             var textSim = 1.0 - (double)dist / maxLen;
             var lenSim = 1.0 - (double)Math.Abs(a.Length - b.Length) / maxLen;
-            return (textSim * 0.7) + (lenSim * 0.3);
+            var charSim = (textSim * 0.7) + (lenSim * 0.3);
+
+            var wordSim = ComputeWordSimilarity(a, b, out var tokA, out var tokB);
+            if (tokA == 0 || tokB == 0)
+                return charSim;
+
+            // Híbrido: texto longo privilegia modo palavra; texto curto preserva modo char.
+            var minTok = Math.Min(tokA, tokB);
+            double wWord;
+            if (minTok >= 8) wWord = 0.60;
+            else if (minTok >= 4) wWord = 0.48;
+            else wWord = 0.30;
+
+            var combined = (charSim * (1.0 - wWord)) + (wordSim * wWord);
+            if (combined > 1.0) return 1.0;
+            if (combined < 0.0) return 0.0;
+            return combined;
         }
 
         private static double ComputeAlignmentSimilarity(string a, string b)

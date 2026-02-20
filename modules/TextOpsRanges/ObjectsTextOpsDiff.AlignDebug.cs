@@ -58,6 +58,7 @@ namespace Obj.Align
             public double AnchorMinLenRatio { get; set; }
             public double GapPenalty { get; set; }
             public List<AlignDebugPair> Anchors { get; set; } = new List<AlignDebugPair>();
+            public AlignHelperDiagnostics? HelperDiagnostics { get; set; }
             public List<AlignDebugBlock> BlocksA { get; set; } = new List<AlignDebugBlock>();
             public List<AlignDebugBlock> BlocksB { get; set; } = new List<AlignDebugBlock>();
             public List<AlignDebugPair> Alignments { get; set; } = new List<AlignDebugPair>();
@@ -115,7 +116,7 @@ namespace Obj.Align
             if (blocksA.Count == 0 || blocksB.Count == 0)
                 return null;
 
-            var alignments = BuildBlockAlignments(blocksA, blocksB, out var normA, out var normB, out var anchors, minSim, band, minLenRatio, lenPenalty, anchorMinSim, anchorMinLenRatio, gapPenalty);
+            var alignments = BuildBlockAlignments(blocksA, blocksB, out var normA, out var normB, out var anchors, out var helperDiagnostics, minSim, band, minLenRatio, lenPenalty, anchorMinSim, anchorMinLenRatio, gapPenalty);
 
             var report = new AlignDebugReport
             {
@@ -134,6 +135,7 @@ namespace Obj.Align
                 AnchorMinSim = anchorMinSim,
                 AnchorMinLenRatio = anchorMinLenRatio,
                 GapPenalty = gapPenalty,
+                HelperDiagnostics = helperDiagnostics,
                 BlocksA = blocksA.Select(ToDebugBlock).ToList(),
                 BlocksB = blocksB.Select(ToDebugBlock).ToList()
             };

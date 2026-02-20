@@ -1241,6 +1241,7 @@ namespace Obj.Commands
                 var gapCount = report.Alignments.Count(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
                 var rangeA = report.RangeA?.HasValue == true ? $"op{report.RangeA.StartOp}-op{report.RangeA.EndOp}" : "(vazio)";
                 var rangeB = report.RangeB?.HasValue == true ? $"op{report.RangeB.StartOp}-op{report.RangeB.EndOp}" : "(vazio)";
+                var helper = report.HelperDiagnostics;
                 var step2Payload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["module"] = "Obj.Align.ObjectsTextOpsDiff",
@@ -1253,12 +1254,20 @@ namespace Obj.Commands
                     ["range_b"] = rangeB,
                     ["auto_dual_back"] = autoDualDespacho && backReport != null
                 };
+                if (helper != null)
+                {
+                    step2Payload["helper_hits_a"] = helper.HitsA;
+                    step2Payload["helper_hits_b"] = helper.HitsB;
+                    step2Payload["helper_candidates"] = helper.Candidates;
+                    step2Payload["helper_accepted"] = helper.Accepted;
+                    step2Payload["helper_rejected"] = helper.Rejected;
+                    step2Payload["helper_used"] = helper.UsedInFinalAnchors;
+                }
                 EmitStage(2, "ok", step2Payload);
                 if (!ReturnUtils.IsEnabled())
                 {
-                    PrintPipelineStep(
-                        "passo 2/4 - saída do alinhamento",
-                        "passo 3/4 - extração (usa op_range + value_full)",
+                    var stepItems = new List<(string Key, string Value)>
+                    {
                         ("modulo", "Obj.Align.ObjectsTextOpsDiff"),
                         ("anchors", report.Anchors.Count.ToString(CultureInfo.InvariantCulture)),
                         ("pairs", report.Alignments.Count.ToString(CultureInfo.InvariantCulture)),
@@ -1267,7 +1276,15 @@ namespace Obj.Commands
                         ("gaps", gapCount.ToString(CultureInfo.InvariantCulture)),
                         ("range_a", rangeA),
                         ("range_b", rangeB)
-                    );
+                    };
+                    if (helper != null)
+                    {
+                        stepItems.Add(("helper_hits_a", helper.HitsA.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("helper_hits_b", helper.HitsB.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("helper_acc_rej", $"{helper.Accepted}/{helper.Rejected}"));
+                        stepItems.Add(("helper_used", helper.UsedInFinalAnchors.ToString(CultureInfo.InvariantCulture)));
+                    }
+                    PrintPipelineStep("passo 2/4 - saída do alinhamento", "passo 3/4 - extração (usa op_range + value_full)", stepItems.ToArray());
                 }
 
                 if (inputs.Count == 2 && !ReturnUtils.IsEnabled())
@@ -3251,9 +3268,10 @@ namespace Obj.Commands
             var fixedCount = report.FixedPairs.Count;
             var varCount = report.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
             var gaps = report.Alignments.Count(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
+            var helper = report.HelperDiagnostics;
             var showVariables = outputMode != OutputMode.FixedOnly;
             var showFixed = outputMode != OutputMode.VariablesOnly;
-            ReportUtils.WriteSummary("TEXTOPS ALIGN", new List<(string Key, string Value)>
+            var summary = new List<(string Key, string Value)>
             {
                 ("A", $"{report.PdfA} p{report.PageA} o{report.ObjA}"),
                 ("B", $"{report.PdfB} p{report.PageB} o{report.ObjB}"),
@@ -3270,8 +3288,43 @@ namespace Obj.Commands
                 ("gap", ReportUtils.F(report.GapPenalty, 2)),
                 ("rangeA", report.RangeA.HasValue ? $"op{report.RangeA.StartOp}-op{report.RangeA.EndOp}" : "-"),
                 ("rangeB", report.RangeB.HasValue ? $"op{report.RangeB.StartOp}-op{report.RangeB.EndOp}" : "-")
-            });
+            };
+            if (helper != null)
+            {
+                summary.Add(("helperHitsA", helper.HitsA.ToString(CultureInfo.InvariantCulture)));
+                summary.Add(("helperHitsB", helper.HitsB.ToString(CultureInfo.InvariantCulture)));
+                summary.Add(("helperAcc/Rej", $"{helper.Accepted}/{helper.Rejected}"));
+                summary.Add(("helperUsed", helper.UsedInFinalAnchors.ToString(CultureInfo.InvariantCulture)));
+            }
+            ReportUtils.WriteSummary("TEXTOPS ALIGN", summary);
             Console.WriteLine();
+
+            if (helper != null)
+            {
+                Console.WriteLine("ALIGN-HELPER");
+                Console.WriteLine($"  hitsA={helper.HitsA} hitsB={helper.HitsB} candidates={helper.Candidates} accepted={helper.Accepted} rejected={helper.Rejected} used={helper.UsedInFinalAnchors}");
+                var topDecisions = helper.Decisions
+                    .OrderByDescending(d => string.Equals(d.Status, "accepted", StringComparison.OrdinalIgnoreCase))
+                    .ThenByDescending(d => d.Score)
+                    .ThenBy(d => d.AIndex)
+                    .ThenBy(d => d.BIndex)
+                    .Take(top <= 0 ? 16 : Math.Max(8, Math.Min(32, top * 2)))
+                    .Select(d => new[]
+                    {
+                        d.Status,
+                        d.Reason,
+                        d.Key,
+                        d.AIndex >= 0 ? d.AIndex.ToString(CultureInfo.InvariantCulture) : "-",
+                        d.BIndex >= 0 ? d.BIndex.ToString(CultureInfo.InvariantCulture) : "-",
+                        ReportUtils.F(d.Score, 3)
+                    })
+                    .ToList();
+                if (topDecisions.Count > 0)
+                {
+                    ReportUtils.WriteTable("ALIGN-HELPER DECISIONS", new[] { "status", "reason", "key", "Aidx", "Bidx", "score" }, topDecisions);
+                    Console.WriteLine();
+                }
+            }
 
             if (report.Anchors.Count > 0)
             {

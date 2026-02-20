@@ -32,7 +32,29 @@ namespace Obj.Align
         {
             public int Index { get; set; }
             public string Key { get; set; } = "";
+            public string Phrase { get; set; } = "";
             public double Score { get; set; }
+        }
+
+        internal sealed class AlignHelperDecision
+        {
+            public int AIndex { get; set; } = -1;
+            public int BIndex { get; set; } = -1;
+            public string Key { get; set; } = "";
+            public string Status { get; set; } = ""; // accepted|rejected
+            public string Reason { get; set; } = "";
+            public double Score { get; set; }
+        }
+
+        internal sealed class AlignHelperDiagnostics
+        {
+            public int HitsA { get; set; }
+            public int HitsB { get; set; }
+            public int Candidates { get; set; }
+            public int Accepted { get; set; }
+            public int Rejected { get; set; }
+            public int UsedInFinalAnchors { get; set; }
+            public List<AlignHelperDecision> Decisions { get; set; } = new List<AlignHelperDecision>();
         }
 
         private static readonly Lazy<AlignHelperLexicon> AlignHelperLexiconCache =
@@ -86,14 +108,17 @@ namespace Obj.Align
             return bestScore >= 0.86 ? bestKey : "";
         }
 
-        private static List<AnchorPair> BuildAnchorPairsAlignHelper(List<string> normA, List<string> normB, double minLenRatio)
+        private static List<AnchorPair> BuildAnchorPairsAlignHelper(List<string> normA, List<string> normB, double minLenRatio, out AlignHelperDiagnostics diagnostics)
         {
+            diagnostics = new AlignHelperDiagnostics();
             var lexicon = AlignHelperLexiconCache.Value;
             if (lexicon.Phrases.Count == 0 || normA.Count == 0 || normB.Count == 0)
                 return new List<AnchorPair>();
 
             var hitsA = DetectAlignHelperHits(normA, lexicon);
             var hitsB = DetectAlignHelperHits(normB, lexicon);
+            diagnostics.HitsA = hitsA.Count;
+            diagnostics.HitsB = hitsB.Count;
             if (hitsA.Count == 0 || hitsB.Count == 0)
                 return new List<AnchorPair>();
 
@@ -112,20 +137,32 @@ namespace Obj.Align
                     var sim = ComputeAlignmentSimilarity(normA[hitA.Index], normB[hitB.Index]);
                     var lenRatio = ComputeLenRatio(normA[hitA.Index], normB[hitB.Index]);
                     if (minLenRatio > 0 && lenRatio < minLenRatio * 0.50)
+                    {
+                        AddAlignHelperDecision(diagnostics, hitA.Index, hitB.Index, hitA.Key, "rejected", "len_ratio", sim);
                         continue;
+                    }
                     if (sim < 0.08)
+                    {
+                        AddAlignHelperDecision(diagnostics, hitA.Index, hitB.Index, hitA.Key, "rejected", "low_similarity", sim);
                         continue;
+                    }
 
                     var posA = normA.Count <= 1 ? 0.0 : hitA.Index / (double)(normA.Count - 1);
                     var posB = normB.Count <= 1 ? 0.0 : hitB.Index / (double)(normB.Count - 1);
                     var posDelta = Math.Abs(posA - posB);
                     if (posDelta > 0.35)
+                    {
+                        AddAlignHelperDecision(diagnostics, hitA.Index, hitB.Index, hitA.Key, "rejected", "position_delta", sim);
                         continue;
+                    }
 
                     var helperScore = Math.Min(hitA.Score, hitB.Score);
                     var score = Math.Max(sim, helperScore) - (posDelta * 0.20);
                     if (score < 0.10)
+                    {
+                        AddAlignHelperDecision(diagnostics, hitA.Index, hitB.Index, hitA.Key, "rejected", "low_score", score);
                         continue;
+                    }
                     candidates.Add(new AnchorPair
                     {
                         AIndex = hitA.Index,
@@ -135,7 +172,20 @@ namespace Obj.Align
                 }
             }
 
-            return SelectBestMonotonicAnchors(candidates);
+            diagnostics.Candidates = candidates.Count;
+            var selected = SelectBestMonotonicAnchors(candidates);
+            var selectedSet = new HashSet<(int A, int B)>(selected.Select(v => (v.AIndex, v.BIndex)));
+            foreach (var c in candidates)
+            {
+                if (selectedSet.Contains((c.AIndex, c.BIndex)))
+                    AddAlignHelperDecision(diagnostics, c.AIndex, c.BIndex, DetectAlignHelperKey(normA[c.AIndex]), "accepted", "selected", c.Score);
+                else
+                    AddAlignHelperDecision(diagnostics, c.AIndex, c.BIndex, DetectAlignHelperKey(normA[c.AIndex]), "rejected", "non_monotonic_pruned", c.Score);
+            }
+
+            diagnostics.Accepted = diagnostics.Decisions.Count(v => string.Equals(v.Status, "accepted", StringComparison.Ordinal));
+            diagnostics.Rejected = diagnostics.Decisions.Count(v => string.Equals(v.Status, "rejected", StringComparison.Ordinal));
+            return selected;
         }
 
         private static List<AnchorPair> MergeAnchorPairsWithHelper(List<AnchorPair> anchors, List<AnchorPair> helperAnchors)
@@ -216,6 +266,23 @@ namespace Obj.Align
             return stack.ToList();
         }
 
+        private static void AddAlignHelperDecision(AlignHelperDiagnostics diagnostics, int aIndex, int bIndex, string key, string status, string reason, double score)
+        {
+            if (diagnostics == null)
+                return;
+            if (diagnostics.Decisions.Count >= 300)
+                return;
+            diagnostics.Decisions.Add(new AlignHelperDecision
+            {
+                AIndex = aIndex,
+                BIndex = bIndex,
+                Key = key ?? "",
+                Status = status ?? "",
+                Reason = reason ?? "",
+                Score = score
+            });
+        }
+
         private static List<AlignHelperHit> DetectAlignHelperHits(List<string> normalizedBlocks, AlignHelperLexicon lexicon)
         {
             var hits = new List<AlignHelperHit>();
@@ -230,6 +297,7 @@ namespace Obj.Align
 
                 var compact = text.Replace(" ", "", StringComparison.Ordinal);
                 string bestKey = "";
+                string bestPhrase = "";
                 double bestScore = 0.0;
 
                 foreach (var phrase in lexicon.Phrases)
@@ -261,6 +329,7 @@ namespace Obj.Align
                     {
                         bestScore = score;
                         bestKey = phrase.Key;
+                        bestPhrase = phrase.Phrase;
                     }
                 }
 
@@ -270,6 +339,7 @@ namespace Obj.Align
                     {
                         Index = i,
                         Key = bestKey,
+                        Phrase = bestPhrase,
                         Score = bestScore
                     });
                 }
