@@ -22,10 +22,10 @@ namespace Obj.Commands
     internal static class ObjectsTextOpsAlign
     {
         private const string AnsiReset = "\u001b[0m";
-        private const string AnsiInfo = "\u001b[38;5;81m";
-        private const string AnsiOk = "\u001b[38;5;46m";
-        private const string AnsiWarn = "\u001b[38;5;214m";
-        private const string AnsiErr = "\u001b[38;5;196m";
+        private const string AnsiInfo = "\u001b[1;96m";
+        private const string AnsiOk = "\u001b[1;92m";
+        private const string AnsiWarn = "\u001b[1;93m";
+        private const string AnsiErr = "\u001b[1;91m";
 
         internal enum OutputMode
         {
