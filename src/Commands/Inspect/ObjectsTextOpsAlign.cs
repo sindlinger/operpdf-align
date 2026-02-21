@@ -3512,14 +3512,19 @@ namespace Obj.Commands
                     gapPenalty = Math.Max(-1, Math.Min(1, gapPenalty));
                     continue;
                 }
-                if (string.Equals(arg, "--align-top", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                if (string.Equals(arg, "--alinhamento-top", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     int.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out alignTop);
                     continue;
                 }
-                if (string.Equals(arg, "--align", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--show-align", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(arg, "--alinhamento-detalhe", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--mostrar-alinhamento", StringComparison.OrdinalIgnoreCase))
                 {
                     showAlign = true;
+                    continue;
+                }
+                if (string.Equals(arg, "--sem-alinhamento", StringComparison.OrdinalIgnoreCase))
+                {
+                    showAlign = false;
                     continue;
                 }
                 if (string.Equals(arg, "--allow-stack", StringComparison.OrdinalIgnoreCase))
@@ -3655,7 +3660,7 @@ namespace Obj.Commands
 
         private static void ShowHelp()
         {
-            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--align] [--align-top N] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
+            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--alinhamento-detalhe] [--alinhamento-top N] [--sem-alinhamento] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
             Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
             Console.WriteLine("aliases de modelo por tipo: @M-DES (despacho), @M-CER (certidao), @M-REQ (requerimento). Se houver múltiplos modelos no alias, o pipeline testa e escolhe o melhor para o alvo.");
             Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
