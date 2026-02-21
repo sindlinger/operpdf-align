@@ -54,7 +54,7 @@ namespace Obj.Align
             normA = blocksA.Select(b => NormalizeForSimilarity(b.Text ?? "")).ToList();
             normB = blocksB.Select(b => NormalizeForSimilarity(b.Text ?? "")).ToList();
             anchors = new List<AnchorPair>();
-            var helperAnchors = BuildAnchorPairsAlignHelper(normA, normB, minLenRatio, out helperDiagnostics);
+            helperDiagnostics = new AlignHelperDiagnostics();
 
             double autoMaxSim = 0.0;
             if (anchorMinSim > 0 || anchorMinLenRatio > 0)
@@ -63,21 +63,9 @@ namespace Obj.Align
             }
             else
             {
-                // Auto anchors (mutual best) to avoid random alignments.
-                var anchorCueRateA = normA.Count == 0
-                    ? 0.0
-                    : normA.Count(IsAnchorModelCue) / (double)normA.Count;
-                var anchorMode = anchorCueRateA >= 0.25;
-                var minLen = minLenRatio > 0
-                    ? (anchorMode ? Math.Max(0.02, minLenRatio * 0.35) : Math.Max(0.3, minLenRatio))
-                    : (anchorMode ? 0.08 : 0.3);
-                anchors = BuildAnchorPairsAuto(normA, normB, minLen, out autoMaxSim);
-            }
-            anchors = MergeAnchorPairsWithHelper(anchors, helperAnchors);
-            if (helperDiagnostics != null)
-            {
-                var mergedSet = new HashSet<(int A, int B)>(anchors.Select(v => (v.AIndex, v.BIndex)));
-                helperDiagnostics.UsedInFinalAnchors = helperAnchors.Count(v => mergedSet.Contains((v.AIndex, v.BIndex)));
+                // DMP-first mode: no automatic anchor constraints unless explicitly requested.
+                anchors = new List<AnchorPair>();
+                autoMaxSim = 0.0;
             }
 
             if (anchors.Count == 0)

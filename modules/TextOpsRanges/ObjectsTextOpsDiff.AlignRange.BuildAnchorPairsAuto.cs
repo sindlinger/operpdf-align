@@ -59,7 +59,9 @@ namespace Obj.Align
                     continue;
                 var sim = bestSimA[i];
                 var anchorCue = IsAnchorModelCue(normA[i]) || IsAnchorModelCue(normB[j]);
-                var localThreshold = anchorCue ? Math.Min(threshold, 0.12) : threshold;
+                // Do not relax similarity floor for cue labels; very low-sim auto anchors
+                // tend to over-constrain segmentation and inflate artificial gaps.
+                var localThreshold = threshold;
                 if (sim < localThreshold)
                     continue;
                 var lenRatio = ComputeLenRatio(normA[i], normB[j]);

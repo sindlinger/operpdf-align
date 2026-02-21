@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Obj.Commands;
+using Obj.DocDetector;
 using Obj.Utils;
 using Obj.Logging;
 
@@ -35,6 +36,7 @@ namespace Obj.OperCli
             if (!ReturnUtils.IsEnabled())
                 InputPreview.PrintPlannedInputs(args);
             Preflight.Run(args);
+            Environment.ExitCode = 0;
 
             var mode = (args[0] ?? "").Trim().ToLowerInvariant();
             var rest = args.Length > 1 ? args[1..] : Array.Empty<string>();
@@ -42,7 +44,7 @@ namespace Obj.OperCli
             {
                 PrintCodePreviewIfNeeded("textopsalign", args);
                 ObjectsTextOpsAlign.Execute(StripDocArgs(rest));
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsalign-despacho", StringComparison.OrdinalIgnoreCase) ||
@@ -50,7 +52,7 @@ namespace Obj.OperCli
             {
                 PrintCodePreviewIfNeeded("textopsalign", args);
                 ObjectsTextOpsAlign.Execute(ForceDoc(rest, "despacho"));
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsalign-certidao", StringComparison.OrdinalIgnoreCase) ||
@@ -58,7 +60,7 @@ namespace Obj.OperCli
             {
                 PrintCodePreviewIfNeeded("textopsalign", args);
                 ObjectsTextOpsAlign.Execute(ForceDoc(rest, "certidao_conselho"));
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsalign-requerimento", StringComparison.OrdinalIgnoreCase) ||
@@ -66,75 +68,89 @@ namespace Obj.OperCli
             {
                 PrintCodePreviewIfNeeded("textopsalign", args);
                 ObjectsTextOpsAlign.Execute(ForceDoc(rest, "requerimento_honorarios"));
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsvar", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsvar", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(StripDocArgs(rest), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsvar-despacho", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsvar", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "despacho"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsvar-certidao", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsvar", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "certidao_conselho"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsvar-requerimento", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsvar", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "requerimento_honorarios"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsfixed", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsfixed", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(StripDocArgs(rest), ObjectsTextOpsAlign.OutputMode.FixedOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsfixed-despacho", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsfixed", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "despacho"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsfixed-certidao", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsfixed", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "certidao_conselho"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsfixed-requerimento", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsfixed", args);
                 ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "requerimento_honorarios"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
-                return 0;
+                return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "build-anchor-model-despacho", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(mode, "anchor-model-despacho", StringComparison.OrdinalIgnoreCase))
             {
                 BuildAnchorModelDespacho.Execute(rest);
-                return 0;
+                return ResolveProcessExitCode();
+            }
+
+            if (string.Equals(mode, "build-merged-page", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(mode, "merge-pages", StringComparison.OrdinalIgnoreCase))
+            {
+                BuildMergedPagePdf.Execute(rest);
+                return ResolveProcessExitCode();
             }
 
             Console.Error.WriteLine($"Comando não suportado neste projeto: {mode}");
             ShowHelp();
             return 1;
+        }
+
+        private static int ResolveProcessExitCode()
+        {
+            if (ObjectsTextOpsAlign.LastExitCode != 0)
+                return ObjectsTextOpsAlign.LastExitCode;
+            return Environment.ExitCode != 0 ? Environment.ExitCode : 0;
         }
 
         private static bool IsHelp(string arg)
@@ -282,6 +298,7 @@ namespace Obj.OperCli
             Console.WriteLine("  textopsfixed-certidao      fixos certidão");
             Console.WriteLine("  textopsfixed-requerimento  fixos requerimento");
             Console.WriteLine("  build-anchor-model-despacho  gera PDF de âncoras do modelo de despacho");
+            Console.WriteLine("  build-merged-page          gera PDF com duas páginas combinadas em uma página grande");
             Console.WriteLine();
             Console.WriteLine("Global");
             Console.WriteLine("  return/--return [arquivo.json]  JSON puro + salva em io/arquivo.json");
@@ -296,6 +313,7 @@ namespace Obj.OperCli
             Console.WriteLine("  operpdf textopsvar-despacho --inputs :D20 --inputs :Q200");
             Console.WriteLine("  operpdf textopsfixed-despacho --inputs :D20 --inputs :Q200");
             Console.WriteLine("  operpdf build-anchor-model-despacho --model reference/models/tjpb_despacho_model.pdf --out reference/models/tjpb_despacho_anchor_model.pdf");
+            Console.WriteLine("  operpdf build-merged-page --input models/nossos/despacho_p1-2.pdf --page-a 1 --page-b 2 --layout vertical");
         }
     }
 }

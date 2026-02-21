@@ -22,6 +22,7 @@ namespace Obj.Commands
 {
     internal static class ObjectsTextOpsAlign
     {
+        internal static int LastExitCode { get; private set; } = 0;
         private const string AnsiReset = "\u001b[0m";
         private const string AnsiCodexBlue = "\u001b[38;5;39m";
         private const string AnsiClaudeOrange = "\u001b[38;5;214m";
@@ -89,6 +90,21 @@ namespace Obj.Commands
                 var color = value ? AnsiOk : AnsiSoft;
                 Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize(text, color)}");
             }
+            Console.WriteLine();
+        }
+
+        private static void PrintAppliedAutoDefaults(List<string> applied)
+        {
+            Console.WriteLine(Colorize("[DEFAULTS AUTOMATICOS]", AnsiInfo));
+            if (applied == null || applied.Count == 0)
+            {
+                Console.WriteLine($"  {Colorize("nenhum", AnsiSoft)}");
+                Console.WriteLine();
+                return;
+            }
+
+            foreach (var line in applied)
+                Console.WriteLine($"  {Colorize(line, AnsiSoft)}");
             Console.WriteLine();
         }
 
@@ -928,7 +944,7 @@ namespace Obj.Commands
                     new ObjectsTextOpsDiff.PageObjSelection { Page = targetPage, Obj = targetObj },
                     ops,
                     backoff,
-                    "front_head");
+                    "single_page");
 
                 if (report?.RangeB != null && report.RangeB.HasValue && report.RangeB.StartOp > 0 && report.RangeB.EndOp > 0)
                     return (report.RangeB.StartOp, report.RangeB.EndOp, true);
@@ -948,13 +964,23 @@ namespace Obj.Commands
 
         internal static void ExecuteWithMode(string[] args, OutputMode outputMode)
         {
+            LastExitCode = 0;
             Console.OutputEncoding = Encoding.UTF8;
             if (!ReturnUtils.IsEnabled())
                 PrintStage("iniciando o modo de detecção");
-            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack, out var sideSpecified, out var allowStack, out var probeEnabled, out var probeFile, out var probePage, out var probeSide, out var probeMaxFields, out var runFromStep, out var runToStep, out var stepOutputEcho, out var stepOutputSave, out var stepOutputDir))
+            if (!ParseOptions(args, out var inputs, out var pageA, out var pageB, out var objA, out var objB, out var opFilter, out var backoff, out var outPath, out var outSpecified, out var top, out var minSim, out var band, out var minLenRatio, out var lenPenalty, out var anchorMinSim, out var anchorMinLenRatio, out var gapPenalty, out var showAlign, out var alignTop, out var pageAUser, out var pageBUser, out var objAUser, out var objBUser, out var docKey, out var useBack, out var sideSpecified, out var allowStack, out var probeEnabled, out var probeFile, out var probePage, out var probeSide, out var probeMaxFields, out var runFromStep, out var runToStep, out var stepOutputEcho, out var stepOutputSave, out var stepOutputDir, out var appliedAutoDefaults))
             {
+                Environment.ExitCode = 2;
+                LastExitCode = 2;
                 ShowHelp();
                 return;
+            }
+
+            var inputCountBeforeDedup = inputs.Count;
+            inputs = DeduplicateInputs(inputs);
+            if (!ReturnUtils.IsEnabled() && inputCountBeforeDedup != inputs.Count)
+            {
+                Console.WriteLine($"Aviso: entradas duplicadas removidas ({inputCountBeforeDedup - inputs.Count}).");
             }
 
             if (!ReturnUtils.IsEnabled())
@@ -1004,10 +1030,14 @@ namespace Obj.Commands
                     ("step_output_echo", stepOutputEcho),
                     ("step_output_save", stepOutputSave)
                 );
+                PrintAppliedAutoDefaults(appliedAutoDefaults);
             }
 
             if (inputs.Count < 2)
             {
+                Console.WriteLine("Erro: são necessários 2 PDFs distintos (modelo + alvo).");
+                Environment.ExitCode = 2;
+                LastExitCode = 2;
                 ShowHelp();
                 return;
             }
@@ -1027,6 +1057,8 @@ namespace Obj.Commands
             if (runFromStep > runToStep)
             {
                 Console.WriteLine($"Faixa de execução inválida: {runFromStep}-{runToStep}");
+                Environment.ExitCode = 2;
+                LastExitCode = 2;
                 return;
             }
             if (runFromStep > PipelineFirstStep && !ReturnUtils.IsEnabled())
@@ -1309,7 +1341,7 @@ namespace Obj.Commands
                             new ObjectsTextOpsDiff.PageObjSelection { Page = targetPage, Obj = targetObj },
                             opFilter,
                             backoff,
-                            "front_head",
+                            "single_page",
                             minSim,
                             band,
                             minLenRatio,
@@ -1392,6 +1424,12 @@ namespace Obj.Commands
                     return;
                 }
 
+                if (AreSameFilePath(aPath, bPath))
+                {
+                    Console.WriteLine($"Aviso: comparação A==B ignorada ({Path.GetFileName(bPath)}).");
+                    continue;
+                }
+
                 int localPageA = pageA;
                 int localObjA = objA;
                 ResolveSelection(bPath, pageBUser, objBUser, pageB, objB, out var localPageB, out var localObjB, out var sourceB);
@@ -1404,34 +1442,6 @@ namespace Obj.Commands
                         : "Despacho route B (alvo)";
                     Console.WriteLine($"{sideLabelB}: p{localPageB} o{localObjB} ({sourceB})");
                 }
-                var isDespachoDoc = DocumentValidationRules.IsDocMatch(docKey, "despacho");
-                var hasBackASelection = false;
-                var hasBackBSelection = false;
-                var backPageASelection = 0;
-                var backPageBSelection = 0;
-                var backObjASelection = 0;
-                var backObjBSelection = 0;
-                var backSourceASelection = "";
-                var backSourceBSelection = "";
-                if (isDespachoDoc)
-                {
-                    hasBackASelection = TryResolveDespachoSelection(aPath, docKey, true, out backPageASelection, out backObjASelection, out backSourceASelection);
-                    hasBackBSelection = TryResolveDespachoSelection(bPath, docKey, true, out backPageBSelection, out backObjBSelection, out backSourceBSelection);
-                }
-                var backAResolved = hasBackASelection &&
-                                    backPageASelection > 0 &&
-                                    backObjASelection > 0 &&
-                                    backSourceASelection.Contains("back", StringComparison.OrdinalIgnoreCase);
-                var backBResolved = hasBackBSelection &&
-                                    backPageBSelection > 0 &&
-                                    backObjBSelection > 0 &&
-                                    backSourceBSelection.Contains("back", StringComparison.OrdinalIgnoreCase);
-                var pairA = backAResolved
-                    ? $"front=page={localPageA} obj={localObjA} source={sourceA} | back=page={backPageASelection} obj={backObjASelection} source={backSourceASelection}"
-                    : $"front=page={localPageA} obj={localObjA} source={sourceA} | back=nao_resolvido";
-                var pairB = backBResolved
-                    ? $"front=page={localPageB} obj={localObjB} source={sourceB} | back=page={backPageBSelection} obj={backObjBSelection} source={backSourceBSelection}"
-                    : $"front=page={localPageB} obj={localObjB} source={sourceB} | back=nao_resolvido";
                 var stageOutputs = new List<Dictionary<string, object>>();
                 void EmitStage(int step, string status, IDictionary<string, object>? payload = null, string? stageKey = null, string? stageLabel = null)
                 {
@@ -1439,7 +1449,7 @@ namespace Obj.Commands
                     EmitStageOutput(stageOutputs, output, stepOutputEcho, runFromStep, runToStep);
                 }
 
-                var sideLabel = useBack ? "back_tail" : "front_head";
+                var sideLabel = "single_page";
                 var step1Payload = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["module"] = "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
@@ -1453,17 +1463,6 @@ namespace Obj.Commands
                     ["ops"] = string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase)),
                     ["params"] = $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"
                 };
-                if (isDespachoDoc)
-                {
-                    step1Payload["pair_a"] = pairA;
-                    step1Payload["pair_b"] = pairB;
-                    step1Payload["sel_back_a"] = backAResolved
-                        ? $"page={backPageASelection} obj={backObjASelection} source={backSourceASelection}"
-                        : "nao_resolvido";
-                    step1Payload["sel_back_b"] = backBResolved
-                        ? $"page={backPageBSelection} obj={backObjBSelection} source={backSourceBSelection}"
-                        : "nao_resolvido";
-                }
                 EmitStage(1, "ok", step1Payload);
                 if (!ReturnUtils.IsEnabled())
                 {
@@ -1477,11 +1476,6 @@ namespace Obj.Commands
                         ("sel_a", $"page={localPageA} obj={localObjA} source={sourceA}"),
                         ("sel_b", $"page={localPageB} obj={localObjB} source={sourceB}")
                     };
-                    if (isDespachoDoc)
-                    {
-                        step1Lines.Add(("pair_a", pairA));
-                        step1Lines.Add(("pair_b", pairB));
-                    }
                     step1Lines.Add(("band", sideLabel));
                     step1Lines.Add(("ops", string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))));
                     step1Lines.Add(("params", $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"));
@@ -1553,76 +1547,6 @@ namespace Obj.Commands
                 report.RoleB = roleB;
 
                 ObjectsTextOpsDiff.AlignDebugReport? backReport = null;
-                var autoDualDespacho = DocumentValidationRules.IsDocMatch(docKey, "despacho") && !useBack && !sideSpecified;
-                if (autoDualDespacho)
-                {
-                    if (backAResolved && backBResolved)
-                    {
-                        if (!ReturnUtils.IsEnabled())
-                        {
-                            PrintPipelineStep(
-                                "passo 2b/4 - alinhamento da segunda página (back_tail)",
-                                "passo 3/4 - extração combinada front_head + back_tail",
-                                ("modulo", "Obj.Align.ObjectsTextOpsDiff"),
-                                ("sel_back_a", $"page={backPageASelection} obj={backObjASelection} source={backSourceASelection}"),
-                                ("sel_back_b", $"page={backPageBSelection} obj={backObjBSelection} source={backSourceBSelection}")
-                            );
-                        }
-
-                        backReport = ObjectsTextOpsDiff.ComputeAlignDebugForSelection(
-                            aPath,
-                            bPath,
-                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageASelection, Obj = backObjASelection },
-                            new ObjectsTextOpsDiff.PageObjSelection { Page = backPageBSelection, Obj = backObjBSelection },
-                            opFilter,
-                            backoff,
-                            "back_tail",
-                            minSim,
-                            band,
-                            minLenRatio,
-                            lenPenalty,
-                            anchorMinSim,
-                            anchorMinLenRatio,
-                            gapPenalty);
-                        if (backReport != null)
-                        {
-                            backReport.RoleA = roleA;
-                            backReport.RoleB = roleB;
-                        }
-
-                        if (!ReturnUtils.IsEnabled())
-                        {
-                            if (backReport != null)
-                            {
-                                var backRangeA = backReport.RangeA?.HasValue == true ? $"op{backReport.RangeA.StartOp}-op{backReport.RangeA.EndOp}" : "(vazio)";
-                                var backRangeB = backReport.RangeB?.HasValue == true ? $"op{backReport.RangeB.StartOp}-op{backReport.RangeB.EndOp}" : "(vazio)";
-                                PrintPipelineStep(
-                                    "passo 2c/4 - saída do alinhamento back_tail",
-                                    "passo 3/4 - extração combinada front_head + back_tail",
-                                    ("pairs_back", backReport.Alignments.Count.ToString(CultureInfo.InvariantCulture)),
-                                    ("range_back_a", backRangeA),
-                                    ("range_back_b", backRangeB)
-                                );
-                            }
-                            else
-                            {
-                                PrintPipelineStep(
-                                    "passo 2c/4 - saída do alinhamento back_tail",
-                                    "passo 3/4 - extração apenas front_head",
-                                    ("resultado", "falhou ao alinhar back_tail")
-                                );
-                            }
-                        }
-                    }
-                    else if (!ReturnUtils.IsEnabled())
-                    {
-                        PrintPipelineStep(
-                            "passo 2b/4 - alinhamento da segunda página (back_tail)",
-                            "passo 3/4 - extração apenas front_head",
-                            ("resultado", "segunda página não resolvida para A e/ou B")
-                        );
-                    }
-                }
 
                 var variableCount = report.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
                 var gapCount = report.Alignments.Count(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
@@ -1638,8 +1562,7 @@ namespace Obj.Commands
                     ["variable"] = variableCount,
                     ["gaps"] = gapCount,
                     ["range_a"] = rangeA,
-                    ["range_b"] = rangeB,
-                    ["auto_dual_back"] = autoDualDespacho && backReport != null
+                    ["range_b"] = rangeB
                 };
                 if (helper != null)
                 {
@@ -1875,6 +1798,46 @@ namespace Obj.Commands
                     WriteStackedOutput(aPath, reports, outPath);
                 }
             }
+        }
+
+        private static List<string> DeduplicateInputs(List<string> inputs)
+        {
+            var result = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var raw in inputs ?? Enumerable.Empty<string>())
+            {
+                var t = (raw ?? "").Trim().Trim('"');
+                if (t.Length == 0)
+                    continue;
+                var key = CanonicalizePathKey(t);
+                if (seen.Add(key))
+                    result.Add(t);
+            }
+            return result;
+        }
+
+        private static string CanonicalizePathKey(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return "";
+            var normalized = PathUtils.NormalizePathForCurrentOS(path.Trim().Trim('"'));
+            try
+            {
+                return Path.GetFullPath(normalized);
+            }
+            catch
+            {
+                return normalized;
+            }
+        }
+
+        private static bool AreSameFilePath(string a, string b)
+        {
+            var ka = CanonicalizePathKey(a);
+            var kb = CanonicalizePathKey(b);
+            if (ka.Length == 0 || kb.Length == 0)
+                return false;
+            return string.Equals(ka, kb, StringComparison.OrdinalIgnoreCase);
         }
 
         private static int ResolvePage(string pdfPath, bool trace)
@@ -2318,10 +2281,8 @@ namespace Obj.Commands
             var stepLimit = Math.Max(3, Math.Min(6, maxPipelineStep));
             var resolvedDoc = DocumentValidationRules.ResolveDocKeyForDetection(docKey);
             var outputDocType = DocumentValidationRules.MapDocKeyToOutputType(resolvedDoc);
-            var bandFront = string.IsNullOrWhiteSpace(report.Label) ? "front_head" : report.Label.Trim();
-            var bandBack = string.IsNullOrWhiteSpace(backReport?.Label) ? "back_tail" : backReport!.Label.Trim();
+            var bandFront = "single_page";
             var mapPath = ResolveAlignRangeMapPath(resolvedDoc);
-            var dualBand = backReport != null;
             var extractionScope = ResolveExtractionScopeTag(report.RoleA, report.RoleB);
             var targetSide = ResolveTargetSideFromScope(extractionScope);
             var targetIsA = string.Equals(targetSide, "pdf_a", StringComparison.OrdinalIgnoreCase);
@@ -2335,7 +2296,7 @@ namespace Obj.Commands
                     ("doc_key", resolvedDoc),
                     ("doc_type", outputDocType),
                     ("scope", extractionScope),
-                    ("band", dualBand ? $"{bandFront}+{bandBack}" : bandFront),
+                    ("band", bandFront),
                     ("map_path", string.IsNullOrWhiteSpace(mapPath) ? "(não encontrado)" : mapPath)
                 );
             }
@@ -2346,7 +2307,7 @@ namespace Obj.Commands
                     ["status"] = "map_not_found",
                     ["doc_key"] = resolvedDoc,
                     ["doc_type"] = outputDocType,
-                    ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
+                    ["band"] = bandFront,
                     ["map_path"] = ""
                 });
                 return new Dictionary<string, object>
@@ -2354,7 +2315,7 @@ namespace Obj.Commands
                     ["status"] = "map_not_found",
                     ["doc_key"] = resolvedDoc,
                     ["doc_type"] = outputDocType,
-                    ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
+                    ["band"] = bandFront,
                     ["map_path"] = ""
                 };
             }
@@ -2393,8 +2354,8 @@ namespace Obj.Commands
             if (verbose)
             {
                 PrintPipelineStep(
-                    "passo 3.2/4 - resultado do recorte para parser (front_head)",
-                    dualBand ? "passo 3.2b/4 - recorte back_tail" : "passo 3.3/4 - parser do mapa YAML",
+                    "passo 3.2/4 - resultado do recorte para parser (single_page)",
+                    "passo 3.3/4 - parser do mapa YAML",
                     ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
                     ("op_range_a", string.IsNullOrWhiteSpace(opRangeAFront) ? "(vazio)" : opRangeAFront),
                     ("op_range_b", string.IsNullOrWhiteSpace(opRangeBFront) ? "(vazio)" : opRangeBFront),
@@ -2405,49 +2366,10 @@ namespace Obj.Commands
                 );
             }
 
-            ObjectsMapFields.CompactExtractionOutput? parsedBack = null;
-            if (dualBand)
-            {
-                if (!TryParseBandReport(backReport!, mapPath, bandBack, aPath, bPath, out parsedBack, out var backError, out var opRangeABack, out var opRangeBBack, out var valueFullABack, out var valueFullBBack) || parsedBack == null)
-                {
-                    if (verbose)
-                    {
-                        PrintPipelineStep(
-                            "passo 3.2b/4 - recorte back_tail",
-                            "passo 3.3/4 - parser do mapa YAML",
-                            ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
-                            ("resultado", "falhou para back_tail; mantendo front_head"),
-                            ("erro", string.IsNullOrWhiteSpace(backError) ? "(sem detalhe)" : backError)
-                        );
-                    }
-                    dualBand = false;
-                }
-                else if (verbose)
-                {
-                    PrintPipelineStep(
-                        "passo 3.2b/4 - resultado do recorte para parser (back_tail)",
-                        "passo 3.3/4 - parser do mapa YAML",
-                        ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
-                        ("op_range_a_back", string.IsNullOrWhiteSpace(opRangeABack) ? "(vazio)" : opRangeABack),
-                        ("op_range_b_back", string.IsNullOrWhiteSpace(opRangeBBack) ? "(vazio)" : opRangeBBack),
-                        ("len_value_full_a_back", valueFullABack.Length.ToString(CultureInfo.InvariantCulture)),
-                        ("len_value_full_b_back", valueFullBBack.Length.ToString(CultureInfo.InvariantCulture)),
-                        ("sample_a_back", ShortText(valueFullABack)),
-                        ("sample_b_back", ShortText(valueFullBBack))
-                    );
-                }
-            }
-
             var valuesA = new Dictionary<string, string>(parsedFront.PdfA.Values, StringComparer.OrdinalIgnoreCase);
             var valuesB = new Dictionary<string, string>(parsedFront.PdfB.Values, StringComparer.OrdinalIgnoreCase);
             var fieldsA = new Dictionary<string, ObjectsMapFields.CompactFieldOutput>(parsedFront.PdfA.Fields, StringComparer.OrdinalIgnoreCase);
             var fieldsB = new Dictionary<string, ObjectsMapFields.CompactFieldOutput>(parsedFront.PdfB.Fields, StringComparer.OrdinalIgnoreCase);
-
-            if (dualBand && parsedBack != null)
-            {
-                MergeSideFrom(valuesA, fieldsA, parsedBack.PdfA);
-                MergeSideFrom(valuesB, fieldsB, parsedBack.PdfB);
-            }
 
             var parserFieldsA = CloneFieldOutputs(fieldsA);
             var parserFieldsB = CloneFieldOutputs(fieldsB);
@@ -2464,8 +2386,8 @@ namespace Obj.Commands
                         ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
                         ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
                         ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
-                        ("origem_values_a", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
-                        ("origem_values_b", dualBand ? "merge: front_head prioridade + fill de back_tail" : "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
+                        ("origem_values_a", "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
+                        ("origem_values_b", "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
                     );
                 }
                 else
@@ -2478,9 +2400,7 @@ namespace Obj.Commands
                         ("scope", extractionScope),
                         ("target_side", targetSide),
                         ("fields_target_non_empty", targetCount.ToString(CultureInfo.InvariantCulture)),
-                        ("origem_values_target", dualBand
-                            ? $"{targetSide}: merge front_head prioridade + fill de back_tail"
-                            : $"{targetSide}: parsed.{targetSide}.values <= parsed.{targetSide}.fields (source/op_range/obj)")
+                        ("origem_values_target", $"{targetSide}: parsed.{targetSide}.values <= parsed.{targetSide}.fields (source/op_range/obj)")
                     );
                 }
             }
@@ -2491,12 +2411,12 @@ namespace Obj.Commands
                 ["doc_type"] = outputDocType,
                 ["scope"] = extractionScope,
                 ["target_side"] = targetSide,
-                ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
+                ["band"] = bandFront,
                 ["map_path"] = parsedFront.MapPath,
                 ["fields_a_non_empty"] = CountNonEmptyValues(valuesA),
                 ["fields_b_non_empty"] = CountNonEmptyValues(valuesB),
                 ["fields_target_non_empty"] = targetIsA ? CountNonEmptyValues(valuesA) : CountNonEmptyValues(valuesB),
-                ["merge_policy"] = dualBand ? "front_head prioridade + fill de back_tail" : "single_band"
+                ["merge_policy"] = "single_band"
             };
             onStepOutput?.Invoke(3, "extraction", "ok", step3Payload);
 
@@ -2591,7 +2511,7 @@ namespace Obj.Commands
                     ["doc_key"] = resolvedDoc,
                     ["doc_type"] = outputDocType,
                     ["map_path"] = parsedFront.MapPath,
-                    ["band"] = dualBand ? $"{bandFront}+{bandBack}" : bandFront,
+                    ["band"] = bandFront,
                     ["parsed"] = parsedOutput,
                     ["pipeline"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                     {
@@ -2610,7 +2530,7 @@ namespace Obj.Commands
                         },
                         ["scope"] = extractionScope,
                         ["target_side"] = targetSide,
-                        ["merge_policy"] = dualBand ? "front_head prioridade; back_tail preenche apenas campos vazios" : "single_band",
+                        ["merge_policy"] = "single_band",
                         ["values_origin_note"] = string.Equals(extractionScope, "pair_both", StringComparison.OrdinalIgnoreCase)
                             ? "Os valores finais de parsed.pdf_a.values e parsed.pdf_b.values vêm do parser YAML (parsed.*.fields) e podem receber complemento dos módulos honorarios/repairer/validator, com trilha em parsed.*.fields.Source e parsed.*.fields.Module."
                             : $"Somente parsed.{targetSide}.values é considerado saída de extração; o lado de modelo/template fica como referência de alinhamento.",
@@ -3140,26 +3060,30 @@ namespace Obj.Commands
             return double.TryParse(raw.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out value);
         }
 
-        private static void AddInputsFromEnv(List<string> inputs, string key)
+        private static int AddInputsFromEnv(List<string> inputs, string key)
         {
+            var before = inputs.Count;
             var raw = Environment.GetEnvironmentVariable(key);
             if (string.IsNullOrWhiteSpace(raw))
-                return;
+                return 0;
             foreach (var token in raw.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 AddInput(inputs, token);
+            return Math.Max(0, inputs.Count - before);
         }
 
-        private static void AddOpFilterFromEnv(HashSet<string> opFilter, string key)
+        private static int AddOpFilterFromEnv(HashSet<string> opFilter, string key)
         {
+            var before = opFilter.Count;
             var raw = Environment.GetEnvironmentVariable(key);
             if (string.IsNullOrWhiteSpace(raw))
-                return;
+                return 0;
             foreach (var op in raw.Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 var t = op.Trim();
                 if (t.Length > 0)
                     opFilter.Add(t);
             }
+            return Math.Max(0, opFilter.Count - before);
         }
 
         private static void ApplyTextOpsAlignEnvDefaults(
@@ -3199,114 +3123,171 @@ namespace Obj.Commands
             ref int runToStep,
             ref bool stepOutputEcho,
             ref bool stepOutputSave,
-            ref string stepOutputDir)
+            ref string stepOutputDir,
+            List<string> applied)
         {
-            AddInputsFromEnv(inputs, "OBJ_TEXTOPSALIGN_INPUTS");
-            AddOpFilterFromEnv(opFilter, "OBJ_TEXTOPSALIGN_OPS");
+            var envOpsAdded = AddOpFilterFromEnv(opFilter, "OBJ_TEXTOPSALIGN_OPS");
+            if (envOpsAdded > 0)
+                applied.Add($"OBJ_TEXTOPSALIGN_OPS -> +{envOpsAdded} op(s) [{string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))}]");
 
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PAGE_A", out var envPageA) && envPageA > 0)
             {
                 pageA = envPageA;
                 pageAUser = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_PAGE_A -> pageA={pageA.ToString(CultureInfo.InvariantCulture)}");
             }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PAGE_B", out var envPageB) && envPageB > 0)
             {
                 pageB = envPageB;
                 pageBUser = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_PAGE_B -> pageB={pageB.ToString(CultureInfo.InvariantCulture)}");
             }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_OBJ_A", out var envObjA) && envObjA > 0)
             {
                 objA = envObjA;
                 objAUser = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_OBJ_A -> objA={objA.ToString(CultureInfo.InvariantCulture)}");
             }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_OBJ_B", out var envObjB) && envObjB > 0)
             {
                 objB = envObjB;
                 objBUser = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_OBJ_B -> objB={objB.ToString(CultureInfo.InvariantCulture)}");
             }
 
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_BACKOFF", out var envBackoff))
+            {
                 backoff = envBackoff;
+                applied.Add($"OBJ_TEXTOPSALIGN_BACKOFF -> backoff={backoff.ToString(CultureInfo.InvariantCulture)}");
+            }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_TOP", out var envTop))
+            {
                 top = envTop;
+                applied.Add($"OBJ_TEXTOPSALIGN_TOP -> top={top.ToString(CultureInfo.InvariantCulture)}");
+            }
             if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_MIN_SIM", out var envMinSim))
+            {
                 minSim = envMinSim;
+                applied.Add($"OBJ_TEXTOPSALIGN_MIN_SIM -> min_sim={ReportUtils.F(minSim, 3)}");
+            }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_BAND", out var envBand))
+            {
                 band = envBand;
+                applied.Add($"OBJ_TEXTOPSALIGN_BAND -> band={band.ToString(CultureInfo.InvariantCulture)}");
+            }
             if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_MIN_LEN_RATIO", out var envMinLenRatio))
+            {
                 minLenRatio = Math.Max(0, Math.Min(1, envMinLenRatio));
+                applied.Add($"OBJ_TEXTOPSALIGN_MIN_LEN_RATIO -> min_len_ratio={ReportUtils.F(minLenRatio, 3)}");
+            }
             if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_LEN_PENALTY", out var envLenPenalty))
+            {
                 lenPenalty = Math.Max(0, Math.Min(1, envLenPenalty));
+                applied.Add($"OBJ_TEXTOPSALIGN_LEN_PENALTY -> len_penalty={ReportUtils.F(lenPenalty, 3)}");
+            }
             if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_ANCHOR_MIN_SIM", out var envAnchorSim))
+            {
                 anchorMinSim = Math.Max(0, Math.Min(1, envAnchorSim));
+                applied.Add($"OBJ_TEXTOPSALIGN_ANCHOR_MIN_SIM -> anchor_sim={ReportUtils.F(anchorMinSim, 3)}");
+            }
             if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_ANCHOR_MIN_LEN_RATIO", out var envAnchorLen))
+            {
                 anchorMinLenRatio = Math.Max(0, Math.Min(1, envAnchorLen));
+                applied.Add($"OBJ_TEXTOPSALIGN_ANCHOR_MIN_LEN_RATIO -> anchor_len={ReportUtils.F(anchorMinLenRatio, 3)}");
+            }
             if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_GAP_PENALTY", out var envGap))
+            {
                 gapPenalty = Math.Max(-1, Math.Min(1, envGap));
+                applied.Add($"OBJ_TEXTOPSALIGN_GAP_PENALTY -> gap_penalty={ReportUtils.F(gapPenalty, 3)}");
+            }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_ALIGN_TOP", out var envAlignTop))
+            {
                 alignTop = envAlignTop;
+                applied.Add($"OBJ_TEXTOPSALIGN_ALIGN_TOP -> alinhamento_top={alignTop.ToString(CultureInfo.InvariantCulture)}");
+            }
             if (TryReadEnvBool("OBJ_TEXTOPSALIGN_SHOW_ALIGN", out var envShowAlign))
+            {
                 showAlign = envShowAlign;
+                applied.Add($"OBJ_TEXTOPSALIGN_SHOW_ALIGN -> show_alignment={showAlign.ToString().ToLowerInvariant()}");
+            }
             if (TryReadEnvBool("OBJ_TEXTOPSALIGN_ALLOW_STACK", out var envAllowStack))
+            {
                 allowStack = envAllowStack;
+                applied.Add($"OBJ_TEXTOPSALIGN_ALLOW_STACK -> allow_stack={allowStack.ToString().ToLowerInvariant()}");
+            }
 
             var envOut = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_OUT");
             if (!string.IsNullOrWhiteSpace(envOut))
             {
                 outPath = envOut.Trim();
                 outSpecified = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_OUT -> out_path={outPath}");
             }
 
             var envDoc = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_DOC");
             if (!string.IsNullOrWhiteSpace(envDoc))
+            {
                 docKey = envDoc.Trim();
+                applied.Add($"OBJ_TEXTOPSALIGN_DOC -> doc_key={docKey}");
+            }
 
             var envSide = (Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_SIDE") ?? "").Trim().ToLowerInvariant();
             if (envSide is "back" or "p2" or "verso")
             {
                 useBack = true;
                 sideSpecified = true;
+                applied.Add("OBJ_TEXTOPSALIGN_SIDE -> use_back=true side_specified=true");
             }
             else if (envSide is "front" or "p1" or "anverso")
             {
                 useBack = false;
                 sideSpecified = true;
+                applied.Add("OBJ_TEXTOPSALIGN_SIDE -> use_back=false side_specified=true");
             }
 
             if (TryReadEnvBool("OBJ_TEXTOPSALIGN_BACK", out var envBack))
             {
                 useBack = envBack;
                 sideSpecified = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_BACK -> use_back={useBack.ToString().ToLowerInvariant()} side_specified=true");
             }
 
             if (TryReadEnvBool("OBJ_TEXTOPSALIGN_PROBE", out var envProbe))
+            {
                 probeEnabled = envProbe;
+                applied.Add($"OBJ_TEXTOPSALIGN_PROBE -> probe_enabled={probeEnabled.ToString().ToLowerInvariant()}");
+            }
             var envProbeFile = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_PROBE_FILE");
             if (!string.IsNullOrWhiteSpace(envProbeFile))
             {
                 probeFile = envProbeFile.Trim();
                 probeEnabled = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_PROBE_FILE -> probe_file={probeFile} probe_enabled=true");
             }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PROBE_PAGE", out var envProbePage))
             {
                 probePage = Math.Max(0, envProbePage);
                 probeEnabled = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_PROBE_PAGE -> probe_page={probePage.ToString(CultureInfo.InvariantCulture)} probe_enabled=true");
             }
             var envProbeSide = (Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_PROBE_SIDE") ?? "").Trim().ToLowerInvariant();
             if (envProbeSide is "a" or "pdf_a" or "left")
             {
                 probeSide = "a";
                 probeEnabled = true;
+                applied.Add("OBJ_TEXTOPSALIGN_PROBE_SIDE -> probe_side=a probe_enabled=true");
             }
             else if (envProbeSide is "b" or "pdf_b" or "right")
             {
                 probeSide = "b";
                 probeEnabled = true;
+                applied.Add("OBJ_TEXTOPSALIGN_PROBE_SIDE -> probe_side=b probe_enabled=true");
             }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PROBE_MAX_FIELDS", out var envProbeMax))
             {
                 probeMaxFields = Math.Max(0, envProbeMax);
                 probeEnabled = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_PROBE_MAX_FIELDS -> probe_max_fields={probeMaxFields.ToString(CultureInfo.InvariantCulture)} probe_enabled=true");
             }
 
             var envRun = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN");
@@ -3314,17 +3295,25 @@ namespace Obj.Commands
             {
                 runFromStep = envFrom;
                 runToStep = envTo;
+                applied.Add($"OBJ_TEXTOPSALIGN_RUN -> run={runFromStep.ToString(CultureInfo.InvariantCulture)}-{runToStep.ToString(CultureInfo.InvariantCulture)}");
             }
 
             if (TryReadEnvBool("OBJ_TEXTOPSALIGN_STEP_OUTPUT_ECHO", out var envStepEcho))
+            {
                 stepOutputEcho = envStepEcho;
+                applied.Add($"OBJ_TEXTOPSALIGN_STEP_OUTPUT_ECHO -> step_output_echo={stepOutputEcho.ToString().ToLowerInvariant()}");
+            }
             if (TryReadEnvBool("OBJ_TEXTOPSALIGN_STEP_OUTPUT_SAVE", out var envStepSave))
+            {
                 stepOutputSave = envStepSave;
+                applied.Add($"OBJ_TEXTOPSALIGN_STEP_OUTPUT_SAVE -> step_output_save={stepOutputSave.ToString().ToLowerInvariant()}");
+            }
             var envStepDir = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_STEP_OUTPUT_DIR");
             if (!string.IsNullOrWhiteSpace(envStepDir))
             {
                 stepOutputDir = envStepDir.Trim();
                 stepOutputSave = true;
+                applied.Add($"OBJ_TEXTOPSALIGN_STEP_OUTPUT_DIR -> step_output_dir={stepOutputDir} step_output_save=true");
             }
         }
 
@@ -3366,7 +3355,8 @@ namespace Obj.Commands
             out int runToStep,
             out bool stepOutputEcho,
             out bool stepOutputSave,
-            out string stepOutputDir)
+            out string stepOutputDir,
+            out List<string> appliedAutoDefaults)
         {
             inputs = new List<string>();
             pageA = 0;
@@ -3405,6 +3395,14 @@ namespace Obj.Commands
             stepOutputEcho = false;
             stepOutputSave = false;
             stepOutputDir = "";
+            appliedAutoDefaults = new List<string>();
+
+            var forbiddenEnvInputs = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_INPUTS");
+            if (!string.IsNullOrWhiteSpace(forbiddenEnvInputs))
+            {
+                Console.WriteLine("Erro: OBJ_TEXTOPSALIGN_INPUTS não é suportado. Use --inputs explícito no comando.");
+                return false;
+            }
 
             ApplyTextOpsAlignEnvDefaults(
                 ref inputs,
@@ -3443,7 +3441,8 @@ namespace Obj.Commands
                 ref runToStep,
                 ref stepOutputEcho,
                 ref stepOutputSave,
-                ref stepOutputDir);
+                ref stepOutputDir,
+                appliedAutoDefaults);
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -3733,6 +3732,7 @@ namespace Obj.Commands
             Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
             Console.WriteLine("aliases de modelo por tipo: @M-DES (despacho), @M-CER (certidao), @M-REQ (requerimento). Se houver múltiplos modelos no alias, o pipeline testa e escolhe o melhor para o alvo.");
             Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
+            Console.WriteLine("obs: OBJ_TEXTOPSALIGN_INPUTS não é suportado e aborta a execução; use sempre --inputs explícito (aliases :D/:Q/@M-*).");
         }
 
         private static void WriteStackedOutput(string aPath, List<ObjectsTextOpsDiff.AlignDebugReport> reports, string outPath)
