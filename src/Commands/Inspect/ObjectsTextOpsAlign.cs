@@ -1541,7 +1541,7 @@ namespace Obj.Commands
                 if (!TryCollapseModelCandidatesForSingleTarget(out var collapsed))
                 {
                     Console.WriteLine("Erro: múltiplos PDFs alvo na mesma execução foram bloqueados para isolamento.");
-                    Console.WriteLine("Use exatamente 2 entradas (modelo + alvo), passe --allow-stack, ou use alias @M-DES/@M-CER/@M-REQ com um único alvo.");
+                    Console.WriteLine("Use exatamente 2 entradas (modelo + alvo), passe --allow-stack, ou use alias @M-DES/@M-DESP/@M-CER/@M-REQ com um único alvo.");
                     return;
                 }
 
@@ -4776,7 +4776,7 @@ namespace Obj.Commands
             Console.WriteLine($"  gap penalty: fixo interno ({ReportUtils.F(FixedGapPenalty, 2)}). --gap não é aceito.");
             Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
             Console.WriteLine("run/--run com etapa >=7 ativa probe automaticamente (use --no-probe para desativar).");
-            Console.WriteLine("aliases de modelo por tipo: @M-DES (despacho), @M-CER (certidao), @M-REQ (requerimento). Modo estrito: somente OBJPDF_ALIAS_M_DES_DIR / OBJPDF_ALIAS_M_CER_DIR / OBJPDF_ALIAS_M_REQ_DIR (sem fallback).");
+            Console.WriteLine("aliases de modelo por tipo: @M-DES/@M-DESP (despacho), @M-CER (certidao), @M-REQ (requerimento). Modo estrito: somente OBJPDF_ALIAS_M_DES_DIR / OBJPDF_ALIAS_M_CER_DIR / OBJPDF_ALIAS_M_REQ_DIR (sem fallback).");
             Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
             Console.WriteLine("obs: OBJ_TEXTOPSALIGN_INPUTS não é suportado e aborta a execução; use sempre --inputs explícito (aliases :D/:Q/@M-*).");
         }

@@ -207,12 +207,6 @@ namespace Obj.Utils
             var envValue = Environment.GetEnvironmentVariable("OBJPDF_MODEL");
             if (!string.IsNullOrWhiteSpace(envValue))
                 return envValue;
-            envValue = Environment.GetEnvironmentVariable("OBJPDF_MODEL_MODEL");
-            if (!string.IsNullOrWhiteSpace(envValue))
-                return envValue;
-            envValue = Environment.GetEnvironmentVariable("OBJPDF_MODEL_DESPACHO");
-            if (!string.IsNullOrWhiteSpace(envValue))
-                return envValue;
 
             return value;
         }
@@ -231,6 +225,7 @@ namespace Obj.Utils
 
             var t = token.Trim();
             if (t.Equals("@M-DES", StringComparison.OrdinalIgnoreCase) ||
+                t.Equals("@M-DESP", StringComparison.OrdinalIgnoreCase) ||
                 t.Equals("@M-DESPACHO", StringComparison.OrdinalIgnoreCase))
             {
                 var values = ResolveTypedModelAlias(ModelAliasKind.Despacho);
@@ -277,109 +272,33 @@ namespace Obj.Utils
 
         private static IEnumerable<string> ResolveTypedModelDirs(ModelAliasKind kind)
         {
-            var dirs = new List<string>();
-            var hasTypedDir = false;
-            void AddDirFromEnv(string envKey)
+            // Modo estrito: cada tipo usa somente um diretório explícito de alias.
+            var envKey = kind switch
             {
-                var raw = Environment.GetEnvironmentVariable(envKey);
-                if (string.IsNullOrWhiteSpace(raw))
-                    return;
-                var normalized = NormalizePathForCurrentOS(raw);
-                if (!string.IsNullOrWhiteSpace(normalized))
-                {
-                    dirs.Add(normalized);
-                    hasTypedDir = true;
-                }
+                ModelAliasKind.Despacho => "OBJPDF_ALIAS_M_DES_DIR",
+                ModelAliasKind.Certidao => "OBJPDF_ALIAS_M_CER_DIR",
+                _ => "OBJPDF_ALIAS_M_REQ_DIR"
+            };
+
+            var raw = Environment.GetEnvironmentVariable(envKey);
+            if (string.IsNullOrWhiteSpace(raw))
+                yield break;
+
+            var normalized = NormalizePathForCurrentOS(raw.Trim());
+            if (string.IsNullOrWhiteSpace(normalized))
+                yield break;
+
+            string full;
+            try
+            {
+                full = Path.GetFullPath(normalized);
+            }
+            catch
+            {
+                full = normalized;
             }
 
-            void AddDirFromModelEnv(string envKey)
-            {
-                var raw = Environment.GetEnvironmentVariable(envKey);
-                if (string.IsNullOrWhiteSpace(raw))
-                    return;
-                var normalized = NormalizePathForCurrentOS(raw);
-                if (string.IsNullOrWhiteSpace(normalized))
-                    return;
-                try
-                {
-                    var full = Path.GetFullPath(normalized);
-                    var dir = Path.GetDirectoryName(full);
-                    if (!string.IsNullOrWhiteSpace(dir))
-                        dirs.Add(dir);
-                }
-                catch
-                {
-                    var dir = Path.GetDirectoryName(normalized);
-                    if (!string.IsNullOrWhiteSpace(dir))
-                        dirs.Add(dir);
-                }
-            }
-
-            switch (kind)
-            {
-                case ModelAliasKind.Despacho:
-                    AddDirFromEnv("OBJPDF_MODELS_DES_DIR");
-                    AddDirFromEnv("OBJPDF_MODELS_DESPACHO_DIR");
-                    AddDirFromEnv("OBJPDF_ALIAS_M_DES_DIR");
-                    if (!hasTypedDir)
-                        AddDirFromModelEnv("OBJPDF_MODEL_DESPACHO");
-                    break;
-                case ModelAliasKind.Certidao:
-                    AddDirFromEnv("OBJPDF_MODELS_CER_DIR");
-                    AddDirFromEnv("OBJPDF_MODELS_CERTIDAO_DIR");
-                    AddDirFromEnv("OBJPDF_ALIAS_M_CER_DIR");
-                    if (!hasTypedDir)
-                        AddDirFromModelEnv("OBJPDF_MODEL_CERTIDAO");
-                    break;
-                case ModelAliasKind.Requerimento:
-                    AddDirFromEnv("OBJPDF_MODELS_REQ_DIR");
-                    AddDirFromEnv("OBJPDF_MODELS_REQUERIMENTO_DIR");
-                    AddDirFromEnv("OBJPDF_ALIAS_M_REQ_DIR");
-                    if (!hasTypedDir)
-                        AddDirFromModelEnv("OBJPDF_MODEL_REQUERIMENTO");
-                    break;
-            }
-
-            if (!hasTypedDir)
-            {
-                try
-                {
-                    var cwd = Directory.GetCurrentDirectory();
-                    if (!string.IsNullOrWhiteSpace(cwd))
-                    {
-                        var baseDir = Path.Combine(cwd, "models", "aliases");
-                        var localDir = kind switch
-                        {
-                            ModelAliasKind.Despacho => Path.Combine(baseDir, "despacho"),
-                            ModelAliasKind.Certidao => Path.Combine(baseDir, "certidao"),
-                            _ => Path.Combine(baseDir, "requerimento")
-                        };
-                        dirs.Add(localDir);
-                    }
-                }
-                catch
-                {
-                    // ignore cwd probing
-                }
-            }
-
-            var unique = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var raw in dirs)
-            {
-                if (string.IsNullOrWhiteSpace(raw))
-                    continue;
-                string full;
-                try
-                {
-                    full = Path.GetFullPath(raw);
-                }
-                catch
-                {
-                    full = raw;
-                }
-                if (unique.Add(full))
-                    yield return full;
-            }
+            yield return full;
         }
 
         private static string ResolveIndexVariable(string value)
@@ -521,13 +440,7 @@ namespace Obj.Utils
                 dir = NormalizePathForCurrentOS(envValue);
                 return true;
             }
-
-            var fallback = Environment.GetEnvironmentVariable("OBJPDF_MODELS_DIR") ?? "";
-            if (string.IsNullOrWhiteSpace(fallback))
-                return false;
-
-            dir = NormalizePathForCurrentOS(fallback);
-            return true;
+            return false;
         }
 
         private static bool TrySelectValidPdf(
