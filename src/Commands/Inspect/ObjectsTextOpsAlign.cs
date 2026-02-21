@@ -25,7 +25,7 @@ namespace Obj.Commands
         private const string AnsiReset = "\u001b[0m";
         private const string AnsiCodexBlue = "\u001b[38;5;39m";
         private const string AnsiClaudeOrange = "\u001b[38;5;214m";
-        private const string AnsiWhite = "\u001b[97m";
+        private const string AnsiDodgeBlue = "\u001b[38;2;30;144;255m";
         private const string AnsiInfo = AnsiCodexBlue;
         private const string AnsiOk = "\u001b[1;92m";
         private const string AnsiWarn = AnsiClaudeOrange;
@@ -2830,7 +2830,7 @@ namespace Obj.Commands
                         var matches = item.TryGetValue("matches", out var mmObj) ? mmObj?.ToString() ?? "0" : "0";
                         var color = itemFound ? AnsiOk : AnsiErr;
                         var valueDisplay = ShortText(value, 64);
-                        Console.WriteLine($"  {Colorize(field + ":", AnsiWarn)} {Colorize(valueDisplay, color)} -> {Colorize(itemFound ? "FOUND" : "MISS", color)} method={method} matches={matches}");
+                        Console.WriteLine($"  {Colorize(field + ":", AnsiWarn)} {Colorize(valueDisplay, AnsiDodgeBlue)} -> {Colorize(itemFound ? "FOUND" : "MISS", color)} method={method} matches={matches}");
                     }
                 }
                 Console.WriteLine();
@@ -2889,10 +2889,21 @@ namespace Obj.Commands
                 if (root.TryGetProperty("validator", out var validator))
                 {
                     var vOk = validator.TryGetProperty("ok", out var vOkEl) && vOkEl.ValueKind == JsonValueKind.True;
+                    var okPair = validator.TryGetProperty("ok_pair", out var okPairEl) && okPairEl.ValueKind == JsonValueKind.True;
+                    var okA = validator.TryGetProperty("ok_a", out var okAEl) && okAEl.ValueKind == JsonValueKind.True;
+                    var okB = validator.TryGetProperty("ok_b", out var okBEl) && okBEl.ValueKind == JsonValueKind.True;
                     var reason = validator.TryGetProperty("reason", out var reasonEl) ? reasonEl.GetString() ?? "" : "";
+                    var reasonPair = validator.TryGetProperty("reason_pair", out var reasonPairEl) ? reasonPairEl.GetString() ?? "" : "";
+                    var reasonA = validator.TryGetProperty("reason_a", out var reasonAEl) ? reasonAEl.GetString() ?? "" : "";
+                    var reasonB = validator.TryGetProperty("reason_b", out var reasonBEl) ? reasonBEl.GetString() ?? "" : "";
                     var color = vOk ? AnsiOk : AnsiErr;
-                    var sideLabel = string.IsNullOrWhiteSpace(targetSide) ? "" : $" side={targetSide}";
-                    Console.WriteLine(Colorize($"[VALIDATOR] {vOk.ToString().ToLowerInvariant()}{sideLabel} reason=\"{reason}\"", color));
+                    Console.WriteLine(Colorize("[VALIDATOR]", color));
+                    Console.WriteLine($"  {Colorize("scope:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(scope) ? "(n/a)" : scope, AnsiSoft)}");
+                    Console.WriteLine($"  {Colorize("target_side:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(targetSide) ? "(n/a)" : targetSide, AnsiSoft)}");
+                    Console.WriteLine($"  {Colorize("effective:", AnsiWarn)} {Colorize(vOk ? "ok" : "fail", color)} reason=\"{(string.IsNullOrWhiteSpace(reason) ? "(ok)" : reason)}\"");
+                    Console.WriteLine($"  {Colorize("pair:", AnsiWarn)} {Colorize(okPair ? "ok" : "fail", okPair ? AnsiOk : AnsiErr)} reason=\"{(string.IsNullOrWhiteSpace(reasonPair) ? "(ok)" : reasonPair)}\"");
+                    Console.WriteLine($"  {Colorize("pdf_a:", AnsiWarn)} {Colorize(okA ? "ok" : "fail", okA ? AnsiOk : AnsiErr)} reason=\"{(string.IsNullOrWhiteSpace(reasonA) ? "(ok)" : reasonA)}\"");
+                    Console.WriteLine($"  {Colorize("pdf_b:", AnsiWarn)} {Colorize(okB ? "ok" : "fail", okB ? AnsiOk : AnsiErr)} reason=\"{(string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB)}\"");
                 }
                 Console.WriteLine();
             }
@@ -2946,7 +2957,7 @@ namespace Obj.Commands
                 }
 
                 var moduleDisplay = ResolveModuleDisplay(moduleTag);
-                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize("\"" + value + "\"", AnsiWhite)}");
+                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize("\"" + value + "\"", AnsiDodgeBlue)}");
                 Console.WriteLine($"    origem={source} op={opRange} obj={obj} status={status} modulo={ColorizeModuleChain(moduleDisplay)}");
                 var adjustModule = ResolveLastAdjustmentModule(moduleTag);
 
@@ -3732,31 +3743,55 @@ namespace Obj.Commands
             ReportUtils.WriteSummary("TEXTOPS ALIGN", summary);
             Console.WriteLine();
 
-            if (helper != null)
+            Console.WriteLine("ALIGN-HELPER");
+            if (helper == null)
             {
-                Console.WriteLine("ALIGN-HELPER");
+                Console.WriteLine("  sem dados de helper para este alinhamento");
+                Console.WriteLine();
+            }
+            else
+            {
                 Console.WriteLine($"  hitsA={helper.HitsA} hitsB={helper.HitsB} candidates={helper.Candidates} accepted={helper.Accepted} rejected={helper.Rejected} used={helper.UsedInFinalAnchors}");
-                var topDecisions = helper.Decisions
+
+                var helperTake = top <= 0 ? 12 : Math.Max(6, Math.Min(24, top));
+                var acceptedRows = helper.Decisions
+                    .Where(d => string.Equals(d.Status, "accepted", StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(d => d.Score)
+                    .ThenBy(d => d.AIndex)
+                    .ThenBy(d => d.BIndex)
+                    .Take(helperTake)
+                    .Select(d => new[]
+                    {
+                        d.Key,
+                        d.AIndex >= 0 ? d.AIndex.ToString(CultureInfo.InvariantCulture) : "-",
+                        d.BIndex >= 0 ? d.BIndex.ToString(CultureInfo.InvariantCulture) : "-",
+                        ReportUtils.F(d.Score, 3),
+                        d.Reason
+                    })
+                    .ToList();
+                if (acceptedRows.Count > 0)
+                    ReportUtils.WriteTable("ALIGN-HELPER ACCEPTED", new[] { "key", "Aidx", "Bidx", "score", "reason" }, acceptedRows);
+
+                var rejectedRows = helper.Decisions
+                    .Where(d => string.Equals(d.Status, "rejected", StringComparison.OrdinalIgnoreCase))
                     .OrderByDescending(d => string.Equals(d.Status, "accepted", StringComparison.OrdinalIgnoreCase))
                     .ThenByDescending(d => d.Score)
                     .ThenBy(d => d.AIndex)
                     .ThenBy(d => d.BIndex)
-                    .Take(top <= 0 ? 16 : Math.Max(8, Math.Min(32, top * 2)))
+                    .Take(helperTake)
                     .Select(d => new[]
                     {
-                        d.Status,
-                        d.Reason,
                         d.Key,
                         d.AIndex >= 0 ? d.AIndex.ToString(CultureInfo.InvariantCulture) : "-",
                         d.BIndex >= 0 ? d.BIndex.ToString(CultureInfo.InvariantCulture) : "-",
-                        ReportUtils.F(d.Score, 3)
+                        ReportUtils.F(d.Score, 3),
+                        d.Reason
                     })
                     .ToList();
-                if (topDecisions.Count > 0)
-                {
-                    ReportUtils.WriteTable("ALIGN-HELPER DECISIONS", new[] { "status", "reason", "key", "Aidx", "Bidx", "score" }, topDecisions);
-                    Console.WriteLine();
-                }
+                if (rejectedRows.Count > 0)
+                    ReportUtils.WriteTable("ALIGN-HELPER REJECTED (TOP)", new[] { "key", "Aidx", "Bidx", "score", "reason" }, rejectedRows);
+
+                Console.WriteLine();
             }
 
             if (report.Anchors.Count > 0)
@@ -3787,6 +3822,8 @@ namespace Obj.Commands
                     PrintAlignPair(p, showDiff: false);
                 Console.WriteLine();
             }
+
+            PrintHumanAlignmentTop(report, top, outputMode);
 
             var topLimit = top <= 0 ? int.MaxValue : top;
             if (showVariables)
@@ -3884,6 +3921,43 @@ namespace Obj.Commands
                 }, topFixed);
                 Console.WriteLine();
             }
+        }
+
+        private static void PrintHumanAlignmentTop(ObjectsTextOpsDiff.AlignDebugReport report, int top, OutputMode outputMode)
+        {
+            var limit = top <= 0 ? 16 : Math.Max(8, Math.Min(40, top * 2));
+            var indexed = report.Alignments
+                .Select((pair, idx) => (pair, idx: idx + 1))
+                .Where(x => IsSelectedByOutputMode(x.pair.Kind, outputMode))
+                .Take(limit)
+                .ToList();
+            if (indexed.Count == 0)
+                return;
+
+            var rows = indexed
+                .Select(x => new[]
+                {
+                    x.idx.ToString(CultureInfo.InvariantCulture),
+                    x.pair.Kind ?? "",
+                    ReportUtils.F(x.pair.Score, 3),
+                    x.pair.A != null ? $"op{FormatOpRange(x.pair.A.StartOp, x.pair.A.EndOp)}" : "-",
+                    x.pair.B != null ? $"op{FormatOpRange(x.pair.B.StartOp, x.pair.B.EndOp)}" : "-",
+                    ShortInlineText(x.pair.A?.Text ?? "<gap>"),
+                    ShortInlineText(x.pair.B?.Text ?? "<gap>")
+                })
+                .ToList();
+            ReportUtils.WriteTable("ALINHAMENTO HUMANO (TOP)", new[] { "idx", "kind", "score", "A_op", "B_op", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B") }, rows);
+            Console.WriteLine();
+        }
+
+        private static string ShortInlineText(string? text, int max = 100)
+        {
+            var normalized = TextNormalization.NormalizeWhitespace(text ?? "");
+            if (string.IsNullOrWhiteSpace(normalized))
+                return "";
+            if (normalized.Length <= max)
+                return normalized;
+            return normalized.Substring(0, Math.Max(0, max - 3)) + "...";
         }
 
         private static void PrintAlignPair(ObjectsTextOpsDiff.AlignDebugPair pair, bool showDiff)
