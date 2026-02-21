@@ -1702,6 +1702,8 @@ namespace Obj.Commands
                 }
                 report.RoleA = roleA;
                 report.RoleB = roleB;
+                var hadVariableBeforeMode = report.Alignments.Any(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
+                var hadGapBeforeMode = report.Alignments.Any(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
                 ApplyOutputModeToReport(report, outputMode);
 
                 ObjectsTextOpsDiff.AlignDebugReport? backReport = null;
@@ -1757,6 +1759,15 @@ namespace Obj.Commands
                         stepItems.Add(("helper_mode", string.IsNullOrWhiteSpace(helper.AnchorMode) ? "(n/a)" : helper.AnchorMode));
                     }
                     PrintPipelineStep("etapa 2/8 - alinhamento textual", "etapa 3/8 - parser YAML (campos com op_range + value_full)", WithPipelineContext(pipelineContextItems, stepItems.ToArray()));
+                    if (outputMode == OutputMode.FixedOnly &&
+                        report.FixedPairs.Count == 0 &&
+                        (hadVariableBeforeMode || hadGapBeforeMode))
+                    {
+                        Console.WriteLine(Colorize(
+                            "[INFO] modo fixed: nenhum bloco fixed encontrado neste par; há apenas variable/gap. Use textopsalign ou textopsvar para depuração completa.",
+                            AnsiSoft));
+                        Console.WriteLine();
+                    }
                 }
 
                 if (inputs.Count == 2 && !ReturnUtils.IsEnabled() && showAlign)
@@ -4410,6 +4421,7 @@ namespace Obj.Commands
             gapPenalty = FixedGapPenalty;
             var runRequestedByCli = false;
             var probeConfiguredByCli = false;
+            var alignmentOutputConfiguredByCli = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -4511,6 +4523,7 @@ namespace Obj.Commands
                 if (string.Equals(arg, "--log", StringComparison.OrdinalIgnoreCase))
                 {
                     showAlign = true;
+                    alignmentOutputConfiguredByCli = true;
                     alignTop = 0; // padrão: mostrar lista completa de alinhamento
                     if (i + 1 < args.Length)
                     {
@@ -4527,6 +4540,7 @@ namespace Obj.Commands
                 if (arg.StartsWith("--log=", StringComparison.OrdinalIgnoreCase))
                 {
                     showAlign = true;
+                    alignmentOutputConfiguredByCli = true;
                     alignTop = 0;
                     var split = arg.Split('=', 2);
                     var rawLog = split.Length == 2 ? (split[1] ?? "").Trim() : "";
@@ -4588,11 +4602,13 @@ namespace Obj.Commands
                 if (string.Equals(arg, "--alinhamento-detalhe", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--mostrar-alinhamento", StringComparison.OrdinalIgnoreCase))
                 {
                     showAlign = true;
+                    alignmentOutputConfiguredByCli = true;
                     continue;
                 }
                 if (string.Equals(arg, "--sem-alinhamento", StringComparison.OrdinalIgnoreCase))
                 {
                     showAlign = false;
+                    alignmentOutputConfiguredByCli = true;
                     continue;
                 }
                 if (string.Equals(arg, "--allow-stack", StringComparison.OrdinalIgnoreCase))
@@ -4741,6 +4757,11 @@ namespace Obj.Commands
             {
                 probeEnabled = true;
                 appliedAutoDefaults.Add($"run {runFromStep.ToString(CultureInfo.InvariantCulture)}-{runToStep.ToString(CultureInfo.InvariantCulture)} -> probe_enabled=true (etapa 7 automática; use --no-probe para desativar)");
+            }
+            if (runRequestedByCli && !alignmentOutputConfiguredByCli)
+            {
+                showAlign = true;
+                appliedAutoDefaults.Add($"run {runFromStep.ToString(CultureInfo.InvariantCulture)}-{runToStep.ToString(CultureInfo.InvariantCulture)} -> show_alignment=true (depuração automática; use --sem-alinhamento para ocultar)");
             }
 
             return true;
