@@ -57,18 +57,33 @@ namespace Obj.Align
             helperDiagnostics = new AlignHelperDiagnostics();
 
             double autoMaxSim = 0.0;
-            if (anchorMinSim > 0 || anchorMinLenRatio > 0)
+            var explicitAnchorMode = anchorMinSim > 0 || anchorMinLenRatio > 0;
+            var explicitAnchors = explicitAnchorMode
+                ? BuildAnchorPairsExplicit(normA, normB, anchorMinSim, anchorMinLenRatio)
+                : new List<AnchorPair>();
+            var autoAnchors = BuildAnchorPairsAuto(normA, normB, Math.Max(0.05, minLenRatio), out autoMaxSim);
+            var helperAnchors = BuildAnchorPairsAlignHelper(normA, normB, Math.Max(0.05, minLenRatio), out helperDiagnostics);
+            var diagnosticAnchors = MergeAnchorPairsWithHelper(autoAnchors, helperAnchors);
+            var helperSet = new HashSet<(int A, int B)>(helperAnchors.Select(v => (v.AIndex, v.BIndex)));
+
+            if (explicitAnchorMode)
             {
-                anchors = BuildAnchorPairsExplicit(normA, normB, anchorMinSim, anchorMinLenRatio);
+                anchors = MergeAnchorPairsWithHelper(explicitAnchors, helperAnchors);
+                helperDiagnostics.AppliedToSegmentation = anchors.Count > 0;
+                helperDiagnostics.AnchorMode = "explicit+helper";
+                helperDiagnostics.UsedInFinalAnchors = anchors.Count(v => helperSet.Contains((v.AIndex, v.BIndex)));
             }
             else
             {
-                // DMP-first mode: no automatic anchor constraints unless explicitly requested.
-                anchors = new List<AnchorPair>();
-                autoMaxSim = 0.0;
+                // DMP-first mode: segment alignment stays unconstrained by anchors,
+                // but anchors are still computed and exposed for full transparency.
+                anchors = diagnosticAnchors;
+                helperDiagnostics.AppliedToSegmentation = false;
+                helperDiagnostics.AnchorMode = "diagnostic_auto+helper";
+                helperDiagnostics.UsedInFinalAnchors = anchors.Count(v => helperSet.Contains((v.AIndex, v.BIndex)));
             }
 
-            if (anchors.Count == 0)
+            if (!explicitAnchorMode || anchors.Count == 0)
             {
                 var effectiveMinSim = minSim;
                 if (effectiveMinSim <= 0)

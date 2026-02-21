@@ -13,6 +13,9 @@ namespace Obj.Align
 {
     internal static partial class ObjectsTextOpsDiff
     {
+        [ThreadStatic]
+        private static string? _alignHelperDocScope;
+
         private sealed class AlignHelperPhrase
         {
             public string Key { get; set; } = "";
@@ -69,11 +72,109 @@ namespace Obj.Align
             public int Accepted { get; set; }
             public int Rejected { get; set; }
             public int UsedInFinalAnchors { get; set; }
+            public bool AppliedToSegmentation { get; set; }
+            public string AnchorMode { get; set; } = "";
             public List<AlignHelperDecision> Decisions { get; set; } = new List<AlignHelperDecision>();
         }
 
         private static readonly Lazy<AlignHelperLexicon> AlignHelperLexiconCache =
             new Lazy<AlignHelperLexicon>(LoadAlignHelperLexicon, true);
+
+        private static readonly Dictionary<string, HashSet<string>> AlignHelperDocKeyAllowList =
+            new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["despacho"] = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "processo_administrativo",
+                    "processo_judicial",
+                    "vara",
+                    "comarca",
+                    "promovente",
+                    "promovido",
+                    "perito",
+                    "cpf_perito",
+                    "especialidade",
+                    "especie_pericia",
+                    "valor_jz",
+                    "valor_de",
+                    "data"
+                },
+                ["certidao"] = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "processo_administrativo",
+                    "processo_judicial",
+                    "vara",
+                    "comarca",
+                    "valor_cm",
+                    "valor_jz",
+                    "adiantamento",
+                    "parcela",
+                    "percentual",
+                    "data"
+                },
+                ["requerimento"] = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "processo_administrativo",
+                    "processo_judicial",
+                    "vara",
+                    "comarca",
+                    "promovente",
+                    "promovido",
+                    "valor_jz",
+                    "data"
+                }
+            };
+
+        private static string NormalizeAlignHelperDocScope(string? docHint)
+        {
+            var raw = (docHint ?? "").Trim().ToLowerInvariant();
+            if (raw.Length == 0)
+                return "";
+            if (raw.Contains("desp", StringComparison.Ordinal))
+                return "despacho";
+            if (raw.Contains("cert", StringComparison.Ordinal) || raw.Contains("cm", StringComparison.Ordinal))
+                return "certidao";
+            if (raw.Contains("req", StringComparison.Ordinal))
+                return "requerimento";
+            return raw;
+        }
+
+        internal static string PushAlignHelperDocScope(string? docHint)
+        {
+            var previous = _alignHelperDocScope ?? "";
+            _alignHelperDocScope = NormalizeAlignHelperDocScope(docHint);
+            return previous;
+        }
+
+        internal static void PopAlignHelperDocScope(string? previousScope)
+        {
+            _alignHelperDocScope = string.IsNullOrWhiteSpace(previousScope) ? null : previousScope;
+        }
+
+        private static bool IsHelperKeyAllowedForCurrentDoc(string key)
+        {
+            var scope = (_alignHelperDocScope ?? "").Trim().ToLowerInvariant();
+            if (scope.Length == 0)
+                return true;
+
+            if (!AlignHelperDocKeyAllowList.TryGetValue(scope, out var allowed))
+                return true;
+            return allowed.Contains(key ?? "");
+        }
+
+        internal static IReadOnlyList<string> GetAlignHelperKeysForDoc(string? docHint)
+        {
+            var scope = NormalizeAlignHelperDocScope(docHint);
+            if (AlignHelperDocKeyAllowList.TryGetValue(scope, out var allowed))
+                return allowed.OrderBy(x => x, StringComparer.OrdinalIgnoreCase).ToList();
+
+            return AlignHelperDocKeyAllowList
+                .Values
+                .SelectMany(v => v)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
 
         private static string DetectAlignHelperKey(string normalizedBlockText)
         {
@@ -92,6 +193,8 @@ namespace Obj.Align
             foreach (var phrase in lexicon.Phrases)
             {
                 if (phrase.Normalized.Length == 0)
+                    continue;
+                if (!IsHelperKeyAllowedForCurrentDoc(phrase.Key))
                     continue;
 
                 var matchPos = text.IndexOf(phrase.Normalized, StringComparison.Ordinal);
@@ -165,14 +268,16 @@ namespace Obj.Align
                     var posA = normA.Count <= 1 ? 0.0 : hitA.Index / (double)(normA.Count - 1);
                     var posB = normB.Count <= 1 ? 0.0 : hitB.Index / (double)(normB.Count - 1);
                     var posDelta = Math.Abs(posA - posB);
-                    if (posDelta > 0.35)
+                    // Tolerância maior para documentos com variação de estrutura:
+                    // permite casar a mesma âncora mesmo quando deslocada no fluxo.
+                    if (posDelta > 0.70)
                     {
                         AddAlignHelperDecision(diagnostics, hitA.Index, hitB.Index, hitA.Key, "rejected", "position_delta", sim);
                         continue;
                     }
 
                     var helperScore = Math.Min(hitA.Score, hitB.Score);
-                    var score = Math.Max(sim, helperScore) - (posDelta * 0.20);
+                    var score = Math.Max(sim, helperScore) - (posDelta * 0.08);
                     if (score < 0.10)
                     {
                         AddAlignHelperDecision(diagnostics, hitA.Index, hitB.Index, hitA.Key, "rejected", "low_score", score);
@@ -318,6 +423,8 @@ namespace Obj.Align
                 foreach (var phrase in lexicon.Phrases)
                 {
                     if (phrase.Normalized.Length == 0)
+                        continue;
+                    if (!IsHelperKeyAllowedForCurrentDoc(phrase.Key))
                         continue;
 
                     var matchPos = text.IndexOf(phrase.Normalized, StringComparison.Ordinal);

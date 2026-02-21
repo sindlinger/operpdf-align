@@ -42,6 +42,7 @@ namespace Obj.Commands
 
         private const int PipelineFirstStep = 1;
         private const int PipelineLastStep = 8;
+        private const double FixedGapPenalty = -0.20;
 
         private static string Colorize(string text, string color)
         {
@@ -944,7 +945,8 @@ namespace Obj.Commands
                     new ObjectsTextOpsDiff.PageObjSelection { Page = targetPage, Obj = targetObj },
                     ops,
                     backoff,
-                    "single_page");
+                    "single_page",
+                    docHint: "despacho");
 
                 if (report?.RangeB != null && report.RangeB.HasValue && report.RangeB.StartOp > 0 && report.RangeB.EndOp > 0)
                     return (report.RangeB.StartOp, report.RangeB.EndOp, true);
@@ -998,16 +1000,16 @@ namespace Obj.Commands
                     ("backoff", backoff.ToString(CultureInfo.InvariantCulture)),
                     ("top", top.ToString(CultureInfo.InvariantCulture)),
                     ("min_sim", ReportUtils.F(minSim, 3)),
-                    ("band", band.ToString(CultureInfo.InvariantCulture)),
+                    ("max_shift_ops", band.ToString(CultureInfo.InvariantCulture)),
                     ("min_len_ratio", ReportUtils.F(minLenRatio, 3)),
                     ("len_penalty", ReportUtils.F(lenPenalty, 3)),
                     ("anchor_sim", ReportUtils.F(anchorMinSim, 3)),
                     ("anchor_len", ReportUtils.F(anchorMinLenRatio, 3)),
-                    ("gap_penalty", ReportUtils.F(gapPenalty, 3)),
-                    ("alinhamento_top", alignTop.ToString(CultureInfo.InvariantCulture)),
+                    ("gap_fixed_internal", ReportUtils.F(gapPenalty, 3)),
+                    ("log_top", alignTop.ToString(CultureInfo.InvariantCulture)),
                     ("probe_file", string.IsNullOrWhiteSpace(probeFile) ? "(vazio)" : probeFile),
                     ("probe_page", probePage.ToString(CultureInfo.InvariantCulture)),
-                    ("probe_side", string.IsNullOrWhiteSpace(probeSide) ? "(vazio)" : probeSide),
+                    ("probe_target_pdf_side", string.IsNullOrWhiteSpace(probeSide) ? "(vazio)" : probeSide),
                     ("probe_max_fields", probeMaxFields.ToString(CultureInfo.InvariantCulture)),
                     ("run_from", runFromStep.ToString(CultureInfo.InvariantCulture)),
                     ("run_to", runToStep.ToString(CultureInfo.InvariantCulture)),
@@ -1179,10 +1181,11 @@ namespace Obj.Commands
                     return false;
 
                 var totalPages = 0;
+                PdfDocument? scoreDoc = null;
                 try
                 {
-                    using var doc = new PdfDocument(new PdfReader(pdfPath));
-                    totalPages = doc.GetNumberOfPages();
+                    scoreDoc = new PdfDocument(new PdfReader(pdfPath));
+                    totalPages = scoreDoc.GetNumberOfPages();
                 }
                 catch
                 {
@@ -1211,52 +1214,120 @@ namespace Obj.Commands
                     return resolvedObj;
                 }
 
-                var frontPage = 0;
-                var frontObj = 0;
-                var backPage = 0;
-                var backObj = 0;
-                foreach (var candidatePage in candidates)
+                var scoreByObj = new Dictionary<int, double>();
+                double ScoreFrontCandidate(int candidateObj)
                 {
-                    var candidateObj = GetObj(candidatePage);
                     if (candidateObj <= 0)
-                        continue;
-
-                    if (frontObj <= 0)
+                        return -10.0;
+                    if (scoreByObj.TryGetValue(candidateObj, out var cached))
+                        return cached;
+                    if (scoreDoc == null)
                     {
-                        frontPage = candidatePage;
-                        frontObj = candidateObj;
+                        scoreByObj[candidateObj] = 0.0;
+                        return 0.0;
                     }
 
-                    var nextPage = candidatePage + 1;
-                    if (totalPages > 0 && nextPage <= totalPages)
+                    try
                     {
-                        var nextObj = GetObj(nextPage);
-                        if (nextObj > 0)
+                        if (!(scoreDoc.GetPdfObject(candidateObj) is PdfStream stream))
                         {
+                            scoreByObj[candidateObj] = -1.0;
+                            return -1.0;
+                        }
+                        if (!PdfTextExtraction.TryFindResourcesForObjId(scoreDoc, candidateObj, out var resources) || resources == null)
+                        {
+                            scoreByObj[candidateObj] = -1.0;
+                            return -1.0;
+                        }
+
+                        var ops = PdfTextExtraction.CollectTextOperatorTexts(stream, resources);
+                        var raw = TextNormalization.NormalizeWhitespace(string.Join(" ", ops));
+                        var norm = raw.ToLowerInvariant();
+                        double score = 0.0;
+
+                        bool Has(string term) => norm.Contains(term, StringComparison.Ordinal);
+
+                        if (Has("processo")) score += 2.5;
+                        if (Has("requerente")) score += 2.0;
+                        if (Has("interessad")) score += 2.0;
+                        if (Has("perit")) score += 1.3;
+                        if (Has("vara") || Has("comarca")) score += 1.2;
+                        if (Has("r$") || Has("valor")) score += 0.8;
+
+                        if (Has("atenciosamente")) score -= 2.5;
+                        if (Has("juiza de direito") || Has("juíza de direito")) score -= 2.5;
+                        if (Has("https://pje") || Has("painel_usuario") || Has("documento html")) score -= 3.5;
+
+                        if (raw.Length >= 350) score += 0.4;
+                        scoreByObj[candidateObj] = score;
+                        return score;
+                    }
+                    catch
+                    {
+                        scoreByObj[candidateObj] = -1.0;
+                        return -1.0;
+                    }
+                }
+
+                try
+                {
+                    var frontPage = 0;
+                    var frontObj = 0;
+                    var backPage = 0;
+                    var backObj = 0;
+                    var bestScore = double.NegativeInfinity;
+
+                    foreach (var candidatePage in candidates)
+                    {
+                        var candidateObj = GetObj(candidatePage);
+                        if (candidateObj <= 0)
+                            continue;
+
+                        var candidateScore = ScoreFrontCandidate(candidateObj);
+                        var nextPage = candidatePage + 1;
+                        var nextObj = 0;
+                        if (totalPages > 0 && nextPage <= totalPages)
+                            nextObj = GetObj(nextPage);
+
+                        // Pequeno bônus por par consecutivo válido (despacho costuma ser 2 páginas).
+                        var combinedScore = candidateScore + (nextObj > 0 ? 0.35 : 0.0);
+                        if (combinedScore > bestScore)
+                        {
+                            bestScore = combinedScore;
                             frontPage = candidatePage;
                             frontObj = candidateObj;
-                            backPage = nextPage;
+                            backPage = nextObj > 0 ? nextPage : 0;
                             backObj = nextObj;
-                            break;
                         }
                     }
-                }
 
-                if (frontObj <= 0)
-                    return false;
+                    if (frontObj <= 0)
+                        return false;
 
-                if (back && backPage > 0 && backObj > 0)
-                {
-                    page = backPage;
-                    obj = backObj;
-                    reason = "despacho_back_auto";
+                    if (back && backPage > 0 && backObj > 0)
+                    {
+                        page = backPage;
+                        obj = backObj;
+                        reason = "despacho_back_auto";
+                        return true;
+                    }
+
+                    page = frontPage;
+                    obj = frontObj;
+                    reason = "despacho_front_auto";
                     return true;
                 }
-
-                page = frontPage;
-                obj = frontObj;
-                reason = "despacho_front_auto";
-                return true;
+                finally
+                {
+                    try
+                    {
+                        scoreDoc?.Close();
+                    }
+                    catch
+                    {
+                        // ignore close errors
+                    }
+                }
             }
 
             void ResolveSelection(
@@ -1348,7 +1419,8 @@ namespace Obj.Commands
                             lenPenalty,
                             anchorMinSim,
                             anchorMinLenRatio,
-                            gapPenalty);
+                            gapPenalty,
+                            docKey);
                     }
                     catch
                     {
@@ -1434,10 +1506,19 @@ namespace Obj.Commands
                 int localObjA = objA;
                 ResolveSelection(bPath, pageBUser, objBUser, pageB, objB, out var localPageB, out var localObjB, out var sourceB);
                 var roleB = DetectInputRole(bPath);
+                var extractionScope = ResolveExtractionScopeTag(roleA, roleB);
+                var targetIsA = string.Equals(extractionScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase);
+                var modelPdfPath = targetIsA ? bPath : aPath;
+                var targetPdfPath = targetIsA ? aPath : bPath;
+                var modelSel = targetIsA
+                    ? $"page={localPageB} obj={localObjB} source={sourceB}"
+                    : $"page={localPageA} obj={localObjA} source={sourceA}";
+                var targetSel = targetIsA
+                    ? $"page={localPageA} obj={localObjA} source={sourceA}"
+                    : $"page={localPageB} obj={localObjB} source={sourceB}";
                 if (!ReturnUtils.IsEnabled() && sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
                 {
-                    var routeScope = ResolveExtractionScopeTag(roleA, roleB);
-                    var sideLabelB = string.Equals(routeScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase)
+                    var sideLabelB = targetIsA
                         ? "Despacho route B (referência/modelo)"
                         : "Despacho route B (alvo)";
                     Console.WriteLine($"{sideLabelB}: p{localPageB} o{localObjB} ({sourceB})");
@@ -1455,13 +1536,13 @@ namespace Obj.Commands
                     ["module"] = "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
                     ["role_a"] = roleA,
                     ["role_b"] = roleB,
-                    ["pdf_a"] = Path.GetFileName(aPath),
-                    ["pdf_b"] = Path.GetFileName(bPath),
-                    ["sel_a"] = $"page={localPageA} obj={localObjA} source={sourceA}",
-                    ["sel_b"] = $"page={localPageB} obj={localObjB} source={sourceB}",
+                    ["modelo_pdf"] = Path.GetFileName(modelPdfPath),
+                    ["pdf_alvo_extracao"] = Path.GetFileName(targetPdfPath),
+                    ["modelo_sel"] = modelSel,
+                    ["alvo_sel"] = targetSel,
                     ["band"] = sideLabel,
                     ["ops"] = string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase)),
-                    ["params"] = $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"
+                    ["params"] = $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} maxShiftOps={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"
                 };
                 EmitStage(1, "ok", step1Payload);
                 if (!ReturnUtils.IsEnabled())
@@ -1471,14 +1552,14 @@ namespace Obj.Commands
                         ("modulo", "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker"),
                         ("role_a", roleA),
                         ("role_b", roleB),
-                        ("pdf_a", Path.GetFileName(aPath)),
-                        ("pdf_b", Path.GetFileName(bPath)),
-                        ("sel_a", $"page={localPageA} obj={localObjA} source={sourceA}"),
-                        ("sel_b", $"page={localPageB} obj={localObjB} source={sourceB}")
+                        ("modelo_pdf", Path.GetFileName(modelPdfPath)),
+                        ("pdf_alvo_extracao", Path.GetFileName(targetPdfPath)),
+                        ("modelo_sel", modelSel),
+                        ("alvo_sel", targetSel)
                     };
                     step1Lines.Add(("band", sideLabel));
                     step1Lines.Add(("ops", string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))));
-                    step1Lines.Add(("params", $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} band={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"));
+                    step1Lines.Add(("params", $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} maxShiftOps={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"));
 
                     PrintPipelineStep(
                         "passo 1/4 - detecção e seleção de objetos",
@@ -1502,7 +1583,8 @@ namespace Obj.Commands
                     lenPenalty,
                     anchorMinSim,
                     anchorMinLenRatio,
-                    gapPenalty);
+                    gapPenalty,
+                    docKey);
 
                 if (report == null)
                 {
@@ -1528,7 +1610,8 @@ namespace Obj.Commands
                                 lenPenalty,
                                 anchorMinSim,
                                 anchorMinLenRatio,
-                                gapPenalty);
+                                gapPenalty,
+                                docKey);
 
                             if (report != null)
                             {
@@ -1545,6 +1628,7 @@ namespace Obj.Commands
                 }
                 report.RoleA = roleA;
                 report.RoleB = roleB;
+                ApplyOutputModeToReport(report, outputMode);
 
                 ObjectsTextOpsDiff.AlignDebugReport? backReport = null;
 
@@ -1572,6 +1656,8 @@ namespace Obj.Commands
                     step2Payload["helper_accepted"] = helper.Accepted;
                     step2Payload["helper_rejected"] = helper.Rejected;
                     step2Payload["helper_used"] = helper.UsedInFinalAnchors;
+                    step2Payload["helper_applied_to_segmentation"] = helper.AppliedToSegmentation;
+                    step2Payload["helper_anchor_mode"] = helper.AnchorMode ?? "";
                 }
                 EmitStage(2, "ok", step2Payload);
                 if (!ReturnUtils.IsEnabled())
@@ -1593,15 +1679,17 @@ namespace Obj.Commands
                         stepItems.Add(("helper_hits_b", helper.HitsB.ToString(CultureInfo.InvariantCulture)));
                         stepItems.Add(("helper_acc_rej", $"{helper.Accepted}/{helper.Rejected}"));
                         stepItems.Add(("helper_used", helper.UsedInFinalAnchors.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("helper_applied", helper.AppliedToSegmentation ? "true" : "false"));
+                        stepItems.Add(("helper_mode", string.IsNullOrWhiteSpace(helper.AnchorMode) ? "(n/a)" : helper.AnchorMode));
                     }
                     PrintPipelineStep("passo 2/4 - saída do alinhamento", "passo 3/4 - extração (usa op_range + value_full)", stepItems.ToArray());
                 }
 
-                if (inputs.Count == 2 && !ReturnUtils.IsEnabled())
+                if (inputs.Count == 2 && !ReturnUtils.IsEnabled() && showAlign)
                 {
                     PrintHumanSummary(report, top, outputMode);
-                    if (showAlign)
-                        PrintAlignmentList(report, alignTop, showDiff: true);
+                    PrintAlignmentList(report, alignTop, showDiff: true);
+                    PrintAlignmentToExtractionPayload(report);
                 }
 
                 Dictionary<string, object>? deferredProbePayload = null;
@@ -1657,7 +1745,7 @@ namespace Obj.Commands
                                 "passo 3.7/4 - probe pós-extração",
                                 "passo 4/4 - saída e resumo",
                                 ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
-                                ("probe_side", sideKey),
+                                ("probe_target_pdf_side", sideKey),
                                 ("probe_file", effectiveProbeFile),
                                 ("probe_page", effectiveProbePage.ToString(CultureInfo.InvariantCulture)),
                                 ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture))
@@ -1752,13 +1840,16 @@ namespace Obj.Commands
                     if (stepOutputSave)
                         SaveStageOutputs(stepOutputDir, baseA, baseB, stageOutputs);
 
-                    if (!ReturnUtils.IsEnabled())
-                        PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
-                    if (!ReturnUtils.IsEnabled())
-                        PrintExtractionSummary(report.Extraction);
-                    if (!ReturnUtils.IsEnabled() && deferredProbePayload != null)
-                        PrintProbeSummary(deferredProbePayload);
+                if (!ReturnUtils.IsEnabled())
+                    PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
+                if (!ReturnUtils.IsEnabled())
+                {
+                    PrintAlignedFieldResults(report, outputMode);
+                    PrintExtractionSummary(report.Extraction, detailed: showAlign);
                 }
+                if (!ReturnUtils.IsEnabled() && deferredProbePayload != null)
+                    PrintProbeSummary(deferredProbePayload);
+            }
                 else
                 {
                     EmitStage(8, "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
@@ -1938,14 +2029,76 @@ namespace Obj.Commands
                 return "";
 
             IEnumerable<ObjectsTextOpsDiff.AlignDebugBlock> selected = blocks;
-            if (range != null && range.HasValue && range.StartOp > 0 && range.EndOp >= range.StartOp)
+            if (range != null && range.HasValue)
             {
+                if (range.StartOp <= 0 || range.EndOp < range.StartOp)
+                    return "";
                 selected = blocks.Where(b => b.EndOp >= range.StartOp && b.StartOp <= range.EndOp);
             }
 
             return string.Join("\n", selected
                 .Select(b => b?.Text ?? "")
                 .Where(t => !string.IsNullOrWhiteSpace(t)));
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugRange BuildRangeFromPairs(
+            IEnumerable<ObjectsTextOpsDiff.AlignDebugPair> pairs,
+            bool useSideA,
+            List<ObjectsTextOpsDiff.AlignDebugBlock> blocks,
+            int backoff)
+        {
+            var list = (pairs ?? Enumerable.Empty<ObjectsTextOpsDiff.AlignDebugPair>())
+                .Select(p => useSideA ? p.A : p.B)
+                .Where(b => b != null && b.StartOp > 0 && b.EndOp >= b.StartOp)
+                .ToList();
+
+            if (list.Count == 0)
+            {
+                return new ObjectsTextOpsDiff.AlignDebugRange
+                {
+                    StartOp = 0,
+                    EndOp = 0,
+                    HasValue = true // explicit empty range for mode-specific extraction
+                };
+            }
+
+            var minStart = list.Min(b => b!.StartOp);
+            var maxEnd = list.Max(b => b!.EndOp);
+            var pad = Math.Max(0, backoff);
+            var maxOp = blocks != null && blocks.Count > 0 ? blocks.Max(b => b.EndOp) : maxEnd;
+            var start = Math.Max(1, minStart - pad);
+            var end = Math.Min(Math.Max(start, maxOp), maxEnd + pad);
+
+            return new ObjectsTextOpsDiff.AlignDebugRange
+            {
+                StartOp = start,
+                EndOp = end,
+                HasValue = true
+            };
+        }
+
+        private static void ApplyOutputModeToReport(ObjectsTextOpsDiff.AlignDebugReport report, OutputMode outputMode)
+        {
+            if (report == null || outputMode == OutputMode.All)
+                return;
+
+            report.Alignments = report.Alignments
+                .Where(p => IsSelectedByOutputMode(p.Kind, outputMode))
+                .ToList();
+
+            if (outputMode == OutputMode.FixedOnly)
+            {
+                report.FixedPairs = report.FixedPairs
+                    .Where(p => IsSelectedByOutputMode(p.Kind, outputMode))
+                    .ToList();
+            }
+            else
+            {
+                report.FixedPairs.Clear();
+            }
+
+            report.RangeA = BuildRangeFromPairs(report.Alignments, useSideA: true, report.BlocksA, report.Backoff);
+            report.RangeB = BuildRangeFromPairs(report.Alignments, useSideA: false, report.BlocksB, report.Backoff);
         }
 
         private static string BuildOpRange(ObjectsTextOpsDiff.AlignDebugRange range)
@@ -2830,7 +2983,7 @@ namespace Obj.Commands
             }
         }
 
-        private static void PrintExtractionSummary(object? extraction)
+        private static void PrintExtractionSummary(object? extraction, bool detailed)
         {
             if (extraction == null)
                 return;
@@ -2840,6 +2993,19 @@ namespace Obj.Commands
                 using var doc = JsonDocument.Parse(JsonSerializer.Serialize(extraction));
                 var root = doc.RootElement;
                 var status = root.TryGetProperty("status", out var statusEl) ? statusEl.GetString() ?? "" : "";
+                var statusNorm = status.Trim().ToLowerInvariant();
+                if (statusNorm is "not_executed" or "skipped")
+                {
+                    if (!detailed)
+                        return;
+                    var reason = root.TryGetProperty("reason", out var reasonEl) ? reasonEl.GetString() ?? "" : "";
+                    var runTo = root.TryGetProperty("run_to_step", out var runToEl) ? runToEl.ToString() : "";
+                    var suffix = string.IsNullOrWhiteSpace(runTo) ? "" : $" run_to_step={runTo}";
+                    Console.WriteLine(Colorize(
+                        $"[EXTRACTION] SKIPPED status={statusNorm} reason=\"{(string.IsNullOrWhiteSpace(reason) ? "(n/a)" : reason)}\"{suffix}",
+                        AnsiSoft));
+                    return;
+                }
                 var ok = string.Equals(status, "ok", StringComparison.OrdinalIgnoreCase);
                 var docKey = root.TryGetProperty("doc_key", out var docEl) ? docEl.GetString() ?? "" : "";
                 var docType = root.TryGetProperty("doc_type", out var typeEl) ? typeEl.GetString() ?? "" : "";
@@ -2854,26 +3020,38 @@ namespace Obj.Commands
                         targetSide = targetSideEl.GetString() ?? "";
                 }
 
-                Console.WriteLine(Colorize(
-                    $"[EXTRACTION] {(ok ? "OK" : "FAIL")} doc={docKey} type={docType} band={band} scope={scope}",
-                    ok ? AnsiOk : AnsiErr));
-
                 if (root.TryGetProperty("parsed", out var parsed))
                 {
                     if (string.Equals(scope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase))
                     {
-                        PrintSideValues(parsed, "pdf_b", "VALORES EXTRAIDOS (PDF ALVO B)");
+                        if (detailed)
+                            PrintSideValues(parsed, "pdf_b", "VALORES EXTRAIDOS (PDF ALVO B)");
+                        PrintSideValuesCompact(parsed, "pdf_b", "RESULTADO FINAL (CAMPOS ALVO B)");
                     }
                     else if (string.Equals(scope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase))
                     {
-                        PrintSideValues(parsed, "pdf_a", "VALORES EXTRAIDOS (PDF ALVO A)");
+                        if (detailed)
+                            PrintSideValues(parsed, "pdf_a", "VALORES EXTRAIDOS (PDF ALVO A)");
+                        PrintSideValuesCompact(parsed, "pdf_a", "RESULTADO FINAL (CAMPOS ALVO A)");
                     }
                     else
                     {
-                        PrintSideValues(parsed, "pdf_a", "VALORES A");
-                        PrintSideValues(parsed, "pdf_b", "VALORES B");
+                        if (detailed)
+                        {
+                            PrintSideValues(parsed, "pdf_a", "VALORES A");
+                            PrintSideValues(parsed, "pdf_b", "VALORES B");
+                        }
+                        PrintSideValuesCompact(parsed, "pdf_a", "RESULTADO FINAL (CAMPOS ALVO A)");
+                        PrintSideValuesCompact(parsed, "pdf_b", "RESULTADO FINAL (CAMPOS ALVO B)");
                     }
                 }
+
+                if (!detailed)
+                    return;
+
+                Console.WriteLine(Colorize(
+                    $"[EXTRACTION] {(ok ? "OK" : "FAIL")} doc={docKey} type={docType} band={band} scope={scope}",
+                    ok ? AnsiOk : AnsiErr));
 
                 if (root.TryGetProperty("validator", out var validator))
                 {
@@ -2900,6 +3078,400 @@ namespace Obj.Commands
             {
                 // summary is best-effort only
             }
+        }
+
+        private static void PrintAlignedFieldResults(ObjectsTextOpsDiff.AlignDebugReport report, OutputMode outputMode)
+        {
+            if (report?.Extraction == null)
+                return;
+
+            var acceptedDecisions = (report.HelperDiagnostics?.Decisions ?? new List<ObjectsTextOpsDiff.AlignHelperDecision>())
+                .Where(d => string.Equals(d.Status, "accepted", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            var acceptedKeys = acceptedDecisions
+                .Select(d => (d.Key ?? "").Trim().ToLowerInvariant())
+                .Where(k => k.Length > 0)
+                .Distinct()
+                .ToList();
+
+            try
+            {
+                using var doc = JsonDocument.Parse(JsonSerializer.Serialize(report.Extraction));
+                var root = doc.RootElement;
+                if (!root.TryGetProperty("parsed", out var parsed) || parsed.ValueKind != JsonValueKind.Object)
+                {
+                    Console.WriteLine(Colorize("ALINHAMENTO -> CAMPOS (ALVO)", AnsiCodexBlue));
+                    Console.WriteLine($"  {Colorize("extração sem parsed.values disponível", AnsiSoft)}");
+                    Console.WriteLine();
+                    return;
+                }
+
+                var targetSide = "pdf_b";
+                if (root.TryGetProperty("pipeline", out var pipeline) && pipeline.ValueKind == JsonValueKind.Object &&
+                    pipeline.TryGetProperty("target_side", out var targetSideEl))
+                {
+                    var side = (targetSideEl.GetString() ?? "").Trim().ToLowerInvariant();
+                    if (side == "pdf_a" || side == "pdf_b")
+                        targetSide = side;
+                }
+
+                if (!parsed.TryGetProperty(targetSide, out var sideNode) || sideNode.ValueKind != JsonValueKind.Object)
+                {
+                    Console.WriteLine(Colorize("ALINHAMENTO -> CAMPOS (ALVO)", AnsiCodexBlue));
+                    Console.WriteLine($"  {Colorize("extração sem parsed.values do lado alvo", AnsiSoft)}");
+                    Console.WriteLine();
+                    return;
+                }
+                var hasValues = sideNode.TryGetProperty("values", out var valuesNode) || sideNode.TryGetProperty("Values", out valuesNode);
+                if (!hasValues || valuesNode.ValueKind != JsonValueKind.Object)
+                {
+                    Console.WriteLine(Colorize("ALINHAMENTO -> CAMPOS (ALVO)", AnsiCodexBlue));
+                    Console.WriteLine($"  {Colorize("lado alvo sem values", AnsiSoft)}");
+                    Console.WriteLine();
+                    return;
+                }
+
+                static IEnumerable<string> FieldsForKey(string key)
+                {
+                    return key switch
+                    {
+                        "processo_judicial" => new[] { "PROCESSO_JUDICIAL" },
+                        "processo_administrativo" => new[] { "PROCESSO_ADMINISTRATIVO" },
+                        "vara" => new[] { "VARA" },
+                        "comarca" => new[] { "COMARCA" },
+                        "perito" => new[] { "PERITO" },
+                        "cpf_perito" => new[] { "CPF_PERITO" },
+                        "especialidade" => new[] { "ESPECIALIDADE" },
+                        "especie_pericia" => new[] { "ESPECIE_DA_PERICIA" },
+                        "promovente" => new[] { "PROMOVENTE" },
+                        "promovido" => new[] { "PROMOVIDO" },
+                        "valor_jz" => new[] { "VALOR_ARBITRADO_JZ", "VALOR_ARBITRADO_FINAL" },
+                        "valor_de" => new[] { "VALOR_ARBITRADO_DE", "VALOR_ARBITRADO_FINAL" },
+                        "valor_cm" => new[] { "VALOR_CM", "VALOR_ARBITRADO_JZ" },
+                        "adiantamento" => new[] { "ADIANTAMENTO" },
+                        "parcela" => new[] { "PARCELA" },
+                        "percentual" => new[] { "PERCENTUAL" },
+                        "data" => new[] { "DATA_DESPESA", "DATA_REQUISICAO", "DATA_ARBITRADO_FINAL" },
+                        _ => Array.Empty<string>()
+                    };
+                }
+
+                static string GetValueIgnoreCase(JsonElement valuesObj, string fieldName)
+                {
+                    foreach (var prop in valuesObj.EnumerateObject())
+                    {
+                        if (!string.Equals(prop.Name, fieldName, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        return prop.Value.GetString() ?? "";
+                    }
+                    return "";
+                }
+
+                static bool TryParseOpRange(string text, out int start, out int end)
+                {
+                    start = 0;
+                    end = 0;
+                    if (string.IsNullOrWhiteSpace(text))
+                        return false;
+                    var numbers = Regex.Matches(text, @"\d+")
+                        .Select(m =>
+                        {
+                            if (int.TryParse(m.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var v))
+                                return v;
+                            return 0;
+                        })
+                        .Where(v => v > 0)
+                        .ToList();
+                    if (numbers.Count == 0)
+                        return false;
+                    if (numbers.Count == 1)
+                    {
+                        start = numbers[0];
+                        end = numbers[0];
+                        return true;
+                    }
+                    start = Math.Min(numbers[0], numbers[1]);
+                    end = Math.Max(numbers[0], numbers[1]);
+                    return true;
+                }
+
+                static bool Intersects((int Start, int End) a, (int Start, int End) b)
+                    => a.Start <= b.End && b.Start <= a.End;
+
+                var hasFields = sideNode.TryGetProperty("fields", out var fieldsNode) || sideNode.TryGetProperty("Fields", out fieldsNode);
+                var allRows = new List<(string Field, string Value, string OpRange, int Start, int End, bool HasRange)>();
+                foreach (var prop in valuesNode.EnumerateObject())
+                {
+                    var value = prop.Value.GetString() ?? "";
+                    if (string.IsNullOrWhiteSpace(value))
+                        continue;
+
+                    var opRange = "";
+                    if (hasFields && fieldsNode.ValueKind == JsonValueKind.Object && fieldsNode.TryGetProperty(prop.Name, out var fieldMeta))
+                    {
+                        if (fieldMeta.TryGetProperty("OpRange", out var rangeEl))
+                            opRange = rangeEl.GetString() ?? "";
+                    }
+
+                    var hasRange = TryParseOpRange(opRange, out var start, out var end);
+                    allRows.Add((prop.Name, value, opRange, start, end, hasRange));
+                }
+
+                var selectedAlignments = report.Alignments
+                    .Where(p => IsSelectedByOutputMode(p.Kind, outputMode))
+                    .ToList();
+
+                var selectedRanges = selectedAlignments
+                    .Where(p => p.B != null && p.B.StartOp > 0 && p.B.EndOp > 0)
+                    .Select(p => (p.B!.StartOp, p.B.EndOp))
+                    .ToList();
+
+                var fixedRanges = selectedAlignments
+                    .Where(p => string.Equals(p.Kind, "fixed", StringComparison.OrdinalIgnoreCase) && p.B != null && p.B.StartOp > 0 && p.B.EndOp > 0)
+                    .Select(p => (p.B!.StartOp, p.B.EndOp))
+                    .ToList();
+                var variableRanges = selectedAlignments
+                    .Where(p => (string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(p.Kind, "gap_a", StringComparison.OrdinalIgnoreCase)) &&
+                                p.B != null && p.B.StartOp > 0 && p.B.EndOp > 0)
+                    .Select(p => (p.B!.StartOp, p.B.EndOp))
+                    .ToList();
+                var alignmentRanges = selectedAlignments
+                    .Where(p => p.B != null && p.B.StartOp > 0 && p.B.EndOp > 0)
+                    .Select(p => (p.B!.StartOp, p.B.EndOp))
+                    .ToList();
+
+                var baseAnchorRanges = report.Anchors
+                    .Where(a => a.B != null && a.B.StartOp > 0 && a.B.EndOp > 0)
+                    .Select(a => (a.B!.StartOp, a.B.EndOp))
+                    .ToList();
+
+                var anchorRanges = baseAnchorRanges;
+                if (outputMode != OutputMode.All)
+                {
+                    if (selectedRanges.Count == 0)
+                        anchorRanges = new List<(int Start, int End)>();
+                    else
+                        anchorRanges = baseAnchorRanges
+                            .Where(ar => selectedRanges.Any(sr => Intersects(ar, sr)))
+                            .ToList();
+                }
+
+                var fieldRangeByName = allRows
+                    .GroupBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(
+                        g => g.Key,
+                        g =>
+                        {
+                            var first = g.First();
+                            return (first.Start, first.End, first.HasRange, first.OpRange);
+                        },
+                        StringComparer.OrdinalIgnoreCase);
+
+                var helperAnchorRows = new List<(string Key, string Field, string Value, string OpRange)>();
+                foreach (var key in acceptedKeys)
+                {
+                    foreach (var field in FieldsForKey(key))
+                    {
+                        var value = GetValueIgnoreCase(valuesNode, field);
+                        if (string.IsNullOrWhiteSpace(value))
+                            continue;
+
+                        if (outputMode != OutputMode.All)
+                        {
+                            if (anchorRanges.Count == 0)
+                                continue;
+
+                            if (fieldRangeByName.TryGetValue(field, out var fr) && fr.HasRange)
+                            {
+                                if (!anchorRanges.Any(ar => Intersects((fr.Start, fr.End), ar)))
+                                    continue;
+                            }
+                        }
+
+                        var helperOpRange = fieldRangeByName.TryGetValue(field, out var rangeMeta) && !string.IsNullOrWhiteSpace(rangeMeta.OpRange)
+                            ? rangeMeta.OpRange
+                            : "(sem op_range)";
+                        helperAnchorRows.Add((key, field, value, helperOpRange));
+                        break;
+                    }
+                }
+
+                List<(string Field, string Value, string OpRange)> PickByRanges(List<(int Start, int End)> ranges)
+                {
+                    if (ranges.Count == 0)
+                        return new List<(string Field, string Value, string OpRange)>();
+                    return allRows
+                        .Where(r => r.HasRange && ranges.Any(rr => Intersects((r.Start, r.End), rr)))
+                        .Select(r => (r.Field, r.Value, string.IsNullOrWhiteSpace(r.OpRange) ? "(vazio)" : r.OpRange))
+                        .Distinct()
+                        .OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+                }
+
+                void PrintFieldSection(string title, string color, List<(string Field, string Value, string OpRange)> rows, string emptyMessage)
+                {
+                    Console.WriteLine(Colorize(title, color));
+                    if (rows.Count == 0)
+                    {
+                        Console.WriteLine($"  {Colorize(emptyMessage, AnsiSoft)}");
+                        Console.WriteLine();
+                        return;
+                    }
+                    foreach (var row in rows)
+                        Console.WriteLine($"  {Colorize(row.Field + ":", AnsiWarn)} {Colorize(row.Value, AnsiDodgeBlue)} {Colorize($"(op={row.OpRange})", AnsiSoft)}");
+                    Console.WriteLine();
+                }
+
+                var anchorRangeRows = PickByRanges(anchorRanges);
+                var helperByKey = new Dictionary<string, (string Field, string Value, string OpRange, HashSet<string> HelperKeys)>(StringComparer.OrdinalIgnoreCase);
+                foreach (var row in helperAnchorRows)
+                {
+                    var dedup = $"{row.Field}|{row.Value}|{row.OpRange}";
+                    if (!helperByKey.TryGetValue(dedup, out var existing))
+                    {
+                        existing = (row.Field, row.Value, row.OpRange, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                    }
+                    existing.HelperKeys.Add(row.Key);
+                    helperByKey[dedup] = existing;
+                }
+
+                var rangeByKey = new Dictionary<string, (string Field, string Value, string OpRange)>(StringComparer.OrdinalIgnoreCase);
+                foreach (var row in anchorRangeRows)
+                {
+                    var dedup = $"{row.Field}|{row.Value}|{row.OpRange}";
+                    if (!rangeByKey.ContainsKey(dedup))
+                        rangeByKey[dedup] = row;
+                }
+
+                var bothKeys = helperByKey.Keys.Intersect(rangeByKey.Keys, StringComparer.OrdinalIgnoreCase).ToList();
+                var helperOnlyKeys = helperByKey.Keys.Except(rangeByKey.Keys, StringComparer.OrdinalIgnoreCase).ToList();
+                var rangeOnlyKeys = rangeByKey.Keys.Except(helperByKey.Keys, StringComparer.OrdinalIgnoreCase).ToList();
+
+                var modeLabel = outputMode switch
+                {
+                    OutputMode.FixedOnly => "fixed",
+                    OutputMode.VariablesOnly => "variable",
+                    _ => "all"
+                };
+
+                var docKey = root.TryGetProperty("doc_key", out var docKeyEl) ? (docKeyEl.GetString() ?? "") : "";
+                var docScope = "global";
+                var docKeyNorm = docKey.Trim().ToLowerInvariant();
+                if (docKeyNorm.Contains("desp", StringComparison.Ordinal))
+                    docScope = "despacho";
+                else if (docKeyNorm.Contains("cert", StringComparison.Ordinal) || docKeyNorm.Contains("cm", StringComparison.Ordinal))
+                    docScope = "certidao";
+                else if (docKeyNorm.Contains("req", StringComparison.Ordinal))
+                    docScope = "requerimento";
+
+                var docAnchors = ObjectsTextOpsDiff.GetAlignHelperKeysForDoc(docKey);
+                var acceptedKeysText = acceptedKeys.Count == 0
+                    ? "(nenhuma)"
+                    : string.Join(", ", acceptedKeys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
+                var docAnchorsText = docAnchors.Count == 0
+                    ? "(nenhuma)"
+                    : string.Join(", ", docAnchors);
+
+                Console.WriteLine(Colorize($"ANCORAS -> CAMPOS (ALVO) [{modeLabel}]", AnsiCodexBlue));
+                Console.WriteLine($"  {Colorize($"{docScope}_anchors:", AnsiWarn)} {Colorize(docAnchorsText, AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("accepted_raw:", AnsiWarn)} {Colorize(acceptedDecisions.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("accepted_keys_unique:", AnsiWarn)} {Colorize(acceptedKeys.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("accepted_keys_list:", AnsiWarn)} {Colorize(acceptedKeysText, AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("anchor_pairs_detected:", AnsiWarn)} {Colorize(report.Anchors.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("helper_rows:", AnsiWarn)} {Colorize(helperByKey.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("op_range_rows:", AnsiWarn)} {Colorize(rangeByKey.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("helper_and_op_range:", AnsiWarn)} {Colorize(bothKeys.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("helper_only:", AnsiWarn)} {Colorize(helperOnlyKeys.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("op_range_only:", AnsiWarn)} {Colorize(rangeOnlyKeys.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                if (helperByKey.Count == 0 && rangeByKey.Count == 0)
+                {
+                    var msg = acceptedKeys.Count == 0 && baseAnchorRanges.Count == 0
+                        ? "sem âncoras detectadas/aceitas nesta execução"
+                        : outputMode == OutputMode.All
+                            ? "sem campos extraídos para as âncoras aceitas"
+                            : "sem campos de âncora no alinhador ativo";
+                    Console.WriteLine($"  {Colorize(msg, AnsiSoft)}");
+                }
+                else
+                {
+                    foreach (var key in bothKeys
+                        .OrderBy(k => helperByKey[k].Field, StringComparer.OrdinalIgnoreCase)
+                        .ThenBy(k => helperByKey[k].Value, StringComparer.OrdinalIgnoreCase))
+                    {
+                        var row = helperByKey[key];
+                        var helperKeysText = string.Join(",", row.HelperKeys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
+                        Console.WriteLine($"  {Colorize($"helper_and_op_range[{helperKeysText}]:", AnsiWarn)} {Colorize(row.Field, AnsiSoft)} => {Colorize(row.Value, AnsiDodgeBlue)} {Colorize($"(op={row.OpRange})", AnsiSoft)}");
+                    }
+                    foreach (var key in helperOnlyKeys
+                        .OrderBy(k => helperByKey[k].Field, StringComparer.OrdinalIgnoreCase)
+                        .ThenBy(k => helperByKey[k].Value, StringComparer.OrdinalIgnoreCase))
+                    {
+                        var row = helperByKey[key];
+                        var helperKeysText = string.Join(",", row.HelperKeys.OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
+                        Console.WriteLine($"  {Colorize($"helper_only[{helperKeysText}]:", AnsiWarn)} {Colorize(row.Field, AnsiSoft)} => {Colorize(row.Value, AnsiDodgeBlue)} {Colorize($"(op={row.OpRange})", AnsiSoft)}");
+                    }
+                    foreach (var key in rangeOnlyKeys
+                        .OrderBy(k => rangeByKey[k].Field, StringComparer.OrdinalIgnoreCase)
+                        .ThenBy(k => rangeByKey[k].Value, StringComparer.OrdinalIgnoreCase))
+                    {
+                        var row = rangeByKey[key];
+                        Console.WriteLine($"  {Colorize("op_range_only:", AnsiWarn)} {Colorize(row.Field, AnsiSoft)} => {Colorize(row.Value, AnsiDodgeBlue)} {Colorize($"(op={row.OpRange})", AnsiSoft)}");
+                    }
+                }
+                Console.WriteLine();
+
+                var fixedEmptyReason = fixedRanges.Count == 0 ? "nenhum bloco fixed no alinhador ativo" : "nenhum campo coberto por blocos fixed";
+                var variableEmptyReason = variableRanges.Count == 0 ? "nenhum bloco variable/gap_a no alinhador ativo" : "nenhum campo coberto por blocos variable/gap_a";
+                var alignmentEmptyReason = alignmentRanges.Count == 0 ? "nenhum bloco selecionado no alinhador ativo" : "nenhum campo coberto por op_range do alinhamento";
+
+                PrintFieldSection($"FIXO -> CAMPOS (ALVO) [{modeLabel}]", AnsiOk, PickByRanges(fixedRanges), fixedEmptyReason);
+                PrintFieldSection($"VARIAVEL -> CAMPOS (ALVO) [{modeLabel}]", AnsiWarn, PickByRanges(variableRanges), variableEmptyReason);
+                PrintFieldSection($"ALINHAMENTO -> CAMPOS (ALVO) [{modeLabel}]", AnsiInfo, PickByRanges(alignmentRanges), alignmentEmptyReason);
+            }
+            catch
+            {
+                // best-effort only
+            }
+        }
+
+        private static void PrintSideValuesCompact(JsonElement parsed, string sideProp, string label)
+        {
+            if (!parsed.TryGetProperty(sideProp, out var side))
+            {
+                Console.WriteLine(Colorize($"[{label}] (0)", AnsiDodgeBlue));
+                Console.WriteLine($"  {Colorize("sem side na extração", AnsiSoft)}");
+                Console.WriteLine();
+                return;
+            }
+            var hasValues = side.TryGetProperty("values", out var values) || side.TryGetProperty("Values", out values);
+            if (!hasValues || values.ValueKind != JsonValueKind.Object)
+            {
+                Console.WriteLine(Colorize($"[{label}] (0)", AnsiDodgeBlue));
+                Console.WriteLine($"  {Colorize("sem values na extração", AnsiSoft)}");
+                Console.WriteLine();
+                return;
+            }
+
+            var pairs = new List<(string Key, string Value)>();
+            foreach (var prop in values.EnumerateObject())
+            {
+                var value = prop.Value.GetString() ?? "";
+                if (!string.IsNullOrWhiteSpace(value))
+                    pairs.Add((prop.Name, value));
+            }
+
+            pairs = pairs.OrderBy(p => p.Key, StringComparer.OrdinalIgnoreCase).ToList();
+            Console.WriteLine(Colorize($"[{label}] ({pairs.Count})", AnsiDodgeBlue));
+            if (pairs.Count == 0)
+            {
+                Console.WriteLine($"  {Colorize("sem campos preenchidos", AnsiSoft)}");
+                Console.WriteLine();
+                return;
+            }
+            foreach (var (key, value) in pairs)
+                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize(value, AnsiDodgeBlue)}");
+            Console.WriteLine();
         }
 
         private static void PrintSideValues(JsonElement parsed, string sideProp, string label)
@@ -3173,7 +3745,7 @@ namespace Obj.Commands
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_BAND", out var envBand))
             {
                 band = envBand;
-                applied.Add($"OBJ_TEXTOPSALIGN_BAND -> band={band.ToString(CultureInfo.InvariantCulture)}");
+                applied.Add($"OBJ_TEXTOPSALIGN_BAND -> max_shift_ops={band.ToString(CultureInfo.InvariantCulture)}");
             }
             if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_MIN_LEN_RATIO", out var envMinLenRatio))
             {
@@ -3195,21 +3767,16 @@ namespace Obj.Commands
                 anchorMinLenRatio = Math.Max(0, Math.Min(1, envAnchorLen));
                 applied.Add($"OBJ_TEXTOPSALIGN_ANCHOR_MIN_LEN_RATIO -> anchor_len={ReportUtils.F(anchorMinLenRatio, 3)}");
             }
-            if (TryReadEnvDouble("OBJ_TEXTOPSALIGN_GAP_PENALTY", out var envGap))
-            {
-                gapPenalty = Math.Max(-1, Math.Min(1, envGap));
-                applied.Add($"OBJ_TEXTOPSALIGN_GAP_PENALTY -> gap_penalty={ReportUtils.F(gapPenalty, 3)}");
-            }
+            var envGapPenalty = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_GAP_PENALTY");
+            if (!string.IsNullOrWhiteSpace(envGapPenalty))
+                applied.Add($"OBJ_TEXTOPSALIGN_GAP_PENALTY -> ignorado (gap fixo interno={ReportUtils.F(FixedGapPenalty, 3)})");
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_ALIGN_TOP", out var envAlignTop))
             {
                 alignTop = envAlignTop;
-                applied.Add($"OBJ_TEXTOPSALIGN_ALIGN_TOP -> alinhamento_top={alignTop.ToString(CultureInfo.InvariantCulture)}");
+                applied.Add($"OBJ_TEXTOPSALIGN_ALIGN_TOP -> log_top={alignTop.ToString(CultureInfo.InvariantCulture)}");
             }
-            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_SHOW_ALIGN", out var envShowAlign))
-            {
-                showAlign = envShowAlign;
-                applied.Add($"OBJ_TEXTOPSALIGN_SHOW_ALIGN -> show_alignment={showAlign.ToString().ToLowerInvariant()}");
-            }
+            if (TryReadEnvBool("OBJ_TEXTOPSALIGN_SHOW_ALIGN", out var _))
+                applied.Add("OBJ_TEXTOPSALIGN_SHOW_ALIGN -> ignorado (use --log para saída detalhada)");
             if (TryReadEnvBool("OBJ_TEXTOPSALIGN_ALLOW_STACK", out var envAllowStack))
             {
                 allowStack = envAllowStack;
@@ -3275,13 +3842,13 @@ namespace Obj.Commands
             {
                 probeSide = "a";
                 probeEnabled = true;
-                applied.Add("OBJ_TEXTOPSALIGN_PROBE_SIDE -> probe_side=a probe_enabled=true");
+                applied.Add("OBJ_TEXTOPSALIGN_PROBE_SIDE -> probe_target_pdf_side=pdf_a probe_enabled=true");
             }
             else if (envProbeSide is "b" or "pdf_b" or "right")
             {
                 probeSide = "b";
                 probeEnabled = true;
-                applied.Add("OBJ_TEXTOPSALIGN_PROBE_SIDE -> probe_side=b probe_enabled=true");
+                applied.Add("OBJ_TEXTOPSALIGN_PROBE_SIDE -> probe_target_pdf_side=pdf_b probe_enabled=true");
             }
             if (TryReadEnvInt("OBJ_TEXTOPSALIGN_PROBE_MAX_FIELDS", out var envProbeMax))
             {
@@ -3374,8 +3941,8 @@ namespace Obj.Commands
             lenPenalty = 0.4;
             anchorMinSim = 0.0;
             anchorMinLenRatio = 0.0;
-            gapPenalty = -0.20;
-            showAlign = true;
+            gapPenalty = FixedGapPenalty;
+            showAlign = false;
             alignTop = 0;
             pageAUser = false;
             pageBUser = false;
@@ -3443,6 +4010,9 @@ namespace Obj.Commands
                 ref stepOutputSave,
                 ref stepOutputDir,
                 appliedAutoDefaults);
+
+            // Gap penalty is intentionally fixed and no longer configurable via CLI/env.
+            gapPenalty = FixedGapPenalty;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -3540,6 +4110,34 @@ namespace Obj.Commands
                     int.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out top);
                     continue;
                 }
+                if (string.Equals(arg, "--log", StringComparison.OrdinalIgnoreCase))
+                {
+                    showAlign = true;
+                    alignTop = 0; // padrão: mostrar lista completa de alinhamento
+                    if (i + 1 < args.Length)
+                    {
+                        var maybeCount = (args[i + 1] ?? "").Trim();
+                        if (!maybeCount.StartsWith("-", StringComparison.Ordinal)
+                            && int.TryParse(maybeCount, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedLogTop))
+                        {
+                            alignTop = parsedLogTop;
+                            i++;
+                        }
+                    }
+                    continue;
+                }
+                if (arg.StartsWith("--log=", StringComparison.OrdinalIgnoreCase))
+                {
+                    showAlign = true;
+                    alignTop = 0;
+                    var split = arg.Split('=', 2);
+                    var rawLog = split.Length == 2 ? (split[1] ?? "").Trim() : "";
+                    if (int.TryParse(rawLog, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedLogTop))
+                    {
+                        alignTop = parsedLogTop;
+                    }
+                    continue;
+                }
                 if (string.Equals(arg, "--min-sim", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     double.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out minSim);
@@ -3574,11 +4172,15 @@ namespace Obj.Commands
                     anchorMinLenRatio = Math.Max(0, Math.Min(1, anchorMinLenRatio));
                     continue;
                 }
-                if ((string.Equals(arg, "--gap", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--gap-penalty", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
+                if (string.Equals(arg, "--gap", StringComparison.OrdinalIgnoreCase) || string.Equals(arg, "--gap-penalty", StringComparison.OrdinalIgnoreCase))
                 {
-                    double.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out gapPenalty);
-                    gapPenalty = Math.Max(-1, Math.Min(1, gapPenalty));
-                    continue;
+                    Console.WriteLine("Erro: --gap/--gap-penalty foi removido. O alinhamento usa gap fixo interno.");
+                    return false;
+                }
+                if (arg.StartsWith("--gap=", StringComparison.OrdinalIgnoreCase) || arg.StartsWith("--gap-penalty=", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Erro: --gap/--gap-penalty foi removido. O alinhamento usa gap fixo interno.");
+                    return false;
                 }
                 if (string.Equals(arg, "--alinhamento-top", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
@@ -3728,7 +4330,11 @@ namespace Obj.Commands
 
         private static void ShowHelp()
         {
-            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--gap N] [--top N] [--alinhamento-detalhe] [--alinhamento-top N] [--sem-alinhamento] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
+            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--top N] [--log[=N]] [--alinhamento-detalhe] [--alinhamento-top N] [--sem-alinhamento] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
+            Console.WriteLine("  --top N    = limite dos quadros resumo (TOP VARIAVEIS/TOP FIXOS/ALINHAMENTO HUMANO)");
+            Console.WriteLine("  --log[=N]  = lista ALINHAMENTO detalhada; N linhas (0 = todas).");
+            Console.WriteLine("  padrão     = saída compacta (ALINHAMENTO -> CAMPOS + RESULTADO FINAL).");
+            Console.WriteLine($"  gap penalty: fixo interno ({ReportUtils.F(FixedGapPenalty, 2)}). --gap não é aceito.");
             Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
             Console.WriteLine("aliases de modelo por tipo: @M-DES (despacho), @M-CER (certidao), @M-REQ (requerimento). Se houver múltiplos modelos no alias, o pipeline testa e escolhe o melhor para o alvo.");
             Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
@@ -3798,12 +4404,12 @@ namespace Obj.Commands
                 ("variable", varCount.ToString(CultureInfo.InvariantCulture)),
                 ("gaps", gaps.ToString(CultureInfo.InvariantCulture)),
                 ("minSim", ReportUtils.F(report.MinSim, 2)),
-                ("band", report.Band.ToString(CultureInfo.InvariantCulture)),
+                ("maxShiftOps", report.Band.ToString(CultureInfo.InvariantCulture)),
                 ("lenRatio", ReportUtils.F(report.MinLenRatio, 2)),
                 ("lenPenalty", ReportUtils.F(report.LenPenalty, 2)),
                 ("anchorSim", ReportUtils.F(report.AnchorMinSim, 2)),
                 ("anchorLen", ReportUtils.F(report.AnchorMinLenRatio, 2)),
-                ("gap", ReportUtils.F(report.GapPenalty, 2)),
+                ("gapFixed", ReportUtils.F(report.GapPenalty, 2)),
                 ("rangeA", report.RangeA.HasValue ? $"op{report.RangeA.StartOp}-op{report.RangeA.EndOp}" : "-"),
                 ("rangeB", report.RangeB.HasValue ? $"op{report.RangeB.StartOp}-op{report.RangeB.EndOp}" : "-")
             };
@@ -3813,27 +4419,28 @@ namespace Obj.Commands
                 summary.Add(("helperHitsB", helper.HitsB.ToString(CultureInfo.InvariantCulture)));
                 summary.Add(("helperAcc/Rej", $"{helper.Accepted}/{helper.Rejected}"));
                 summary.Add(("helperUsed", helper.UsedInFinalAnchors.ToString(CultureInfo.InvariantCulture)));
+                summary.Add(("helperApplied", helper.AppliedToSegmentation ? "true" : "false"));
+                summary.Add(("helperMode", string.IsNullOrWhiteSpace(helper.AnchorMode) ? "(n/a)" : helper.AnchorMode));
             }
+            summary.Add(("anchorsReported", report.Anchors.Count.ToString(CultureInfo.InvariantCulture)));
             ReportUtils.WriteSummary("TEXTOPS ALIGN", summary);
             Console.WriteLine();
 
-            Console.WriteLine("ALIGN-HELPER");
+            Console.WriteLine(Colorize("ALIGN-HELPER", AnsiCodexBlue));
             if (helper == null)
             {
-                Console.WriteLine("  sem dados de helper para este alinhamento");
+                Console.WriteLine($"  {Colorize("sem dados de helper para este alinhamento", AnsiSoft)}");
                 Console.WriteLine();
             }
             else
             {
-                Console.WriteLine($"  hitsA={helper.HitsA} hitsB={helper.HitsB} candidates={helper.Candidates} accepted={helper.Accepted} rejected={helper.Rejected} used={helper.UsedInFinalAnchors}");
+                Console.WriteLine($"  hitsA={helper.HitsA} hitsB={helper.HitsB} candidates={helper.Candidates} accepted={helper.Accepted} rejected={helper.Rejected} used={helper.UsedInFinalAnchors} applied={helper.AppliedToSegmentation.ToString().ToLowerInvariant()} mode={helper.AnchorMode}");
 
-                var helperTake = top <= 0 ? 12 : Math.Max(6, Math.Min(24, top));
                 var acceptedRows = helper.Decisions
                     .Where(d => string.Equals(d.Status, "accepted", StringComparison.OrdinalIgnoreCase))
                     .OrderByDescending(d => d.Score)
                     .ThenBy(d => d.AIndex)
                     .ThenBy(d => d.BIndex)
-                    .Take(helperTake)
                     .Select(d => new[]
                     {
                         d.Key,
@@ -3844,7 +4451,7 @@ namespace Obj.Commands
                     })
                     .ToList();
                 if (acceptedRows.Count > 0)
-                    ReportUtils.WriteTable("ALIGN-HELPER ACCEPTED", new[] { "key", "Aidx", "Bidx", "score", "reason" }, acceptedRows);
+                    ReportUtils.WriteTable(Colorize("ALIGN-HELPER ACCEPTED (COMPLETO)", AnsiOk), new[] { "key", "Aidx", "Bidx", "score", "reason" }, acceptedRows);
 
                 var rejectedRows = helper.Decisions
                     .Where(d => string.Equals(d.Status, "rejected", StringComparison.OrdinalIgnoreCase))
@@ -3852,7 +4459,6 @@ namespace Obj.Commands
                     .ThenByDescending(d => d.Score)
                     .ThenBy(d => d.AIndex)
                     .ThenBy(d => d.BIndex)
-                    .Take(helperTake)
                     .Select(d => new[]
                     {
                         d.Key,
@@ -3863,26 +4469,32 @@ namespace Obj.Commands
                     })
                     .ToList();
                 if (rejectedRows.Count > 0)
-                    ReportUtils.WriteTable("ALIGN-HELPER REJECTED (TOP)", new[] { "key", "Aidx", "Bidx", "score", "reason" }, rejectedRows);
+                    ReportUtils.WriteTable(Colorize("ALIGN-HELPER REJECTED (COMPLETO)", AnsiErr), new[] { "key", "Aidx", "Bidx", "score", "reason" }, rejectedRows);
+                if (acceptedRows.Count == 0 && rejectedRows.Count == 0)
+                    Console.WriteLine($"  {Colorize("sem decisões registradas", AnsiSoft)}");
 
                 Console.WriteLine();
             }
 
+            Console.WriteLine(Colorize("ANCHORS (COMPLETO)", AnsiDodgeBlue));
             if (report.Anchors.Count > 0)
             {
-                Console.WriteLine("ANCHORS");
                 foreach (var a in report.Anchors)
                     PrintAlignPair(a, showDiff: false);
-                Console.WriteLine();
             }
+            else
+            {
+                Console.WriteLine($"  {Colorize("sem anchors selecionadas para este alinhamento", AnsiSoft)}");
+            }
+            Console.WriteLine();
 
             // Mostrar variáveis (o que importa para extração).
             var varPairs = report.Alignments
-                .Where(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase) || p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase))
+                .Where(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase))
                 .ToList();
             if (showVariables && varPairs.Count > 0)
             {
-                Console.WriteLine("VARIAVEIS (DMP)");
+                Console.WriteLine(Colorize("VARIAVEIS (DMP)", AnsiClaudeOrange));
                 foreach (var p in varPairs)
                     PrintAlignPair(p, showDiff: p.A != null && p.B != null);
                 Console.WriteLine();
@@ -3891,7 +4503,7 @@ namespace Obj.Commands
             // Mostrar fixos (âncoras naturais).
             if (showFixed && report.FixedPairs.Count > 0)
             {
-                Console.WriteLine("FIXOS");
+                Console.WriteLine(Colorize("FIXOS", AnsiOk));
                 foreach (var p in report.FixedPairs)
                     PrintAlignPair(p, showDiff: false);
                 Console.WriteLine();
@@ -3904,7 +4516,7 @@ namespace Obj.Commands
             {
                 var topVar = report.Alignments
                     .Where(p => p.A != null && p.B != null)
-                    .Where(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase) || p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase))
+                    .Where(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase))
                     .OrderByDescending(p => p.Score)
                     .Take(topLimit)
                     .Select(p => new[]
@@ -3918,7 +4530,7 @@ namespace Obj.Commands
 
                 if (topVar.Count > 0)
                 {
-                    ReportUtils.WriteTable("TOP VARIAVEIS/DIFF", new[]
+                    ReportUtils.WriteTable(Colorize("TOP VARIAVEIS/DIFF", AnsiClaudeOrange), new[]
                     {
                         "kind", "score", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B")
                     }, topVar);
@@ -3943,7 +4555,7 @@ namespace Obj.Commands
 
                 if (topFixed.Count > 0)
                 {
-                    ReportUtils.WriteTable("TOP FIXOS", new[]
+                    ReportUtils.WriteTable(Colorize("TOP FIXOS", AnsiOk), new[]
                     {
                         "kind", "score", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B")
                     }, topFixed);
@@ -3963,7 +4575,7 @@ namespace Obj.Commands
                             p.B?.Text ?? ""
                         })
                         .ToList();
-                    ReportUtils.WriteTable("TOP ALIGNMENTS", new[]
+                    ReportUtils.WriteTable(Colorize("TOP ALIGNMENTS", AnsiCodexBlue), new[]
                     {
                         "kind", "score", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B")
                     }, topAlign);
@@ -3989,12 +4601,34 @@ namespace Obj.Commands
                         p.B?.Text ?? ""
                     })
                     .ToList();
-                ReportUtils.WriteTable("TOP ALIGNMENTS", new[]
+                ReportUtils.WriteTable(Colorize("TOP ALIGNMENTS", AnsiCodexBlue), new[]
                 {
                     "kind", "score", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B")
                 }, topFixed);
                 Console.WriteLine();
             }
+        }
+
+        private static void PrintAlignmentToExtractionPayload(ObjectsTextOpsDiff.AlignDebugReport report)
+        {
+            var opRangeA = BuildOpRange(report.RangeA);
+            var opRangeB = BuildOpRange(report.RangeB);
+            var valueFullA = BuildValueFullFromBlocks(report.BlocksA, report.RangeA);
+            var valueFullB = BuildValueFullFromBlocks(report.BlocksB, report.RangeB);
+
+            Console.WriteLine(Colorize("ALIGN->EXTRACAO (PAYLOAD COMPLETO)", AnsiCodexBlue));
+            Console.WriteLine($"  {Colorize("interpretação:", AnsiWarn)} {Colorize("primeiro=lado A (modelo/referência) | segundo=lado B (pdf alvo)", AnsiSoft)}");
+            Console.WriteLine($"  {Colorize("op_range_primeiro:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(opRangeA) ? "(vazio)" : opRangeA, AnsiSoft)}");
+            Console.WriteLine($"  {Colorize("op_range_segundo:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(opRangeB) ? "(vazio)" : opRangeB, AnsiSoft)}");
+            Console.WriteLine($"  {Colorize("len_value_full_primeiro:", AnsiWarn)} {Colorize(valueFullA.Length.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+            Console.WriteLine($"  {Colorize("len_value_full_segundo:", AnsiWarn)} {Colorize(valueFullB.Length.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+            Console.WriteLine($"  {Colorize("op_range_a/op_range_b:", AnsiWarn)} {Colorize("compat: primeiro/segundo", AnsiSoft)}");
+
+            Console.WriteLine($"  {Colorize("value_full_primeiro:", AnsiWarn)}");
+            Console.WriteLine(string.IsNullOrWhiteSpace(valueFullA) ? Colorize("  (vazio)", AnsiSoft) : valueFullA);
+            Console.WriteLine($"  {Colorize("value_full_segundo:", AnsiWarn)}");
+            Console.WriteLine(string.IsNullOrWhiteSpace(valueFullB) ? Colorize("  (vazio)", AnsiSoft) : valueFullB);
+            Console.WriteLine();
         }
 
         private static void PrintHumanAlignmentTop(ObjectsTextOpsDiff.AlignDebugReport report, int top, OutputMode outputMode)
@@ -4020,7 +4654,7 @@ namespace Obj.Commands
                     ShortInlineText(x.pair.B?.Text ?? "<gap>")
                 })
                 .ToList();
-            ReportUtils.WriteTable("ALINHAMENTO HUMANO (TOP)", new[] { "idx", "kind", "score", "A_op", "B_op", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B") }, rows);
+            ReportUtils.WriteTable(Colorize("ALINHAMENTO HUMANO (TOP)", AnsiCodexBlue), new[] { "idx", "kind", "score", "A_op", "B_op", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B") }, rows);
             Console.WriteLine();
         }
 
@@ -4052,11 +4686,15 @@ namespace Obj.Commands
         private static void PrintAlignmentList(ObjectsTextOpsDiff.AlignDebugReport report, int top, bool showDiff)
         {
             var limit = top <= 0 ? int.MaxValue : top;
-            var list = report.Alignments.Take(limit).ToList();
+            var list = report.Alignments
+                .Where(p => !string.Equals(p.Kind, "gap_a", StringComparison.OrdinalIgnoreCase) &&
+                            !string.Equals(p.Kind, "gap_b", StringComparison.OrdinalIgnoreCase))
+                .Take(limit)
+                .ToList();
             if (list.Count == 0)
                 return;
 
-            Console.WriteLine("ALINHAMENTO");
+            Console.WriteLine(Colorize("ALINHAMENTO (COMPLETO)", AnsiCodexBlue));
             for (int i = 0; i < list.Count; i++)
             {
                 var pair = list[i];

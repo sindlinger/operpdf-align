@@ -210,25 +210,33 @@ namespace Obj.Commands
 
             var segA = BuildSegment(normBand, opRangeA ?? "", valueFullA ?? "", objA, pdfPathA ?? "");
             var segB = BuildSegment(normBand, opRangeB ?? "", valueFullB ?? "", objB, pdfPathB ?? "");
+            var isSinglePage = string.Equals(normBand, "single_page", StringComparison.OrdinalIgnoreCase);
 
             var segmentsA = new Dictionary<string, AlignSegment>(StringComparer.OrdinalIgnoreCase)
             {
-                ["front_head"] = string.Equals(normBand, "front_head", StringComparison.OrdinalIgnoreCase) ? segA : emptyFront,
-                ["back_tail"] = string.Equals(normBand, "back_tail", StringComparison.OrdinalIgnoreCase) ? segA : emptyBack,
-                ["back_signature"] = string.Equals(normBand, "back_signature", StringComparison.OrdinalIgnoreCase) ? segA : emptySig
+                ["front_head"] = (isSinglePage || string.Equals(normBand, "front_head", StringComparison.OrdinalIgnoreCase)) ? segA : emptyFront,
+                ["back_tail"] = (isSinglePage || string.Equals(normBand, "back_tail", StringComparison.OrdinalIgnoreCase)) ? segA : emptyBack,
+                ["back_signature"] = (isSinglePage || string.Equals(normBand, "back_signature", StringComparison.OrdinalIgnoreCase)) ? segA : emptySig
             };
 
             var segmentsB = new Dictionary<string, AlignSegment>(StringComparer.OrdinalIgnoreCase)
             {
-                ["front_head"] = string.Equals(normBand, "front_head", StringComparison.OrdinalIgnoreCase) ? segB : emptyFront,
-                ["back_tail"] = string.Equals(normBand, "back_tail", StringComparison.OrdinalIgnoreCase) ? segB : emptyBack,
-                ["back_signature"] = string.Equals(normBand, "back_signature", StringComparison.OrdinalIgnoreCase) ? segB : emptySig
+                ["front_head"] = (isSinglePage || string.Equals(normBand, "front_head", StringComparison.OrdinalIgnoreCase)) ? segB : emptyFront,
+                ["back_tail"] = (isSinglePage || string.Equals(normBand, "back_tail", StringComparison.OrdinalIgnoreCase)) ? segB : emptyBack,
+                ["back_signature"] = (isSinglePage || string.Equals(normBand, "back_signature", StringComparison.OrdinalIgnoreCase)) ? segB : emptySig
             };
 
-            var allowedBands = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            var allowedBands = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (isSinglePage)
             {
-                normBand
-            };
+                allowedBands.Add("front_head");
+                allowedBands.Add("back_tail");
+                allowedBands.Add("back_signature");
+            }
+            else
+            {
+                allowedBands.Add(normBand);
+            }
 
             var fieldsA = ExtractFieldsForSide(map, segmentsA, allowedBands, "pdf_a");
             var fieldsB = ExtractFieldsForSide(map, segmentsB, allowedBands, "pdf_b");

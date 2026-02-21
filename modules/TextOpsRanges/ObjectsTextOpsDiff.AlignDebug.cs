@@ -87,153 +87,162 @@ namespace Obj.Align
             double lenPenalty = 0.0,
             double anchorMinSim = 0.0,
             double anchorMinLenRatio = 0.0,
-            double gapPenalty = -0.35)
+            double gapPenalty = -0.35,
+            string docHint = "")
         {
             if (string.IsNullOrWhiteSpace(aPath) || string.IsNullOrWhiteSpace(bPath))
                 return null;
 
-            using var docA = new PdfDocument(new PdfReader(aPath));
-            using var docB = new PdfDocument(new PdfReader(bPath));
-
-            var foundA = FindStreamAndResourcesByObjId(docA, selA.Obj);
-            var foundB = FindStreamAndResourcesByObjId(docB, selB.Obj);
-            if (foundA.Stream == null || foundA.Resources == null) return null;
-            if (foundB.Stream == null || foundB.Resources == null) return null;
-
-            var blocksA = ExtractSelfBlocks(foundA.Stream, foundA.Resources, opFilter);
-            var blocksB = ExtractSelfBlocks(foundB.Stream, foundB.Resources, opFilter);
-
-            if (NeedsSpacingFix(blocksA))
-                blocksA = ExtractSelfBlocksForPathByPage(aPath, selA.Page, opFilter);
-            if (NeedsSpacingFix(blocksB))
-                blocksB = ExtractSelfBlocksForPathByPage(bPath, selB.Page, opFilter);
-
-            if (NeedsSpacingFix(blocksB))
+            var previousScope = PushAlignHelperDocScope(docHint);
+            try
             {
-                var spacingAnchors = BuildAnchorSet(blocksA);
-                blocksB = ApplyAnchorsToBlocks(blocksB, spacingAnchors);
-            }
-            if (blocksA.Count == 0 || blocksB.Count == 0)
-                return null;
+                using var docA = new PdfDocument(new PdfReader(aPath));
+                using var docB = new PdfDocument(new PdfReader(bPath));
 
-            var alignments = BuildBlockAlignments(blocksA, blocksB, out var normA, out var normB, out var anchors, out var helperDiagnostics, minSim, band, minLenRatio, lenPenalty, anchorMinSim, anchorMinLenRatio, gapPenalty);
+                var foundA = FindStreamAndResourcesByObjId(docA, selA.Obj);
+                var foundB = FindStreamAndResourcesByObjId(docB, selB.Obj);
+                if (foundA.Stream == null || foundA.Resources == null) return null;
+                if (foundB.Stream == null || foundB.Resources == null) return null;
 
-            var report = new AlignDebugReport
-            {
-                Label = label ?? "",
-                PdfA = Path.GetFileName(aPath),
-                PdfB = Path.GetFileName(bPath),
-                PageA = selA.Page,
-                PageB = selB.Page,
-                ObjA = selA.Obj,
-                ObjB = selB.Obj,
-                Backoff = backoff,
-                MinSim = minSim,
-                Band = band,
-                MinLenRatio = minLenRatio,
-                LenPenalty = lenPenalty,
-                AnchorMinSim = anchorMinSim,
-                AnchorMinLenRatio = anchorMinLenRatio,
-                GapPenalty = gapPenalty,
-                HelperDiagnostics = helperDiagnostics,
-                BlocksA = blocksA.Select(ToDebugBlock).ToList(),
-                BlocksB = blocksB.Select(ToDebugBlock).ToList()
-            };
+                var blocksA = ExtractSelfBlocks(foundA.Stream, foundA.Resources, opFilter);
+                var blocksB = ExtractSelfBlocks(foundB.Stream, foundB.Resources, opFilter);
 
-            var variableRangeA = new VariableRange();
-            var variableRangeB = new VariableRange();
+                if (NeedsSpacingFix(blocksA))
+                    blocksA = ExtractSelfBlocksForPathByPage(aPath, selA.Page, opFilter);
+                if (NeedsSpacingFix(blocksB))
+                    blocksB = ExtractSelfBlocksForPathByPage(bPath, selB.Page, opFilter);
 
-            foreach (var ap in anchors)
-            {
-                if (ap.AIndex >= 0 && ap.BIndex >= 0 && ap.AIndex < blocksA.Count && ap.BIndex < blocksB.Count)
+                if (NeedsSpacingFix(blocksB))
                 {
-                    report.Anchors.Add(new AlignDebugPair
-                    {
-                        AIndex = ap.AIndex,
-                        BIndex = ap.BIndex,
-                        Score = ap.Score,
-                        Kind = "anchor",
-                        A = ToDebugBlock(blocksA[ap.AIndex]),
-                        B = ToDebugBlock(blocksB[ap.BIndex])
-                    });
+                    var spacingAnchors = BuildAnchorSet(blocksA);
+                    blocksB = ApplyAnchorsToBlocks(blocksB, spacingAnchors);
                 }
-            }
+                if (blocksA.Count == 0 || blocksB.Count == 0)
+                    return null;
 
-            foreach (var align in alignments)
-            {
-                if (align.AIndex >= 0 && align.BIndex >= 0)
+                var alignments = BuildBlockAlignments(blocksA, blocksB, out var normA, out var normB, out var anchors, out var helperDiagnostics, minSim, band, minLenRatio, lenPenalty, anchorMinSim, anchorMinLenRatio, gapPenalty);
+
+                var report = new AlignDebugReport
                 {
-                    var same = string.Equals(
-                        NormalizeForFixedComparison(blocksA[align.AIndex].Text),
-                        NormalizeForFixedComparison(blocksB[align.BIndex].Text),
-                        StringComparison.OrdinalIgnoreCase);
-                    if (same)
+                    Label = label ?? "",
+                    PdfA = Path.GetFileName(aPath),
+                    PdfB = Path.GetFileName(bPath),
+                    PageA = selA.Page,
+                    PageB = selB.Page,
+                    ObjA = selA.Obj,
+                    ObjB = selB.Obj,
+                    Backoff = backoff,
+                    MinSim = minSim,
+                    Band = band,
+                    MinLenRatio = minLenRatio,
+                    LenPenalty = lenPenalty,
+                    AnchorMinSim = anchorMinSim,
+                    AnchorMinLenRatio = anchorMinLenRatio,
+                    GapPenalty = gapPenalty,
+                    HelperDiagnostics = helperDiagnostics,
+                    BlocksA = blocksA.Select(ToDebugBlock).ToList(),
+                    BlocksB = blocksB.Select(ToDebugBlock).ToList()
+                };
+
+                var variableRangeA = new VariableRange();
+                var variableRangeB = new VariableRange();
+
+                foreach (var ap in anchors)
+                {
+                    if (ap.AIndex >= 0 && ap.BIndex >= 0 && ap.AIndex < blocksA.Count && ap.BIndex < blocksB.Count)
                     {
-                        report.FixedPairs.Add(new AlignDebugPair
+                        report.Anchors.Add(new AlignDebugPair
                         {
-                            AIndex = align.AIndex,
-                            BIndex = align.BIndex,
-                            Score = align.Score,
-                            Kind = "fixed",
-                            A = ToDebugBlock(blocksA[align.AIndex]),
-                            B = ToDebugBlock(blocksB[align.BIndex])
+                            AIndex = ap.AIndex,
+                            BIndex = ap.BIndex,
+                            Score = ap.Score,
+                            Kind = "anchor",
+                            A = ToDebugBlock(blocksA[ap.AIndex]),
+                            B = ToDebugBlock(blocksB[ap.BIndex])
                         });
-                        report.Alignments.Add(report.FixedPairs[^1]);
                     }
-                    else
+                }
+
+                foreach (var align in alignments)
+                {
+                    if (align.AIndex >= 0 && align.BIndex >= 0)
+                    {
+                        var same = string.Equals(
+                            NormalizeForFixedComparison(blocksA[align.AIndex].Text),
+                            NormalizeForFixedComparison(blocksB[align.BIndex].Text),
+                            StringComparison.OrdinalIgnoreCase);
+                        if (same)
+                        {
+                            report.FixedPairs.Add(new AlignDebugPair
+                            {
+                                AIndex = align.AIndex,
+                                BIndex = align.BIndex,
+                                Score = align.Score,
+                                Kind = "fixed",
+                                A = ToDebugBlock(blocksA[align.AIndex]),
+                                B = ToDebugBlock(blocksB[align.BIndex])
+                            });
+                            report.Alignments.Add(report.FixedPairs[^1]);
+                        }
+                        else
+                        {
+                            AddVariable(blocksA[align.AIndex], ref variableRangeA, report.VariableBlocksA);
+                            AddVariable(blocksB[align.BIndex], ref variableRangeB, report.VariableBlocksB);
+                            report.Alignments.Add(new AlignDebugPair
+                            {
+                                AIndex = align.AIndex,
+                                BIndex = align.BIndex,
+                                Score = align.Score,
+                                Kind = "variable",
+                                A = ToDebugBlock(blocksA[align.AIndex]),
+                                B = ToDebugBlock(blocksB[align.BIndex])
+                            });
+                        }
+
+                    }
+                    else if (align.AIndex >= 0)
                     {
                         AddVariable(blocksA[align.AIndex], ref variableRangeA, report.VariableBlocksA);
-                        AddVariable(blocksB[align.BIndex], ref variableRangeB, report.VariableBlocksB);
                         report.Alignments.Add(new AlignDebugPair
                         {
                             AIndex = align.AIndex,
+                            BIndex = -1,
+                            Score = align.Score,
+                            Kind = "gap_b",
+                            A = ToDebugBlock(blocksA[align.AIndex])
+                        });
+                    }
+                    else if (align.BIndex >= 0)
+                    {
+                        AddVariable(blocksB[align.BIndex], ref variableRangeB, report.VariableBlocksB);
+                        report.Alignments.Add(new AlignDebugPair
+                        {
+                            AIndex = -1,
                             BIndex = align.BIndex,
                             Score = align.Score,
-                            Kind = "variable",
-                            A = ToDebugBlock(blocksA[align.AIndex]),
+                            Kind = "gap_a",
                             B = ToDebugBlock(blocksB[align.BIndex])
                         });
                     }
+                }
 
-                }
-                else if (align.AIndex >= 0)
-                {
-                    AddVariable(blocksA[align.AIndex], ref variableRangeA, report.VariableBlocksA);
-                    report.Alignments.Add(new AlignDebugPair
-                    {
-                        AIndex = align.AIndex,
-                        BIndex = -1,
-                        Score = align.Score,
-                        Kind = "gap_b",
-                        A = ToDebugBlock(blocksA[align.AIndex])
-                    });
-                }
-                else if (align.BIndex >= 0)
-                {
-                    AddVariable(blocksB[align.BIndex], ref variableRangeB, report.VariableBlocksB);
-                    report.Alignments.Add(new AlignDebugPair
-                    {
-                        AIndex = -1,
-                        BIndex = align.BIndex,
-                        Score = align.Score,
-                        Kind = "gap_a",
-                        B = ToDebugBlock(blocksB[align.BIndex])
-                    });
-                }
+                if (!variableRangeA.HasValue)
+                    variableRangeA = FallbackRange(blocksA);
+                if (!variableRangeB.HasValue)
+                    variableRangeB = FallbackRange(blocksB);
+
+                var (startA, endA) = ApplyBackoff(variableRangeA, backoff);
+                var (startB, endB) = ApplyBackoff(variableRangeB, backoff);
+
+                report.RangeA = new AlignDebugRange { StartOp = startA, EndOp = endA, HasValue = startA > 0 && endA > 0 };
+                report.RangeB = new AlignDebugRange { StartOp = startB, EndOp = endB, HasValue = startB > 0 && endB > 0 };
+
+                return report;
             }
-
-            if (!variableRangeA.HasValue)
-                variableRangeA = FallbackRange(blocksA);
-            if (!variableRangeB.HasValue)
-                variableRangeB = FallbackRange(blocksB);
-
-            var (startA, endA) = ApplyBackoff(variableRangeA, backoff);
-            var (startB, endB) = ApplyBackoff(variableRangeB, backoff);
-
-            report.RangeA = new AlignDebugRange { StartOp = startA, EndOp = endA, HasValue = startA > 0 && endA > 0 };
-            report.RangeB = new AlignDebugRange { StartOp = startB, EndOp = endB, HasValue = startB > 0 && endB > 0 };
-
-            return report;
+            finally
+            {
+                PopAlignHelperDocScope(previousScope);
+            }
         }
 
         private static AlignDebugBlock ToDebugBlock(SelfBlock block)

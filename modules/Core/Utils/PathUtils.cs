@@ -340,24 +340,27 @@ namespace Obj.Utils
                     break;
             }
 
-            try
+            if (!hasTypedDir)
             {
-                var cwd = Directory.GetCurrentDirectory();
-                if (!string.IsNullOrWhiteSpace(cwd))
+                try
                 {
-                    var baseDir = Path.Combine(cwd, "models", "aliases");
-                    var localDir = kind switch
+                    var cwd = Directory.GetCurrentDirectory();
+                    if (!string.IsNullOrWhiteSpace(cwd))
                     {
-                        ModelAliasKind.Despacho => Path.Combine(baseDir, "despacho"),
-                        ModelAliasKind.Certidao => Path.Combine(baseDir, "certidao"),
-                        _ => Path.Combine(baseDir, "requerimento")
-                    };
-                    dirs.Add(localDir);
+                        var baseDir = Path.Combine(cwd, "models", "aliases");
+                        var localDir = kind switch
+                        {
+                            ModelAliasKind.Despacho => Path.Combine(baseDir, "despacho"),
+                            ModelAliasKind.Certidao => Path.Combine(baseDir, "certidao"),
+                            _ => Path.Combine(baseDir, "requerimento")
+                        };
+                        dirs.Add(localDir);
+                    }
                 }
-            }
-            catch
-            {
-                // ignore cwd probing
+                catch
+                {
+                    // ignore cwd probing
+                }
             }
 
             var unique = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

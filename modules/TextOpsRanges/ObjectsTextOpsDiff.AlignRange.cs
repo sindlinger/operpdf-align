@@ -936,6 +936,8 @@ namespace Obj.Align
                 return new List<BlockAlignment>();
 
             const double negInf = -1e9;
+            // Banda adaptativa: evita cascata de gaps quando um lado tem mais blocos.
+            var dynamicBand = band <= 0 ? 0 : Math.Max(band, Math.Abs(n - m) + 2);
 
             var dp = new double[n + 1, m + 1];
             var move = new byte[n + 1, m + 1];
@@ -960,21 +962,36 @@ namespace Obj.Align
             {
                 for (int j = 1; j <= m; j++)
                 {
-                    var withinBand = band <= 0 || Math.Abs(i - j) <= band;
+                    var withinBand = dynamicBand <= 0 || Math.Abs(i - j) <= dynamicBand;
                     var aIdx = startA + (i - 1);
                     var bIdx = startB + (j - 1);
                     var anchorCueA = IsAnchorModelCue(normA[aIdx]);
+                    var anchorCueB = IsAnchorModelCue(normB[bIdx]);
+                    var anchorCue = anchorCueA || anchorCueB;
                     var sim = ComputeAlignmentSimilarity(normA[aIdx], normB[bIdx]);
                     var lenRatio = ComputeLenRatio(normA[aIdx], normB[bIdx]);
                     var scoreDiag = negInf;
-                    var effectiveMinSim = anchorCueA ? Math.Min(minSim, 0.08) : minSim;
-                    var lenOk = (minLenRatio <= 0 || lenRatio >= minLenRatio || anchorCueA);
-                    if (withinBand &&
-                        sim >= effectiveMinSim &&
-                        lenOk)
+                    var effectiveMinSim = anchorCue ? Math.Min(minSim, 0.08) : minSim;
+                    var lenOk = (minLenRatio <= 0 || lenRatio >= minLenRatio || anchorCue);
+                    if (withinBand)
                     {
-                        var penalty = (lenPenalty > 0 && !anchorCueA) ? (1.0 - lenRatio) * lenPenalty : 0.0;
-                        scoreDiag = dp[i - 1, j - 1] + sim - penalty;
+                        if (sim >= effectiveMinSim)
+                        {
+                            if (lenOk)
+                            {
+                                var penalty = (lenPenalty > 0 && !anchorCue) ? (1.0 - lenRatio) * lenPenalty : 0.0;
+                                scoreDiag = dp[i - 1, j - 1] + sim - penalty;
+                            }
+                        }
+                        if (double.IsNegativeInfinity(scoreDiag) || scoreDiag <= negInf / 2)
+                        {
+                            // DMP-first fallback:
+                            // quando a similaridade não passa o corte, ainda tentamos parear
+                            // como variável fraca para evitar cascatas de gap_a/gap_b espúrios.
+                            var weakPenalty = lenOk ? 0.0 : 0.05;
+                            var weakDiag = dp[i - 1, j - 1] + (sim * 0.35) - 0.15 - weakPenalty;
+                            scoreDiag = weakDiag;
+                        }
                     }
                     var scoreUp = dp[i - 1, j] + gapPenalty;
                     var scoreLeft = dp[i, j - 1] + gapPenalty;
