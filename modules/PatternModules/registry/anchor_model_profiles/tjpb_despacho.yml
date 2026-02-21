@@ -1,0 +1,202 @@
+anchor_rules:
+  - label: ANC_TRIBUNAL
+    needles:
+      - tribunal de justica
+      - poder judiciario
+    max_per_page: 1
+  - label: ANC_PROCESSO_ADMIN
+    needles:
+      - processo n
+      - processon
+      - processo nº
+    max_per_page: 2
+  - label: ANC_REQUERENTE
+    needles:
+      - "requerente:"
+    max_per_page: 1
+  - label: ANC_INTERESSADO
+    needles:
+      - interessad
+    max_per_page: 1
+  - label: ANC_PERITO
+    needles:
+      - perito
+      - perita
+    max_per_page: 2
+  - label: ANC_ESPECIALIDADE
+    needles:
+      - assistente social
+      - engenheiro
+      - grafotecnico
+      - especialidade
+    max_per_page: 2
+  - label: ANC_VALOR_JZ
+    needles:
+      - valor de r$
+      - no valor de
+    max_per_page: 2
+  - label: ANC_CPF_PERITO
+    needles:
+      - cpf
+    max_per_page: 2
+  - label: ANC_PROCESSO_JUDICIAL
+    needles:
+      - pericia nos autos
+      - acao
+      - processo n
+    max_per_page: 2
+  - label: ANC_PROMOVENTE
+    needles:
+      - movido por
+      - autor
+    max_per_page: 2
+  - label: ANC_PROMOVIDO
+    needles:
+      - em face de
+      - reu
+    max_per_page: 2
+  - label: ANC_VARA
+    needles:
+      - juizo da
+      - vara
+    max_per_page: 2
+  - label: ANC_COMARCA
+    needles:
+      - comarca
+    max_per_page: 2
+  - label: ANC_ENCAMINHE
+    needles:
+      - encaminhem-se
+      - encaminhem se
+    max_per_page: 1
+  - label: ANC_DIRETORIA
+    needles:
+      - diretoria especial
+    max_per_page: 2
+  - label: ANC_ASSINATURA
+    needles:
+      - documento assinado eletronicamente
+      - diretor especial
+    max_per_page: 2
+  - label: ANC_DATA_DESPESA
+    needles:
+      - joao pessoa
+      - assinado
+    max_per_page: 2
+  - label: ANC_VERIFICADOR
+    needles:
+      - codigo verificador
+      - crc
+    max_per_page: 1
+
+placeholder_rules:
+  - tag: "<PROCESSO_ADMINISTRATIVO>"
+    label: ANC_PROCESSO_ADMIN
+    max_per_page: 1
+  - tag: "<PROCESSO_JUDICIAL>"
+    label: ANC_PROCESSO_JUDICIAL
+    max_per_page: 2
+  - tag: "<VARA>"
+    label: ANC_VARA
+    max_per_page: 3
+  - tag: "<COMARCA>"
+    label: ANC_COMARCA
+    max_per_page: 3
+  - tag: "<PERITO>"
+    label: ANC_PERITO
+    max_per_page: 3
+  - tag: "<CPF_PERITO>"
+    label: ANC_CPF_PERITO
+    max_per_page: 2
+  - tag: "<PROMOVENTE>"
+    label: ANC_PROMOVENTE
+    max_per_page: 2
+  - tag: "<PROMOVIDO>"
+    label: ANC_PROMOVIDO
+    max_per_page: 2
+  - tag: "<ESPECIALIDADE>"
+    label: ANC_ESPECIALIDADE
+    max_per_page: 2
+  - tag: "<ESPECIE_DA_PERICIA>"
+    label: ANC_ESPECIE_PERICIA
+    max_per_page: 2
+  - tag: "<VALOR_ARBITRADO_JZ>"
+    label: ANC_VALOR_JZ
+    max_per_page: 1
+  - tag: "<VALOR_ARBITRADO_DE>"
+    label: ANC_VALOR_DE
+    max_per_page: 1
+  - tag: "<DATA_DESPESA>"
+    label: ANC_DATA_DESPESA
+    max_per_page: 2
+
+render_text:
+  placeholder:
+    ANC_PROCESSO_ADMIN: "<PROCESSO_ADMINISTRATIVO>"
+    ANC_PROCESSO_JUDICIAL: "<PROCESSO_JUDICIAL>"
+    ANC_REQUERENTE: "<REQUERENTE>"
+    ANC_INTERESSADO: "<INTERESSADO>"
+    ANC_VARA: "<VARA>"
+    ANC_COMARCA: "<COMARCA>"
+    ANC_PERITO: "<PERITO>"
+    ANC_CPF_PERITO: "<CPF_PERITO>"
+    ANC_PROMOVENTE: "<PROMOVENTE>"
+    ANC_PROMOVIDO: "<PROMOVIDO>"
+    ANC_ESPECIALIDADE: "<ESPECIALIDADE>"
+    ANC_ESPECIE_PERICIA: "<ESPECIE_DA_PERICIA>"
+    ANC_VALOR_JZ: "<VALOR_ARBITRADO_JZ>"
+    ANC_VALOR_DE: "<VALOR_ARBITRADO_DE>"
+    ANC_DATA_DESPESA: "<DATA_DESPESA>"
+    ANC_TRIBUNAL: "<TRIBUNAL>"
+    ANC_DIRETORIA: "<DIRETORIA>"
+    ANC_ASSINATURA: "<ASSINATURA>"
+    ANC_ENCAMINHE: "<ENCAMINHE-SE>"
+    ANC_VERIFICADOR: "<VERIFICADOR>"
+
+  anchor_phrase:
+    ANC_TRIBUNAL: "Tribunal de Justica"
+    ANC_DIRETORIA: "Diretoria Especial"
+    ANC_PROCESSO_ADMIN: "Processo nº"
+    ANC_PROCESSO_JUDICIAL: "processo nº"
+    ANC_REQUERENTE: "Requerente:"
+    ANC_INTERESSADO: "Interessado:"
+    ANC_PERITO: "Perito"
+    ANC_ESPECIALIDADE: "Especialidade"
+    ANC_CPF_PERITO: "CPF"
+    ANC_VALOR_JZ: "valor de R$"
+    ANC_VALOR_DE: "valor de R$"
+    ANC_PROMOVENTE: "movido por"
+    ANC_PROMOVIDO: "em face de"
+    ANC_VARA: "Juizo da"
+    ANC_COMARCA: "Comarca de"
+    ANC_ENCAMINHE: "encaminhem-se os presentes autos"
+    ANC_ASSINATURA: "Documento assinado eletronicamente"
+    ANC_DATA_DESPESA: "em Joao Pessoa"
+    ANC_VERIFICADOR: "codigo verificador"
+
+  masked:
+    ANC_TRIBUNAL: "PPPPP PPPPP PPP PPPPPPP"
+    ANC_DIRETORIA: "PPPPPPPPP PPPPPPP"
+    ANC_PROCESSO_ADMIN: "Processo nº 2022.000.000"
+    ANC_PROCESSO_JUDICIAL: "Processo nº 0000000-00.0000.0.00.0000"
+    ANC_REQUERENTE: "Requerente: Juizo da 0ª VVVV da CCCCCCC de CCCCCCCC"
+    ANC_INTERESSADO: "Interessad: Pppppppp Ppppppp Pppp pp Ppppp - Perita Medica Neurologista"
+    ANC_VARA: "perante o Juizo da 0ª VVVV da CCCCCCC de CCCCCCCC"
+    ANC_COMARCA: "Comarca de CCCCCCCC"
+    ANC_PERITO: "em favor da Perita Medica Neurologista Pppppppp Ppppppp Pppp pp Ppppp"
+    ANC_CPF_PERITO: "CPF 000.000.000-00"
+    ANC_PROMOVENTE: "movido por AAAAA AAAAAAA AAAAA AA"
+    ANC_PROMOVIDO: "em face do BBBBB BBBBBBB BBBBB BB"
+    ANC_ESPECIALIDADE: "Perita Medica Neurologista"
+    ANC_ESPECIE_PERICIA: "Pericia PPPPP"
+    ANC_VALOR_JZ: "no valor de R$ 000,00"
+    ANC_VALOR_DE: "no valor de R$ 000,00"
+    ANC_DATA_DESPESA: "00 de PPPPP de 0000"
+    ANC_ASSINATURA: "Documento assinado"
+    ANC_ENCAMINHE: "Encaminhe-se"
+    ANC_VERIFICADOR: "Codigo verificador 00000000"
+
+defaults:
+  placeholder_text: "ANCORA"
+  anchor_phrase_text: "ancora"
+  masked_text: "PPPPP 0000"
