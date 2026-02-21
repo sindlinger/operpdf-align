@@ -94,6 +94,33 @@ namespace Obj.Commands
             Console.WriteLine();
         }
 
+        private static (string Key, string Value)[] BuildPipelineContextItems(
+            string modelPdfPath,
+            string targetPdfPath)
+        {
+            var modelName = string.IsNullOrWhiteSpace(modelPdfPath) ? "(vazio)" : Path.GetFileName(modelPdfPath);
+            var targetName = string.IsNullOrWhiteSpace(targetPdfPath) ? "(vazio)" : Path.GetFileName(targetPdfPath);
+            return new[]
+            {
+                ("pdf", $"{modelName} (modelo)"),
+                ("pdf", $"{targetName} (a ser extraído)")
+            };
+        }
+
+        private static (string Key, string Value)[] WithPipelineContext(
+            IReadOnlyList<(string Key, string Value)>? contextItems,
+            params (string Key, string Value)[] stepItems)
+        {
+            if (contextItems == null || contextItems.Count == 0)
+                return stepItems ?? Array.Empty<(string Key, string Value)>();
+
+            var items = new List<(string Key, string Value)>(contextItems.Count + (stepItems?.Length ?? 0));
+            items.AddRange(contextItems);
+            if (stepItems != null && stepItems.Length > 0)
+                items.AddRange(stepItems);
+            return items.ToArray();
+        }
+
         private static void PrintAppliedAutoDefaults(List<string> applied)
         {
             Console.WriteLine(Colorize("[DEFAULTS AUTOMATICOS]", AnsiInfo));
@@ -424,53 +451,10 @@ namespace Obj.Commands
                     rawDirs.Add(value);
             }
 
-            void AddDirOfModelEnv(string key)
-            {
-                var value = Environment.GetEnvironmentVariable(key);
-                if (string.IsNullOrWhiteSpace(value))
-                    return;
-                try
-                {
-                    var full = Path.GetFullPath(value);
-                    var dir = Path.GetDirectoryName(full);
-                    if (!string.IsNullOrWhiteSpace(dir))
-                        rawDirs.Add(dir);
-                }
-                catch
-                {
-                    var dir = Path.GetDirectoryName(value);
-                    if (!string.IsNullOrWhiteSpace(dir))
-                        rawDirs.Add(dir);
-                }
-            }
-
-            AddFromEnv("OBJPDF_MODELS_DES_DIR");
-            AddFromEnv("OBJPDF_MODELS_CER_DIR");
-            AddFromEnv("OBJPDF_MODELS_REQ_DIR");
-            AddFromEnv("OBJPDF_MODELS_DESPACHO_DIR");
-            AddFromEnv("OBJPDF_MODELS_CERTIDAO_DIR");
-            AddFromEnv("OBJPDF_MODELS_REQUERIMENTO_DIR");
-            AddFromEnv("OBJPDF_MODELS_DIR");
-            AddDirOfModelEnv("OBJPDF_MODEL_DESPACHO");
-            AddDirOfModelEnv("OBJPDF_MODEL_CERTIDAO");
-            AddDirOfModelEnv("OBJPDF_MODEL_REQUERIMENTO");
-            AddDirOfModelEnv("OBJPDF_MODEL");
-
-            try
-            {
-                var cwd = Directory.GetCurrentDirectory();
-                if (!string.IsNullOrWhiteSpace(cwd))
-                {
-                    rawDirs.Add(Path.Combine(cwd, "models", "aliases", "despacho"));
-                    rawDirs.Add(Path.Combine(cwd, "models", "aliases", "certidao"));
-                    rawDirs.Add(Path.Combine(cwd, "models", "aliases", "requerimento"));
-                    rawDirs.Add(Path.Combine(cwd, "models", "nossos"));
-                }
-            }
-            catch
-            {
-                // ignore cwd fallback
-            }
+            // Modo estrito: somente diretórios tipados explícitos (sem fallback).
+            AddFromEnv("OBJPDF_ALIAS_M_DES_DIR");
+            AddFromEnv("OBJPDF_ALIAS_M_CER_DIR");
+            AddFromEnv("OBJPDF_ALIAS_M_REQ_DIR");
 
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var raw in rawDirs)
@@ -1598,8 +1582,7 @@ namespace Obj.Commands
                 int localObjA = objA;
                 ResolveSelection(bPath, pageBUser, objBUser, pageB, objB, out var localPageB, out var localObjB, out var sourceB);
                 var roleB = DetectInputRole(bPath);
-                var extractionScope = ResolveExtractionScopeTag(roleA, roleB);
-                var targetIsA = string.Equals(extractionScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase);
+                var targetIsA = IsTargetRole(roleA) && IsTemplateRole(roleB);
                 var modelPdfPath = targetIsA ? bPath : aPath;
                 var targetPdfPath = targetIsA ? aPath : bPath;
                 var modelSel = targetIsA
@@ -1608,6 +1591,9 @@ namespace Obj.Commands
                 var targetSel = targetIsA
                     ? $"page={localPageA} obj={localObjA} source={sourceA}"
                     : $"page={localPageB} obj={localObjB} source={sourceB}";
+                var pipelineContextItems = BuildPipelineContextItems(
+                    modelPdfPath,
+                    targetPdfPath);
                 if (!ReturnUtils.IsEnabled() && sourceB.StartsWith("despacho", StringComparison.OrdinalIgnoreCase))
                 {
                     var sideLabelB = targetIsA
@@ -1643,11 +1629,7 @@ namespace Obj.Commands
                     {
                         ("modulo", "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker"),
                         ("role_a", roleA),
-                        ("role_b", roleB),
-                        ("modelo_pdf", Path.GetFileName(modelPdfPath)),
-                        ("pdf_alvo_extracao", Path.GetFileName(targetPdfPath)),
-                        ("modelo_sel", modelSel),
-                        ("alvo_sel", targetSel)
+                        ("role_b", roleB)
                     };
                     step1Lines.Add(("band", sideLabel));
                     step1Lines.Add(("ops", string.Join(",", opFilter.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))));
@@ -1656,7 +1638,7 @@ namespace Obj.Commands
                     PrintPipelineStep(
                         "etapa 1/8 - detecção e seleção de objetos",
                         "etapa 2/8 - alinhamento",
-                        step1Lines.ToArray()
+                        WithPipelineContext(pipelineContextItems, step1Lines.ToArray())
                     );
                 }
                 if (!ReturnUtils.IsEnabled())
@@ -1774,7 +1756,7 @@ namespace Obj.Commands
                         stepItems.Add(("helper_applied", helper.AppliedToSegmentation ? "true" : "false"));
                         stepItems.Add(("helper_mode", string.IsNullOrWhiteSpace(helper.AnchorMode) ? "(n/a)" : helper.AnchorMode));
                     }
-                    PrintPipelineStep("etapa 2/8 - alinhamento textual", "etapa 3/8 - parser YAML (campos com op_range + value_full)", stepItems.ToArray());
+                    PrintPipelineStep("etapa 2/8 - alinhamento textual", "etapa 3/8 - parser YAML (campos com op_range + value_full)", WithPipelineContext(pipelineContextItems, stepItems.ToArray()));
                 }
 
                 if (inputs.Count == 2 && !ReturnUtils.IsEnabled() && showAlign)
@@ -1797,6 +1779,7 @@ namespace Obj.Commands
                         docKey,
                         verbose: !ReturnUtils.IsEnabled(),
                         maxPipelineStep: runToStep,
+                        pipelineContextItems: pipelineContextItems,
                         onStepOutput: (step, stageKey, status, payload) =>
                         {
                             EmitStage(step, status, payload, stageKey, ResolveStageLabel(step));
@@ -1836,11 +1819,13 @@ namespace Obj.Commands
                             PrintPipelineStep(
                                 "etapa 7/8 - probe pós-extração",
                                 "etapa 8/8 - persistência e resumo",
-                                ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
-                                ("probe_target_pdf_side", sideKey),
-                                ("probe_file", effectiveProbeFile),
-                                ("probe_page", effectiveProbePage.ToString(CultureInfo.InvariantCulture)),
-                                ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture))
+                                WithPipelineContext(
+                                    pipelineContextItems,
+                                    ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
+                                    ("probe_target_pdf_side", sideKey),
+                                    ("probe_file", effectiveProbeFile),
+                                    ("probe_page", effectiveProbePage.ToString(CultureInfo.InvariantCulture)),
+                                    ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture)))
                             );
                         }
 
@@ -1944,7 +1929,14 @@ namespace Obj.Commands
                         SaveStageOutputs(stepOutputDir, reportOutputPrefix, stageOutputs);
 
                 if (!ReturnUtils.IsEnabled())
-                    PrintPipelineStep("etapa 8/8 - persistência e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
+                    PrintPipelineStep(
+                        "etapa 8/8 - persistência e resumo",
+                        "fim",
+                        WithPipelineContext(
+                            pipelineContextItems,
+                            ("modulo", "ObjectsTextOpsAlign + JsonSerializer"),
+                            ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath),
+                            ("extraction", "resumo final da extração + JSON em outputs/extract")));
                 if (!ReturnUtils.IsEnabled())
                 {
                     PrintAlignedFieldResults(report, outputMode);
@@ -2464,9 +2456,10 @@ namespace Obj.Commands
             string docKey,
             bool verbose = false,
             int maxPipelineStep = PipelineLastStep,
+            IReadOnlyList<(string Key, string Value)>? pipelineContextItems = null,
             Action<int, string, string, Dictionary<string, object>>? onStepOutput = null)
         {
-            return BuildExtractionPayload(report, null, aPath, bPath, docKey, verbose, maxPipelineStep, onStepOutput);
+            return BuildExtractionPayload(report, null, aPath, bPath, docKey, verbose, maxPipelineStep, pipelineContextItems, onStepOutput);
         }
 
         private static bool TryParseBandReport(
@@ -2535,6 +2528,7 @@ namespace Obj.Commands
             string docKey,
             bool verbose = false,
             int maxPipelineStep = PipelineLastStep,
+            IReadOnlyList<(string Key, string Value)>? pipelineContextItems = null,
             Action<int, string, string, Dictionary<string, object>>? onStepOutput = null)
         {
             var stepLimit = Math.Max(3, Math.Min(6, maxPipelineStep));
@@ -2545,18 +2539,23 @@ namespace Obj.Commands
             var extractionScope = ResolveExtractionScopeTag(report.RoleA, report.RoleB);
             var targetSide = ResolveTargetSideFromScope(extractionScope);
             var targetIsA = string.Equals(targetSide, "pdf_a", StringComparison.OrdinalIgnoreCase);
+            var effectivePipelineContext = pipelineContextItems ?? BuildPipelineContextItems(
+                targetIsA ? bPath : aPath,
+                targetIsA ? aPath : bPath);
 
             if (verbose)
             {
                 PrintPipelineStep(
                     "etapa 3/8 - preparação do parser YAML",
                     "etapa 3/8 - recorte value_full/op_range",
-                    ("modulo", "ObjectsTextOpsAlign + DocumentValidationRules"),
-                    ("doc_key", resolvedDoc),
-                    ("doc_type", outputDocType),
-                    ("scope", extractionScope),
-                    ("band", bandFront),
-                    ("map_path", string.IsNullOrWhiteSpace(mapPath) ? "(não encontrado)" : mapPath)
+                    WithPipelineContext(
+                        effectivePipelineContext,
+                        ("modulo", "ObjectsTextOpsAlign + DocumentValidationRules"),
+                        ("doc_key", resolvedDoc),
+                        ("doc_type", outputDocType),
+                        ("scope", extractionScope),
+                        ("band", bandFront),
+                        ("map_path", string.IsNullOrWhiteSpace(mapPath) ? "(não encontrado)" : mapPath))
                 );
             }
             if (string.IsNullOrWhiteSpace(mapPath))
@@ -2587,8 +2586,10 @@ namespace Obj.Commands
                     PrintPipelineStep(
                         "etapa 3/8 - parser YAML (falhou)",
                         "encerrado com erro de parser YAML",
-                        ("modulo", "Obj.Commands.ObjectsMapFields"),
-                        ("erro", string.IsNullOrWhiteSpace(frontError) ? "(sem detalhe)" : frontError)
+                        WithPipelineContext(
+                            effectivePipelineContext,
+                            ("modulo", "Obj.Commands.ObjectsMapFields"),
+                            ("erro", string.IsNullOrWhiteSpace(frontError) ? "(sem detalhe)" : frontError))
                     );
                 }
                 onStepOutput?.Invoke(3, "yaml_parser_fields", "fail", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
@@ -2617,13 +2618,15 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "etapa 3/8 - recorte value_full/op_range",
                     "etapa 3/8 - parser YAML (campos)",
-                    ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
-                    ("op_range_a", string.IsNullOrWhiteSpace(opRangeAFront) ? "(vazio)" : opRangeAFront),
-                    ("op_range_b", string.IsNullOrWhiteSpace(opRangeBFront) ? "(vazio)" : opRangeBFront),
-                    ("len_value_full_a", valueFullAFront.Length.ToString(CultureInfo.InvariantCulture)),
-                    ("len_value_full_b", valueFullBFront.Length.ToString(CultureInfo.InvariantCulture)),
-                    ("sample_a", ShortText(valueFullAFront)),
-                    ("sample_b", ShortText(valueFullBFront))
+                    WithPipelineContext(
+                        effectivePipelineContext,
+                        ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
+                        ("op_range_a", string.IsNullOrWhiteSpace(opRangeAFront) ? "(vazio)" : opRangeAFront),
+                        ("op_range_b", string.IsNullOrWhiteSpace(opRangeBFront) ? "(vazio)" : opRangeBFront),
+                        ("len_value_full_a", valueFullAFront.Length.ToString(CultureInfo.InvariantCulture)),
+                        ("len_value_full_b", valueFullBFront.Length.ToString(CultureInfo.InvariantCulture)),
+                        ("sample_a", ShortText(valueFullAFront)),
+                        ("sample_b", ShortText(valueFullBFront)))
                 );
             }
 
@@ -2644,11 +2647,13 @@ namespace Obj.Commands
                     PrintPipelineStep(
                         "etapa 3/8 - parser YAML (ok)",
                         "etapa 4/8 - honorários",
-                        ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
-                        ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
-                        ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
-                        ("origem_values_a", "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
-                        ("origem_values_b", "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)")
+                        WithPipelineContext(
+                            effectivePipelineContext,
+                            ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
+                            ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
+                            ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
+                            ("origem_values_a", "parsed.pdf_a.values <= parsed.pdf_a.fields (source/op_range/obj)"),
+                            ("origem_values_b", "parsed.pdf_b.values <= parsed.pdf_b.fields (source/op_range/obj)"))
                     );
                 }
                 else
@@ -2657,11 +2662,13 @@ namespace Obj.Commands
                     PrintPipelineStep(
                         "etapa 3/8 - parser YAML (ok)",
                         "etapa 4/8 - honorários",
-                        ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
-                        ("scope", extractionScope),
-                        ("target_side", targetSide),
-                        ("fields_target_non_empty", targetCount.ToString(CultureInfo.InvariantCulture)),
-                        ("origem_values_target", $"{targetSide}: parsed.{targetSide}.values <= parsed.{targetSide}.fields (source/op_range/obj)")
+                        WithPipelineContext(
+                            effectivePipelineContext,
+                            ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
+                            ("scope", extractionScope),
+                            ("target_side", targetSide),
+                            ("fields_target_non_empty", targetCount.ToString(CultureInfo.InvariantCulture)),
+                            ("origem_values_target", $"{targetSide}: parsed.{targetSide}.values <= parsed.{targetSide}.fields (source/op_range/obj)"))
                     );
                 }
             }
@@ -2868,21 +2875,23 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "etapa 4/8 - honorários",
                     "etapa 5/8 - reparador",
-                    ("modulo", "Obj.Honorarios.HonorariosFacade (Backfill + Enricher)"),
-                    ("changed_keys_a", DescribeChangedKeys(beforeHonorariosA, valuesA)),
-                    ("changed_keys_b", DescribeChangedKeys(beforeHonorariosB, valuesB)),
-                    ("status_honorarios_a", honorariosA?.Summary?.PdfA?.Status ?? "(sem status)"),
-                    ("status_honorarios_b", honorariosB?.Summary?.PdfA?.Status ?? "(sem status)"),
-                    ("especialidade_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "ESPECIALIDADE")),
-                    ("especialidade_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "ESPECIALIDADE")),
-                    ("especie_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "ESPECIE_DA_PERICIA")),
-                    ("especie_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "ESPECIE_DA_PERICIA")),
-                    ("valor_jz_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "VALOR_ARBITRADO_JZ")),
-                    ("valor_jz_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "VALOR_ARBITRADO_JZ")),
-                    ("valor_path_a_pre_validator", DescribeMoneyPath(valuesA, fieldsA)),
-                    ("valor_path_b_pre_validator", DescribeMoneyPath(valuesB, fieldsB)),
-                    ("derived_valor_a", honorariosA?.DerivedValor ?? ""),
-                    ("derived_valor_b", honorariosB?.DerivedValor ?? "")
+                    WithPipelineContext(
+                        effectivePipelineContext,
+                        ("modulo", "Obj.Honorarios.HonorariosFacade (Backfill + Enricher)"),
+                        ("changed_keys_a", DescribeChangedKeys(beforeHonorariosA, valuesA)),
+                        ("changed_keys_b", DescribeChangedKeys(beforeHonorariosB, valuesB)),
+                        ("status_honorarios_a", honorariosA?.Summary?.PdfA?.Status ?? "(sem status)"),
+                        ("status_honorarios_b", honorariosB?.Summary?.PdfA?.Status ?? "(sem status)"),
+                        ("especialidade_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "ESPECIALIDADE")),
+                        ("especialidade_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "ESPECIALIDADE")),
+                        ("especie_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "ESPECIE_DA_PERICIA")),
+                        ("especie_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "ESPECIE_DA_PERICIA")),
+                        ("valor_jz_flow_a", DescribeFieldFlowInline(beforeHonorariosA, valuesA, honorariosA?.DerivedValues, "VALOR_ARBITRADO_JZ")),
+                        ("valor_jz_flow_b", DescribeFieldFlowInline(beforeHonorariosB, valuesB, honorariosB?.DerivedValues, "VALOR_ARBITRADO_JZ")),
+                        ("valor_path_a_pre_validator", DescribeMoneyPath(valuesA, fieldsA)),
+                        ("valor_path_b_pre_validator", DescribeMoneyPath(valuesB, fieldsB)),
+                        ("derived_valor_a", honorariosA?.DerivedValor ?? ""),
+                        ("derived_valor_b", honorariosB?.DerivedValor ?? ""))
                 );
             }
 
@@ -2935,17 +2944,19 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "etapa 5/8 - reparador",
                     "etapa 6/8 - validação documental",
-                    ("modulo", "Obj.ValidationCore.ValidationRepairer"),
-                    ("repair_apply_a", repairA.Applied.ToString().ToLowerInvariant()),
-                    ("repair_apply_b", repairB.Applied.ToString().ToLowerInvariant()),
-                    ("repair_changed_a", Obj.ValidationCore.ValidationRepairer.DescribeChangedFields(repairA.ChangedFields)),
-                    ("repair_changed_b", Obj.ValidationCore.ValidationRepairer.DescribeChangedFields(repairB.ChangedFields)),
-                    ("repair_ok_a", repairA.Ok.ToString().ToLowerInvariant()),
-                    ("repair_reason_a", string.IsNullOrWhiteSpace(repairA.Reason) ? "(ok)" : repairA.Reason),
-                    ("repair_ok_b", repairB.Ok.ToString().ToLowerInvariant()),
-                    ("repair_reason_b", string.IsNullOrWhiteSpace(repairB.Reason) ? "(ok)" : repairB.Reason),
-                    ("repair_legacy_mirror_a", repairA.LegacyMirrorMatchesCore ? "match" : "mismatch"),
-                    ("repair_legacy_mirror_b", repairB.LegacyMirrorMatchesCore ? "match" : "mismatch")
+                    WithPipelineContext(
+                        effectivePipelineContext,
+                        ("modulo", "Obj.ValidationCore.ValidationRepairer"),
+                        ("repair_apply_a", repairA.Applied.ToString().ToLowerInvariant()),
+                        ("repair_apply_b", repairB.Applied.ToString().ToLowerInvariant()),
+                        ("repair_changed_a", Obj.ValidationCore.ValidationRepairer.DescribeChangedFields(repairA.ChangedFields)),
+                        ("repair_changed_b", Obj.ValidationCore.ValidationRepairer.DescribeChangedFields(repairB.ChangedFields)),
+                        ("repair_ok_a", repairA.Ok.ToString().ToLowerInvariant()),
+                        ("repair_reason_a", string.IsNullOrWhiteSpace(repairA.Reason) ? "(ok)" : repairA.Reason),
+                        ("repair_ok_b", repairB.Ok.ToString().ToLowerInvariant()),
+                        ("repair_reason_b", string.IsNullOrWhiteSpace(repairB.Reason) ? "(ok)" : repairB.Reason),
+                        ("repair_legacy_mirror_a", repairA.LegacyMirrorMatchesCore ? "match" : "mismatch"),
+                        ("repair_legacy_mirror_b", repairB.LegacyMirrorMatchesCore ? "match" : "mismatch"))
                 );
             }
 
@@ -3015,24 +3026,26 @@ namespace Obj.Commands
                 PrintPipelineStep(
                     "etapa 6/8 - validador",
                     "etapa 7/8 - probe",
-                    ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
-                    ("changed_keys_validator_a_apply", validatorChangedA == null || validatorChangedA.Count == 0
-                        ? "(nenhum)"
-                        : string.Join(", ", validatorChangedA)),
-                    ("changed_keys_validator_a", DescribeChangedKeys(beforeValidatorA, valuesA)),
-                    ("changed_keys_validator_b", validatorChangedB == null || validatorChangedB.Count == 0
-                        ? "(nenhum)"
-                        : string.Join(", ", validatorChangedB)),
-                    ("policy_strict_money_a", policyChangedA.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedA)),
-                    ("policy_strict_money_b", policyChangedB.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedB)),
-                    ("valor_path_a_pos_validator", DescribeMoneyPath(valuesA, fieldsA)),
-                    ("valor_path_b_pos_validator", DescribeMoneyPath(valuesB, fieldsB)),
-                    ("validator_ok_pair", okPair.ToString().ToLowerInvariant()),
-                    ("validator_reason_pair", string.IsNullOrWhiteSpace(reasonPair) ? "(ok)" : reasonPair),
-                    ("validator_ok_a", okA.ToString().ToLowerInvariant()),
-                    ("validator_reason_a", string.IsNullOrWhiteSpace(reasonA) ? "(ok)" : reasonA!),
-                    ("validator_ok_b", okB.ToString().ToLowerInvariant()),
-                    ("validator_reason_b", string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB!)
+                    WithPipelineContext(
+                        effectivePipelineContext,
+                        ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
+                        ("changed_keys_validator_a_apply", validatorChangedA == null || validatorChangedA.Count == 0
+                            ? "(nenhum)"
+                            : string.Join(", ", validatorChangedA)),
+                        ("changed_keys_validator_a", DescribeChangedKeys(beforeValidatorA, valuesA)),
+                        ("changed_keys_validator_b", validatorChangedB == null || validatorChangedB.Count == 0
+                            ? "(nenhum)"
+                            : string.Join(", ", validatorChangedB)),
+                        ("policy_strict_money_a", policyChangedA.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedA)),
+                        ("policy_strict_money_b", policyChangedB.Count == 0 ? "(nenhum)" : string.Join(", ", policyChangedB)),
+                        ("valor_path_a_pos_validator", DescribeMoneyPath(valuesA, fieldsA)),
+                        ("valor_path_b_pos_validator", DescribeMoneyPath(valuesB, fieldsB)),
+                        ("validator_ok_pair", okPair.ToString().ToLowerInvariant()),
+                        ("validator_reason_pair", string.IsNullOrWhiteSpace(reasonPair) ? "(ok)" : reasonPair),
+                        ("validator_ok_a", okA.ToString().ToLowerInvariant()),
+                        ("validator_reason_a", string.IsNullOrWhiteSpace(reasonA) ? "(ok)" : reasonA!),
+                        ("validator_ok_b", okB.ToString().ToLowerInvariant()),
+                        ("validator_reason_b", string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB!))
                 );
             }
 
@@ -3411,6 +3424,20 @@ namespace Obj.Commands
                     return "";
                 }
 
+                static bool TryGetPropertyIgnoreCase(JsonElement obj, string propertyName, out JsonElement value)
+                {
+                    foreach (var prop in obj.EnumerateObject())
+                    {
+                        if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        value = prop.Value;
+                        return true;
+                    }
+
+                    value = default;
+                    return false;
+                }
+
                 static bool TryParseOpRange(string text, out int start, out int end)
                 {
                     start = 0;
@@ -3443,7 +3470,7 @@ namespace Obj.Commands
                     => a.Start <= b.End && b.Start <= a.End;
 
                 var hasFields = sideNode.TryGetProperty("fields", out var fieldsNode) || sideNode.TryGetProperty("Fields", out fieldsNode);
-                var allRows = new List<(string Field, string Value, string OpRange, int Start, int End, bool HasRange)>();
+                var allRows = new List<(string Field, string Value, string OpRange, int Start, int End, bool HasRange, string Source, string Module, string Status, int Obj, bool IsDerived, bool IsModuleAdjusted, bool HasTextualEvidence)>();
                 foreach (var prop in valuesNode.EnumerateObject())
                 {
                     var value = prop.Value.GetString() ?? "";
@@ -3451,14 +3478,35 @@ namespace Obj.Commands
                         continue;
 
                     var opRange = "";
-                    if (hasFields && fieldsNode.ValueKind == JsonValueKind.Object && fieldsNode.TryGetProperty(prop.Name, out var fieldMeta))
+                    var source = "";
+                    var module = "parser";
+                    var status = "";
+                    var obj = 0;
+                    if (hasFields && fieldsNode.ValueKind == JsonValueKind.Object && TryGetPropertyIgnoreCase(fieldsNode, prop.Name, out var fieldMeta))
                     {
-                        if (fieldMeta.TryGetProperty("OpRange", out var rangeEl))
+                        if (TryGetPropertyIgnoreCase(fieldMeta, "OpRange", out var rangeEl))
                             opRange = rangeEl.GetString() ?? "";
+                        if (TryGetPropertyIgnoreCase(fieldMeta, "Source", out var sourceEl))
+                            source = sourceEl.GetString() ?? "";
+                        if (TryGetPropertyIgnoreCase(fieldMeta, "Module", out var moduleEl))
+                        {
+                            var moduleRaw = moduleEl.GetString() ?? "";
+                            module = string.IsNullOrWhiteSpace(moduleRaw) ? "parser" : moduleRaw;
+                        }
+                        if (TryGetPropertyIgnoreCase(fieldMeta, "Status", out var statusEl))
+                            status = statusEl.GetString() ?? "";
+                        if (TryGetPropertyIgnoreCase(fieldMeta, "Obj", out var objEl) && objEl.TryGetInt32(out var parsedObj))
+                            obj = parsedObj;
                     }
 
                     var hasRange = TryParseOpRange(opRange, out var start, out var end);
-                    allRows.Add((prop.Name, value, opRange, start, end, hasRange));
+                    var isDerived = source.Contains("derived", StringComparison.OrdinalIgnoreCase);
+                    var isModuleAdjusted = !string.IsNullOrWhiteSpace(module) &&
+                                           module.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                               .Any(part => !string.Equals(part, "parser", StringComparison.OrdinalIgnoreCase));
+                    var statusNotFound = string.Equals(status, "NOT_FOUND", StringComparison.OrdinalIgnoreCase);
+                    var hasTextualEvidence = !isDerived && hasRange && obj > 0 && !statusNotFound;
+                    allRows.Add((prop.Name, value, opRange, start, end, hasRange, source, module, status, obj, isDerived, isModuleAdjusted, hasTextualEvidence));
                 }
 
                 var selectedAlignments = report.Alignments
@@ -3553,6 +3601,27 @@ namespace Obj.Commands
                         .ToList();
                 }
 
+                static string BuildNonTextualReason((string Field, string Value, string OpRange, int Start, int End, bool HasRange, string Source, string Module, string Status, int Obj, bool IsDerived, bool IsModuleAdjusted, bool HasTextualEvidence) row)
+                {
+                    var reasons = new List<string>();
+                    if (row.IsDerived)
+                        reasons.Add("source=derived");
+                    if (!row.HasRange)
+                        reasons.Add("sem_op_range");
+                    if (row.Obj <= 0)
+                        reasons.Add("sem_obj");
+                    if (string.Equals(row.Status, "NOT_FOUND", StringComparison.OrdinalIgnoreCase))
+                        reasons.Add("status=NOT_FOUND");
+                    if (row.IsModuleAdjusted)
+                        reasons.Add("ajuste_modulo");
+                    if (string.IsNullOrWhiteSpace(row.Source))
+                        reasons.Add("source_vazio");
+                    return reasons.Count == 0 ? "sem_evidencia_textual" : string.Join(",", reasons);
+                }
+
+                bool InRanges((string Field, string Value, string OpRange, int Start, int End, bool HasRange, string Source, string Module, string Status, int Obj, bool IsDerived, bool IsModuleAdjusted, bool HasTextualEvidence) row, List<(int Start, int End)> ranges)
+                    => row.HasRange && ranges.Count > 0 && ranges.Any(rr => Intersects((row.Start, row.End), rr));
+
                 void PrintFieldSection(string title, string color, List<(string Field, string Value, string OpRange)> rows, string emptyMessage)
                 {
                     Console.WriteLine(Colorize(title, color));
@@ -3592,6 +3661,70 @@ namespace Obj.Commands
                 var helperOnlyKeys = helperByKey.Keys.Except(rangeByKey.Keys, StringComparer.OrdinalIgnoreCase).ToList();
                 var rangeOnlyKeys = rangeByKey.Keys.Except(helperByKey.Keys, StringComparer.OrdinalIgnoreCase).ToList();
 
+                var helperFields = new HashSet<string>(helperAnchorRows.Select(r => r.Field), StringComparer.OrdinalIgnoreCase);
+
+                var fixedRowsExclusive = new List<(string Field, string Value, string OpRange)>();
+                var variableRowsExclusive = new List<(string Field, string Value, string OpRange)>();
+                var alignmentRowsExclusive = new List<(string Field, string Value, string OpRange)>();
+                var nonTextualRows = new List<(string Field, string Value, string OpRange, string Source, string Module, string Reason)>();
+
+                foreach (var row in allRows.OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase))
+                {
+                    if (!row.HasTextualEvidence)
+                    {
+                        nonTextualRows.Add((
+                            row.Field,
+                            row.Value,
+                            string.IsNullOrWhiteSpace(row.OpRange) ? "(sem op_range)" : row.OpRange,
+                            string.IsNullOrWhiteSpace(row.Source) ? "(sem source)" : row.Source,
+                            string.IsNullOrWhiteSpace(row.Module) ? "parser" : row.Module,
+                            BuildNonTextualReason(row)));
+                        continue;
+                    }
+
+                    var inFixed = InRanges(row, fixedRanges);
+                    var inVariable = InRanges(row, variableRanges);
+                    var inAlignment = InRanges(row, alignmentRanges);
+                    var isHelperField = outputMode != OutputMode.FixedOnly && helperFields.Contains(row.Field);
+                    var printable = (row.Field, row.Value, string.IsNullOrWhiteSpace(row.OpRange) ? "(vazio)" : row.OpRange);
+
+                    if (isHelperField || (inVariable && !inFixed))
+                    {
+                        variableRowsExclusive.Add(printable);
+                        continue;
+                    }
+
+                    if (inFixed && !inVariable)
+                    {
+                        fixedRowsExclusive.Add(printable);
+                        continue;
+                    }
+
+                    if (inAlignment)
+                    {
+                        alignmentRowsExclusive.Add(printable);
+                        continue;
+                    }
+                }
+
+                fixedRowsExclusive = fixedRowsExclusive
+                    .Distinct()
+                    .OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                variableRowsExclusive = variableRowsExclusive
+                    .Distinct()
+                    .OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                alignmentRowsExclusive = alignmentRowsExclusive
+                    .Distinct()
+                    .OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+                nonTextualRows = nonTextualRows
+                    .GroupBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                    .Select(g => g.First())
+                    .OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
                 var modeLabel = outputMode switch
                 {
                     OutputMode.FixedOnly => "fixed",
@@ -3628,6 +3761,8 @@ namespace Obj.Commands
                 Console.WriteLine($"  {Colorize("helper_and_op_range:", AnsiWarn)} {Colorize(bothKeys.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
                 Console.WriteLine($"  {Colorize("helper_only:", AnsiWarn)} {Colorize(helperOnlyKeys.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
                 Console.WriteLine($"  {Colorize("op_range_only:", AnsiWarn)} {Colorize(rangeOnlyKeys.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("textual_evidence_rows:", AnsiWarn)} {Colorize(allRows.Count(r => r.HasTextualEvidence).ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("non_textual_rows:", AnsiWarn)} {Colorize(nonTextualRows.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
                 if (helperByKey.Count == 0 && rangeByKey.Count == 0)
                 {
                     var msg = acceptedKeys.Count == 0 && baseAnchorRanges.Count == 0
@@ -3667,11 +3802,27 @@ namespace Obj.Commands
 
                 var fixedEmptyReason = fixedRanges.Count == 0 ? "nenhum bloco fixed no alinhador ativo" : "nenhum campo coberto por blocos fixed";
                 var variableEmptyReason = variableRanges.Count == 0 ? "nenhum bloco variable/gap_a no alinhador ativo" : "nenhum campo coberto por blocos variable/gap_a";
-                var alignmentEmptyReason = alignmentRanges.Count == 0 ? "nenhum bloco selecionado no alinhador ativo" : "nenhum campo coberto por op_range do alinhamento";
+                var alignmentEmptyReason = alignmentRanges.Count == 0 ? "nenhum bloco selecionado no alinhador ativo" : "nenhum campo exclusivo do alinhamento (fora fixed/variable/helper)";
 
-                PrintFieldSection($"FIXO -> CAMPOS (ALVO) [{modeLabel}]", AnsiOk, PickByRanges(fixedRanges), fixedEmptyReason);
-                PrintFieldSection($"VARIAVEL -> CAMPOS (ALVO) [{modeLabel}]", AnsiWarn, PickByRanges(variableRanges), variableEmptyReason);
-                PrintFieldSection($"ALINHAMENTO -> CAMPOS (ALVO) [{modeLabel}]", AnsiInfo, PickByRanges(alignmentRanges), alignmentEmptyReason);
+                PrintFieldSection($"FIXO -> CAMPOS (ALVO) [{modeLabel}]", AnsiOk, fixedRowsExclusive, fixedEmptyReason);
+                PrintFieldSection($"VARIAVEL -> CAMPOS (ALVO) [{modeLabel}]", AnsiWarn, variableRowsExclusive, variableEmptyReason);
+                PrintFieldSection($"ALINHAMENTO -> CAMPOS (ALVO) [{modeLabel}]", AnsiInfo, alignmentRowsExclusive, alignmentEmptyReason);
+
+                Console.WriteLine(Colorize($"DERIVADOS/AJUSTADOS (SEM EVIDENCIA DIRETA) [{modeLabel}]", AnsiWarn));
+                if (nonTextualRows.Count == 0)
+                {
+                    Console.WriteLine($"  {Colorize("nenhum campo nesta condição", AnsiSoft)}");
+                    Console.WriteLine();
+                }
+                else
+                {
+                    foreach (var row in nonTextualRows)
+                    {
+                        Console.WriteLine($"  {Colorize(row.Field + ":", AnsiWarn)} {Colorize(row.Value, AnsiDodgeBlue)} {Colorize($"(op={row.OpRange})", AnsiSoft)}");
+                        Console.WriteLine($"    origem={row.Source} modulo={ColorizeModuleChain(ResolveModuleDisplay(row.Module))} motivo={row.Reason}");
+                    }
+                    Console.WriteLine();
+                }
             }
             catch
             {
@@ -4257,6 +4408,8 @@ namespace Obj.Commands
 
             // Gap penalty is intentionally fixed and no longer configurable via CLI/env.
             gapPenalty = FixedGapPenalty;
+            var runRequestedByCli = false;
+            var probeConfiguredByCli = false;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -4268,6 +4421,7 @@ namespace Obj.Commands
                     && TryParseRunRange(args[i + 1], out runFromStep, out runToStep))
                 {
                     i++;
+                    runRequestedByCli = true;
                     stepOutputEcho = true;
                     continue;
                 }
@@ -4454,6 +4608,7 @@ namespace Obj.Commands
                         Console.WriteLine($"Faixa inválida para --run/--steps: {rawRange}. Use N ou N-M (1..8).");
                         return false;
                     }
+                    runRequestedByCli = true;
                     stepOutputEcho = true;
                     continue;
                 }
@@ -4466,6 +4621,7 @@ namespace Obj.Commands
                         Console.WriteLine($"Faixa inválida para --run/--steps: {rawRange}. Use N ou N-M (1..8).");
                         return false;
                     }
+                    runRequestedByCli = true;
                     stepOutputEcho = true;
                     continue;
                 }
@@ -4512,6 +4668,7 @@ namespace Obj.Commands
                 if (string.Equals(arg, "--probe", StringComparison.OrdinalIgnoreCase))
                 {
                     probeEnabled = true;
+                    probeConfiguredByCli = true;
                     if (i + 1 < args.Length)
                     {
                         var next = args[i + 1] ?? "";
@@ -4526,6 +4683,7 @@ namespace Obj.Commands
                 if (arg.StartsWith("--probe=", StringComparison.OrdinalIgnoreCase))
                 {
                     probeEnabled = true;
+                    probeConfiguredByCli = true;
                     var split = arg.Split('=', 2);
                     probeFile = split.Length == 2 ? split[1].Trim().Trim('"') : "";
                     continue;
@@ -4533,18 +4691,21 @@ namespace Obj.Commands
                 if (string.Equals(arg, "--probe-file", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     probeEnabled = true;
+                    probeConfiguredByCli = true;
                     probeFile = (args[++i] ?? "").Trim().Trim('"');
                     continue;
                 }
                 if (string.Equals(arg, "--probe-page", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     probeEnabled = true;
+                    probeConfiguredByCli = true;
                     int.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out probePage);
                     continue;
                 }
                 if (string.Equals(arg, "--probe-side", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     probeEnabled = true;
+                    probeConfiguredByCli = true;
                     var rawSide = (args[++i] ?? "").Trim().ToLowerInvariant();
                     if (rawSide == "a" || rawSide == "pdf_a" || rawSide == "left")
                         probeSide = "a";
@@ -4555,8 +4716,15 @@ namespace Obj.Commands
                 if (string.Equals(arg, "--probe-max-fields", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     probeEnabled = true;
+                    probeConfiguredByCli = true;
                     int.TryParse(args[++i], NumberStyles.Any, CultureInfo.InvariantCulture, out probeMaxFields);
                     probeMaxFields = Math.Max(0, probeMaxFields);
+                    continue;
+                }
+                if (string.Equals(arg, "--no-probe", StringComparison.OrdinalIgnoreCase))
+                {
+                    probeEnabled = false;
+                    probeConfiguredByCli = true;
                     continue;
                 }
 
@@ -4569,18 +4737,25 @@ namespace Obj.Commands
                 }
             }
 
+            if (runRequestedByCli && runToStep >= 7 && !probeConfiguredByCli)
+            {
+                probeEnabled = true;
+                appliedAutoDefaults.Add($"run {runFromStep.ToString(CultureInfo.InvariantCulture)}-{runToStep.ToString(CultureInfo.InvariantCulture)} -> probe_enabled=true (etapa 7 automática; use --no-probe para desativar)");
+            }
+
             return true;
         }
 
         private static void ShowHelp()
         {
-            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--top N] [--log[=N]] [--alinhamento-detalhe] [--alinhamento-top N] [--sem-alinhamento] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N]");
+            Console.WriteLine("operpdf inspect textopsalign|textopsvar|textopsfixed <pdfA> <pdfB|pdfC|...> [--inputs a.pdf,b.pdf] [--doc tjpb_despacho] [--front|--back|--side front|back] [--pageA N] [--pageB N] [--objA N] [--objB N] [--ops Tj,TJ] [--backoff N] [--min-sim N] [--band N|--max-shift N] [--min-len-ratio N] [--len-penalty N] [--anchor-sim N] [--anchor-len N] [--top N] [--log[=N]] [--alinhamento-detalhe] [--alinhamento-top N] [--sem-alinhamento] [--out file] [--run N|N-M] [--step-output echo|save|both|none] [--step-echo] [--step-save] [--steps-dir dir] [--probe[ file.pdf] --probe-page N --probe-side a|b --probe-max-fields N] [--no-probe]");
             Console.WriteLine("  --top N    = limite dos quadros resumo (TOP VARIAVEIS/TOP FIXOS/ALINHAMENTO HUMANO)");
             Console.WriteLine("  --log[=N]  = lista ALINHAMENTO detalhada; N linhas (0 = todas).");
             Console.WriteLine("  padrão     = saída compacta (ALINHAMENTO -> CAMPOS + RESULTADO FINAL).");
             Console.WriteLine($"  gap penalty: fixo interno ({ReportUtils.F(FixedGapPenalty, 2)}). --gap não é aceito.");
             Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
-            Console.WriteLine("aliases de modelo por tipo: @M-DES (despacho), @M-CER (certidao), @M-REQ (requerimento). Se houver múltiplos modelos no alias, o pipeline testa e escolhe o melhor para o alvo.");
+            Console.WriteLine("run/--run com etapa >=7 ativa probe automaticamente (use --no-probe para desativar).");
+            Console.WriteLine("aliases de modelo por tipo: @M-DES (despacho), @M-CER (certidao), @M-REQ (requerimento). Modo estrito: somente OBJPDF_ALIAS_M_DES_DIR / OBJPDF_ALIAS_M_CER_DIR / OBJPDF_ALIAS_M_REQ_DIR (sem fallback).");
             Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
             Console.WriteLine("obs: OBJ_TEXTOPSALIGN_INPUTS não é suportado e aborta a execução; use sempre --inputs explícito (aliases :D/:Q/@M-*).");
         }
