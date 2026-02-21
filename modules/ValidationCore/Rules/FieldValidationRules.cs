@@ -1190,6 +1190,9 @@ namespace Obj.ValidationCore
             {
                 "ADIANTAMENTO"
             };
+            var optionalDocKey = DocumentValidationRules.MapOutputTypeToDocKey(outputDocType);
+            if (DocumentValidationRules.IsDocMatch(optionalDocKey, DocumentValidationRules.DocKeyDespacho))
+                optional.Add("CPF_PERITO");
 
             var reject = ShouldRejectByValidator(
                 local,

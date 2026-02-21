@@ -117,7 +117,6 @@ namespace Obj.ValidationCore
                 return string.Equals(f, "PROCESSO_ADMINISTRATIVO", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(f, "PROCESSO_JUDICIAL", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(f, "PERITO", StringComparison.OrdinalIgnoreCase)
-                    || string.Equals(f, "CPF_PERITO", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(f, "PROMOVENTE", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(f, "VARA", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(f, "COMARCA", StringComparison.OrdinalIgnoreCase)

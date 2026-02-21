@@ -176,7 +176,7 @@ namespace Obj.Commands
             {
                 1 => "detection_selection",
                 2 => "alignment",
-                3 => "extraction",
+                3 => "yaml_parser_fields",
                 4 => "honorarios",
                 5 => "repairer",
                 6 => "validator",
@@ -192,7 +192,7 @@ namespace Obj.Commands
             {
                 1 => "detecção e seleção",
                 2 => "alinhamento",
-                3 => "extração",
+                3 => "parser YAML (campos)",
                 4 => "honorários",
                 5 => "reparador",
                 6 => "validador",
@@ -334,10 +334,43 @@ namespace Obj.Commands
             return sb.ToString();
         }
 
-        private static void SaveStageOutputs(
-            string outputDir,
+        private static string BuildRunToken()
+        {
+            var stamp = DateTime.UtcNow.ToString("yyyyMMddTHHmmssfff", CultureInfo.InvariantCulture);
+            return $"{stamp}_{Environment.ProcessId.ToString(CultureInfo.InvariantCulture)}";
+        }
+
+        private static string BuildDefaultOutputPrefix(
             string baseA,
             string baseB,
+            OutputMode outputMode,
+            string docKey,
+            string runToken)
+        {
+            var safeA = SanitizeFileToken(baseA);
+            var safeB = SanitizeFileToken(baseB);
+            var safeMode = SanitizeFileToken(ResolveReturnCommandName(outputMode)).ToLowerInvariant();
+            var safeDoc = SanitizeFileToken(string.IsNullOrWhiteSpace(docKey) ? "doc" : docKey).ToLowerInvariant();
+            var safeRun = SanitizeFileToken(string.IsNullOrWhiteSpace(runToken) ? "run" : runToken).ToLowerInvariant();
+            return $"{safeA}__{safeB}__{safeMode}__{safeDoc}__{safeRun}";
+        }
+
+        private static string BuildDefaultStackOutputPrefix(
+            string baseA,
+            OutputMode outputMode,
+            string docKey,
+            string runToken)
+        {
+            var safeA = SanitizeFileToken(baseA);
+            var safeMode = SanitizeFileToken(ResolveReturnCommandName(outputMode)).ToLowerInvariant();
+            var safeDoc = SanitizeFileToken(string.IsNullOrWhiteSpace(docKey) ? "doc" : docKey).ToLowerInvariant();
+            var safeRun = SanitizeFileToken(string.IsNullOrWhiteSpace(runToken) ? "run" : runToken).ToLowerInvariant();
+            return $"{safeA}__STACK__{safeMode}__{safeDoc}__{safeRun}";
+        }
+
+        private static void SaveStageOutputs(
+            string outputDir,
+            string outputPrefix,
             List<Dictionary<string, object>> stageOutputs)
         {
             if (string.IsNullOrWhiteSpace(outputDir) || stageOutputs == null || stageOutputs.Count == 0)
@@ -349,7 +382,7 @@ namespace Obj.Commands
                 WriteIndented = true,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             };
-            var prefix = $"{baseA}__{baseB}";
+            var prefix = string.IsNullOrWhiteSpace(outputPrefix) ? "pipeline" : outputPrefix;
             for (var i = 0; i < stageOutputs.Count; i++)
             {
                 var stage = stageOutputs[i];
@@ -689,6 +722,64 @@ namespace Obj.Commands
                 ["enabled"] = false,
                 ["module"] = module ?? "",
                 ["status"] = "skipped",
+                ["reason"] = reason ?? ""
+            };
+        }
+
+        private static Dictionary<string, object> BuildModuleStatusLine(
+            IDictionary<string, object>? modulePayload,
+            string defaultModule,
+            string fallbackReason)
+        {
+            if (modulePayload == null)
+            {
+                return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["module"] = defaultModule ?? "",
+                    ["status"] = "skipped",
+                    ["reason"] = fallbackReason ?? ""
+                };
+            }
+
+            var module = modulePayload.TryGetValue("module", out var moduleObj) ? moduleObj?.ToString() ?? "" : "";
+            var rawStatus = modulePayload.TryGetValue("status", out var statusObj) ? statusObj?.ToString() ?? "" : "";
+            var reason = modulePayload.TryGetValue("reason", out var reasonObj) ? reasonObj?.ToString() ?? "" : "";
+
+            if (string.IsNullOrWhiteSpace(module))
+                module = defaultModule ?? "";
+            if (string.IsNullOrWhiteSpace(rawStatus))
+                rawStatus = "ok";
+
+            var statusNorm = rawStatus.Trim().ToLowerInvariant();
+            string normalizedStatus;
+            if (statusNorm == "ok")
+            {
+                normalizedStatus = "ok";
+                if (string.IsNullOrWhiteSpace(reason))
+                    reason = "executed";
+            }
+            else if (statusNorm == "skipped")
+            {
+                normalizedStatus = "skipped";
+                if (string.IsNullOrWhiteSpace(reason))
+                    reason = fallbackReason ?? "not_executed";
+            }
+            else if (statusNorm == "fail")
+            {
+                normalizedStatus = "fail";
+                if (string.IsNullOrWhiteSpace(reason))
+                    reason = "module_failed";
+            }
+            else
+            {
+                normalizedStatus = "fail";
+                reason = string.IsNullOrWhiteSpace(reason) ? rawStatus : $"{rawStatus}: {reason}";
+            }
+
+            return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["module"] = module,
+                ["status"] = normalizedStatus,
                 ["reason"] = reason ?? ""
             };
         }
@@ -1075,6 +1166,7 @@ namespace Obj.Commands
                 stepOutputEcho = true;
             if (stepOutputSave && string.IsNullOrWhiteSpace(stepOutputDir))
                 stepOutputDir = Path.Combine("outputs", "pipeline_steps");
+            var outputRunToken = BuildRunToken();
 
             var despachoCandidateCache = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
 
@@ -1562,8 +1654,8 @@ namespace Obj.Commands
                     step1Lines.Add(("params", $"backoff={backoff} minSim={minSim.ToString("0.##", CultureInfo.InvariantCulture)} maxShiftOps={band} minLen={minLenRatio.ToString("0.##", CultureInfo.InvariantCulture)}"));
 
                     PrintPipelineStep(
-                        "passo 1/4 - detecção e seleção de objetos",
-                        "passo 2/4 - alinhamento",
+                        "etapa 1/8 - detecção e seleção de objetos",
+                        "etapa 2/8 - alinhamento",
                         step1Lines.ToArray()
                     );
                 }
@@ -1682,7 +1774,7 @@ namespace Obj.Commands
                         stepItems.Add(("helper_applied", helper.AppliedToSegmentation ? "true" : "false"));
                         stepItems.Add(("helper_mode", string.IsNullOrWhiteSpace(helper.AnchorMode) ? "(n/a)" : helper.AnchorMode));
                     }
-                    PrintPipelineStep("passo 2/4 - saída do alinhamento", "passo 3/4 - extração (usa op_range + value_full)", stepItems.ToArray());
+                    PrintPipelineStep("etapa 2/8 - alinhamento textual", "etapa 3/8 - parser YAML (campos com op_range + value_full)", stepItems.ToArray());
                 }
 
                 if (inputs.Count == 2 && !ReturnUtils.IsEnabled() && showAlign)
@@ -1742,8 +1834,8 @@ namespace Obj.Commands
                         if (!ReturnUtils.IsEnabled())
                         {
                             PrintPipelineStep(
-                                "passo 3.7/4 - probe pós-extração",
-                                "passo 4/4 - saída e resumo",
+                                "etapa 7/8 - probe pós-extração",
+                                "etapa 8/8 - persistência e resumo",
                                 ("modulo", "Obj.RootProbe.ExtractionProbeModule"),
                                 ("probe_target_pdf_side", sideKey),
                                 ("probe_file", effectiveProbeFile),
@@ -1759,21 +1851,32 @@ namespace Obj.Commands
                             sideKey,
                             probeMaxFields);
 
+                        var probeRawStatus = probePayload.TryGetValue("status", out var probeStatusObj) ? probeStatusObj?.ToString() ?? "" : "";
+                        var probeStageStatus = string.Equals(probeRawStatus, "ok", StringComparison.OrdinalIgnoreCase) ? "ok" : "fail";
+                        if (!probePayload.ContainsKey("reason"))
+                            probePayload["reason"] = probeStageStatus == "ok" ? "executed" : (string.IsNullOrWhiteSpace(probeRawStatus) ? "probe_failed" : probeRawStatus);
+
                         AttachProbeToExtraction(report.Extraction, probePayload);
                         deferredProbePayload = probePayload;
-                        EmitStage(7, "ok", new Dictionary<string, object>(probePayload, StringComparer.OrdinalIgnoreCase));
+                        EmitStage(7, probeStageStatus, new Dictionary<string, object>(probePayload, StringComparer.OrdinalIgnoreCase));
                     }
                     else
                     {
-                        EmitStage(7, "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
-                        {
-                            ["reason"] = "probe_disabled"
-                        });
+                        var skippedProbe = BuildSkippedModulePayload("Obj.RootProbe.ExtractionProbeModule", "probe_disabled");
+                        AttachProbeToExtraction(report.Extraction, skippedProbe);
+                        EmitStage(7, "skipped", new Dictionary<string, object>(skippedProbe, StringComparer.OrdinalIgnoreCase));
                     }
+                }
+                else
+                {
+                    var skippedProbe = BuildSkippedModulePayload("Obj.RootProbe.ExtractionProbeModule", $"run_limit_step_{runToStep}");
+                    AttachProbeToExtraction(report.Extraction, skippedProbe);
+                    EmitStage(7, "skipped", new Dictionary<string, object>(skippedProbe, StringComparer.OrdinalIgnoreCase));
                 }
                 var reportBaseA = Path.GetFileNameWithoutExtension(aPath);
                 var reportBaseB = Path.GetFileNameWithoutExtension(bPath);
-                report.ReturnInfo = BuildReturnInfo(outputMode, $"{reportBaseA}__{reportBaseB}__output_pipe.json");
+                var reportOutputPrefix = BuildDefaultOutputPrefix(reportBaseA, reportBaseB, outputMode, docKey, outputRunToken);
+                report.ReturnInfo = BuildReturnInfo(outputMode, $"{reportOutputPrefix}__output_pipe.json");
                 report.ReturnView = BuildReturnView(report, outputMode);
                 report.PipelineStages = stageOutputs;
                 if (report.ReturnView != null)
@@ -1791,13 +1894,13 @@ namespace Obj.Commands
                         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
                     };
                     var json = JsonSerializer.Serialize(report, jsonOptions);
-                    var baseA = Path.GetFileNameWithoutExtension(aPath);
-                    var baseB = Path.GetFileNameWithoutExtension(bPath);
+                    var baseA = reportBaseA;
+                    var baseB = reportBaseB;
                     var emitJsonToStdout = ReturnUtils.IsEnabled();
                     if (emitJsonToStdout)
                     {
                         Console.WriteLine(json);
-                        ReturnUtils.PersistJson(json, $"{baseA}__{baseB}__output_pipe.json");
+                        ReturnUtils.PersistJson(json, $"{reportOutputPrefix}__output_pipe.json");
                     }
 
                     if (!string.IsNullOrWhiteSpace(outPath) && outSpecified)
@@ -1811,7 +1914,7 @@ namespace Obj.Commands
                     {
                         if (outputMode == OutputMode.All)
                         {
-                            outPath = Path.Combine("outputs", "align_ranges", $"{baseA}__{baseB}__textops_align.json");
+                            outPath = Path.Combine("outputs", "align_ranges", $"{reportOutputPrefix}__textops_align.json");
                             Directory.CreateDirectory(Path.GetDirectoryName(outPath) ?? ".");
                             File.WriteAllText(outPath, json, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
                             Console.WriteLine("Arquivo salvo: " + outPath);
@@ -1820,7 +1923,7 @@ namespace Obj.Commands
 
                     if (report.Extraction != null && !ReturnUtils.IsEnabled())
                     {
-                        var extractionOutPath = Path.Combine("outputs", "extract", $"{baseA}__{baseB}__textops_extract.json");
+                        var extractionOutPath = Path.Combine("outputs", "extract", $"{reportOutputPrefix}__textops_extract.json");
                         Directory.CreateDirectory(Path.GetDirectoryName(extractionOutPath) ?? ".");
                         var extractionJson = JsonSerializer.Serialize(report.Extraction, jsonOptions);
                         File.WriteAllText(extractionOutPath, extractionJson, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
@@ -1838,10 +1941,10 @@ namespace Obj.Commands
                     });
 
                     if (stepOutputSave)
-                        SaveStageOutputs(stepOutputDir, baseA, baseB, stageOutputs);
+                        SaveStageOutputs(stepOutputDir, reportOutputPrefix, stageOutputs);
 
                 if (!ReturnUtils.IsEnabled())
-                    PrintPipelineStep("passo 4/4 - saída e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
+                    PrintPipelineStep("etapa 8/8 - persistência e resumo", "fim", ("modulo", "ObjectsTextOpsAlign + JsonSerializer"), ("align_json", string.IsNullOrWhiteSpace(outPath) ? "(stdout/default)" : outPath), ("extraction", "resumo final da extração + JSON em outputs/extract"));
                 if (!ReturnUtils.IsEnabled())
                 {
                     PrintAlignedFieldResults(report, outputMode);
@@ -1861,7 +1964,7 @@ namespace Obj.Commands
                         ["partial_run"] = runToStep < PipelineLastStep
                     });
                     if (stepOutputSave)
-                        SaveStageOutputs(stepOutputDir, reportBaseA, reportBaseB, stageOutputs);
+                        SaveStageOutputs(stepOutputDir, reportOutputPrefix, stageOutputs);
                 }
             }
 
@@ -1877,7 +1980,8 @@ namespace Obj.Commands
                     var json = JsonSerializer.Serialize(reports, jsonOptions);
                     Console.WriteLine(json);
                     var baseA = Path.GetFileNameWithoutExtension(aPath);
-                    ReturnUtils.PersistJson(json, $"{baseA}__STACK__output_pipe.json");
+                    var stackOutputPrefix = BuildDefaultStackOutputPrefix(baseA, outputMode, docKey, outputRunToken);
+                    ReturnUtils.PersistJson(json, $"{stackOutputPrefix}__output_pipe.json");
                     if (!string.IsNullOrWhiteSpace(outPath) && outSpecified)
                     {
                         Directory.CreateDirectory(Path.GetDirectoryName(outPath) ?? ".");
@@ -1886,7 +1990,9 @@ namespace Obj.Commands
                 }
                 else
                 {
-                    WriteStackedOutput(aPath, reports, outPath);
+                    var baseA = Path.GetFileNameWithoutExtension(aPath);
+                    var stackOutputPrefix = BuildDefaultStackOutputPrefix(baseA, outputMode, docKey, outputRunToken);
+                    WriteStackedOutput(aPath, reports, outPath, stackOutputPrefix);
                 }
             }
         }
@@ -2443,8 +2549,8 @@ namespace Obj.Commands
             if (verbose)
             {
                 PrintPipelineStep(
-                    "passo 3.1/4 - preparação da extração",
-                    "passo 3.2/4 - recorte value_full/op_range",
+                    "etapa 3/8 - preparação do parser YAML",
+                    "etapa 3/8 - recorte value_full/op_range",
                     ("modulo", "ObjectsTextOpsAlign + DocumentValidationRules"),
                     ("doc_key", resolvedDoc),
                     ("doc_type", outputDocType),
@@ -2455,9 +2561,10 @@ namespace Obj.Commands
             }
             if (string.IsNullOrWhiteSpace(mapPath))
             {
-                onStepOutput?.Invoke(3, "extraction", "error", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                onStepOutput?.Invoke(3, "yaml_parser_fields", "fail", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["status"] = "map_not_found",
+                    ["reason"] = "alignrange_map_not_found",
                     ["doc_key"] = resolvedDoc,
                     ["doc_type"] = outputDocType,
                     ["band"] = bandFront,
@@ -2478,15 +2585,16 @@ namespace Obj.Commands
                 if (verbose)
                 {
                     PrintPipelineStep(
-                        "passo 3.3/4 - parser do mapa YAML (falhou)",
-                        "encerrado com erro de extração",
+                        "etapa 3/8 - parser YAML (falhou)",
+                        "encerrado com erro de parser YAML",
                         ("modulo", "Obj.Commands.ObjectsMapFields"),
                         ("erro", string.IsNullOrWhiteSpace(frontError) ? "(sem detalhe)" : frontError)
                     );
                 }
-                onStepOutput?.Invoke(3, "extraction", "error", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                onStepOutput?.Invoke(3, "yaml_parser_fields", "fail", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["status"] = "extract_failed",
+                    ["reason"] = string.IsNullOrWhiteSpace(frontError) ? "yaml_parser_failed" : frontError,
                     ["doc_key"] = resolvedDoc,
                     ["doc_type"] = outputDocType,
                     ["band"] = bandFront,
@@ -2507,8 +2615,8 @@ namespace Obj.Commands
             if (verbose)
             {
                 PrintPipelineStep(
-                    "passo 3.2/4 - resultado do recorte para parser (single_page)",
-                    "passo 3.3/4 - parser do mapa YAML",
+                    "etapa 3/8 - recorte value_full/op_range",
+                    "etapa 3/8 - parser YAML (campos)",
                     ("modulo", "ObjectsTextOpsAlign.BuildValueFullFromBlocks"),
                     ("op_range_a", string.IsNullOrWhiteSpace(opRangeAFront) ? "(vazio)" : opRangeAFront),
                     ("op_range_b", string.IsNullOrWhiteSpace(opRangeBFront) ? "(vazio)" : opRangeBFront),
@@ -2534,8 +2642,8 @@ namespace Obj.Commands
                 if (string.Equals(extractionScope, "pair_both", StringComparison.OrdinalIgnoreCase))
                 {
                     PrintPipelineStep(
-                        "passo 3.3/4 - parser do mapa YAML (ok)",
-                        "passo 3.4/4 - enriquecimento de honorários",
+                        "etapa 3/8 - parser YAML (ok)",
+                        "etapa 4/8 - honorários",
                         ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
                         ("fields_a_non_empty", CountNonEmptyValues(valuesA).ToString(CultureInfo.InvariantCulture)),
                         ("fields_b_non_empty", CountNonEmptyValues(valuesB).ToString(CultureInfo.InvariantCulture)),
@@ -2547,8 +2655,8 @@ namespace Obj.Commands
                 {
                     var targetCount = targetIsA ? CountNonEmptyValues(valuesA) : CountNonEmptyValues(valuesB);
                     PrintPipelineStep(
-                        "passo 3.3/4 - parser do mapa YAML (ok)",
-                        "passo 3.4/4 - enriquecimento de honorários",
+                        "etapa 3/8 - parser YAML (ok)",
+                        "etapa 4/8 - honorários",
                         ("modulo", "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)"),
                         ("scope", extractionScope),
                         ("target_side", targetSide),
@@ -2571,7 +2679,7 @@ namespace Obj.Commands
                 ["fields_target_non_empty"] = targetIsA ? CountNonEmptyValues(valuesA) : CountNonEmptyValues(valuesB),
                 ["merge_policy"] = "single_band"
             };
-            onStepOutput?.Invoke(3, "extraction", "ok", step3Payload);
+            onStepOutput?.Invoke(3, "yaml_parser_fields", "ok", step3Payload);
 
             var beforeHonorariosA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeHonorariosB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
@@ -2658,6 +2766,11 @@ namespace Obj.Commands
                     valueFlowOutput["pdf_b"] = flowB;
                 }
 
+                var effectiveValidatorPayload = validatorPayload ?? BuildSkippedModulePayload("Obj.ValidatorModule.ValidatorFacade", $"run_limit_step_{executedUntilStep}");
+                var effectiveRepairerPayload = repairerPayload ?? BuildSkippedModulePayload("Obj.ValidationCore.ValidationRepairer", $"run_limit_step_{executedUntilStep}");
+                var effectiveHonorariosPayload = honorariosPayload ?? BuildSkippedModulePayload("Obj.Honorarios.HonorariosFacade", $"run_limit_step_{executedUntilStep}");
+                var effectiveProbePayload = BuildSkippedModulePayload("Obj.RootProbe.ExtractionProbeModule", $"run_limit_step_{executedUntilStep}");
+
                 return new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
                     ["status"] = "ok",
@@ -2690,14 +2803,58 @@ namespace Obj.Commands
                         ["run"] = runInfo
                     },
                     ["value_flow"] = valueFlowOutput,
-                    ["validator"] = validatorPayload ?? BuildSkippedModulePayload("Obj.ValidatorModule.ValidatorFacade", $"run_limit_step_{executedUntilStep}"),
-                    ["repairer"] = repairerPayload ?? BuildSkippedModulePayload("Obj.ValidationCore.ValidationRepairer", $"run_limit_step_{executedUntilStep}"),
-                    ["honorarios"] = honorariosPayload ?? BuildSkippedModulePayload("Obj.Honorarios.HonorariosFacade", $"run_limit_step_{executedUntilStep}")
+                    ["validator"] = effectiveValidatorPayload,
+                    ["repairer"] = effectiveRepairerPayload,
+                    ["honorarios"] = effectiveHonorariosPayload,
+                    ["probe"] = effectiveProbePayload,
+                    ["module_status"] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["honorarios"] = BuildModuleStatusLine(effectiveHonorariosPayload, "Obj.Honorarios.HonorariosFacade", $"run_limit_step_{executedUntilStep}"),
+                        ["repairer"] = BuildModuleStatusLine(effectiveRepairerPayload, "Obj.ValidationCore.ValidationRepairer", $"run_limit_step_{executedUntilStep}"),
+                        ["validator"] = BuildModuleStatusLine(effectiveValidatorPayload, "Obj.ValidatorModule.ValidatorFacade", $"run_limit_step_{executedUntilStep}"),
+                        ["probe"] = BuildModuleStatusLine(effectiveProbePayload, "Obj.RootProbe.ExtractionProbeModule", $"run_limit_step_{executedUntilStep}")
+                    }
                 };
             }
 
+            void EmitSkippedDownstreamModules(int executedUntilStep)
+            {
+                if (onStepOutput == null)
+                    return;
+
+                if (executedUntilStep < 4)
+                {
+                    onStepOutput.Invoke(4, "honorarios", "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["module"] = "Obj.Honorarios.HonorariosFacade",
+                        ["reason"] = $"run_limit_step_{executedUntilStep}"
+                    });
+                }
+
+                if (executedUntilStep < 5)
+                {
+                    onStepOutput.Invoke(5, "repairer", "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["module"] = "Obj.ValidationCore.ValidationRepairer",
+                        ["reason"] = $"run_limit_step_{executedUntilStep}"
+                    });
+                }
+
+                if (executedUntilStep < 6)
+                {
+                    onStepOutput.Invoke(6, "validator", "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        ["module"] = "Obj.ValidatorModule.ValidatorFacade",
+                        ["reason"] = $"run_limit_step_{executedUntilStep}"
+                    });
+                }
+            }
+
             if (stepLimit <= 3)
+            {
+                EmitSkippedDownstreamModules(3);
                 return BuildExtractionResult(3, null, null, null, null, null);
+            }
 
             HonorariosFacade.ApplyProfissaoAsEspecialidade(valuesA);
             HonorariosFacade.ApplyProfissaoAsEspecialidade(valuesB);
@@ -2709,8 +2866,8 @@ namespace Obj.Commands
             if (verbose)
             {
                 PrintPipelineStep(
-                    "passo 3.4/4 - honorários aplicado",
-                    "passo 3.5/4 - reparador",
+                    "etapa 4/8 - honorários",
+                    "etapa 5/8 - reparador",
                     ("modulo", "Obj.Honorarios.HonorariosFacade (Backfill + Enricher)"),
                     ("changed_keys_a", DescribeChangedKeys(beforeHonorariosA, valuesA)),
                     ("changed_keys_b", DescribeChangedKeys(beforeHonorariosB, valuesB)),
@@ -2733,6 +2890,8 @@ namespace Obj.Commands
             {
                 ["enabled"] = true,
                 ["module"] = "Obj.Honorarios.HonorariosFacade",
+                ["status"] = "ok",
+                ["reason"] = "executed",
                 ["apply_a"] = true,
                 ["apply_b"] = true,
                 ["pdf_a"] = BuildHonorariosSnapshot(honorariosA),
@@ -2741,6 +2900,7 @@ namespace Obj.Commands
             onStepOutput?.Invoke(4, "honorarios", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.Honorarios.HonorariosFacade",
+                ["reason"] = "executed",
                 ["scope"] = extractionScope,
                 ["target_side"] = targetSide,
                 ["changed_keys_a"] = DescribeChangedKeys(beforeHonorariosA, valuesA),
@@ -2751,7 +2911,10 @@ namespace Obj.Commands
                 ["derived_valor_b"] = honorariosB?.DerivedValor ?? ""
             });
             if (stepLimit <= 4)
+            {
+                EmitSkippedDownstreamModules(4);
                 return BuildExtractionResult(4, honorariosPayload, null, null, honorariosA?.DerivedValues, honorariosB?.DerivedValues);
+            }
 
             var catalog = ValidatorFacade.GetPeritoCatalog(null);
             var beforeRepairA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
@@ -2760,12 +2923,18 @@ namespace Obj.Commands
             var repairB = Obj.ValidationCore.ValidationRepairer.ApplyWithValidatorRules(valuesB, outputDocType, catalog);
             MarkModuleChanges(beforeRepairA, valuesA, fieldsA, "repairer");
             MarkModuleChanges(beforeRepairB, valuesB, fieldsB, "repairer");
+            var repairReasonParts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(repairA.Reason))
+                repairReasonParts.Add($"A:{repairA.Reason}");
+            if (!string.IsNullOrWhiteSpace(repairB.Reason))
+                repairReasonParts.Add($"B:{repairB.Reason}");
+            var repairPairReason = repairReasonParts.Count == 0 ? "executed" : string.Join(" | ", repairReasonParts);
 
             if (verbose)
             {
                 PrintPipelineStep(
-                    "passo 3.5/4 - reparador",
-                    "passo 3.6/4 - validação documental",
+                    "etapa 5/8 - reparador",
+                    "etapa 6/8 - validação documental",
                     ("modulo", "Obj.ValidationCore.ValidationRepairer"),
                     ("repair_apply_a", repairA.Applied.ToString().ToLowerInvariant()),
                     ("repair_apply_b", repairB.Applied.ToString().ToLowerInvariant()),
@@ -2784,6 +2953,8 @@ namespace Obj.Commands
             {
                 ["enabled"] = true,
                 ["module"] = "Obj.ValidationCore.ValidationRepairer",
+                ["status"] = repairA.Ok && repairB.Ok ? "ok" : "fail",
+                ["reason"] = repairPairReason,
                 ["apply_a"] = repairA.Applied,
                 ["apply_b"] = repairB.Applied,
                 ["ok_a"] = repairA.Ok,
@@ -2795,7 +2966,7 @@ namespace Obj.Commands
                 ["legacy_mirror_a"] = repairA.LegacyMirrorMatchesCore,
                 ["legacy_mirror_b"] = repairB.LegacyMirrorMatchesCore
             };
-            onStepOutput?.Invoke(5, "repairer", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            onStepOutput?.Invoke(5, "repairer", repairA.Ok && repairB.Ok ? "ok" : "fail", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.ValidationCore.ValidationRepairer",
                 ["scope"] = extractionScope,
@@ -2805,10 +2976,14 @@ namespace Obj.Commands
                 ["repair_ok_a"] = repairA.Ok,
                 ["repair_ok_b"] = repairB.Ok,
                 ["repair_reason_a"] = repairA.Reason ?? "",
-                ["repair_reason_b"] = repairB.Reason ?? ""
+                ["repair_reason_b"] = repairB.Reason ?? "",
+                ["reason"] = repairPairReason
             });
             if (stepLimit <= 5)
+            {
+                EmitSkippedDownstreamModules(5);
                 return BuildExtractionResult(5, honorariosPayload, repairerPayload, null, honorariosA?.DerivedValues, honorariosB?.DerivedValues);
+            }
 
             var beforeValidatorA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
             var beforeValidatorB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
@@ -2838,8 +3013,8 @@ namespace Obj.Commands
             if (verbose)
             {
                 PrintPipelineStep(
-                    "passo 3.6/4 - validação",
-                    "passo 4/4 - resumo colorido e persistência",
+                    "etapa 6/8 - validador",
+                    "etapa 7/8 - probe",
                     ("modulo", "Obj.ValidatorModule.ValidatorFacade"),
                     ("changed_keys_validator_a_apply", validatorChangedA == null || validatorChangedA.Count == 0
                         ? "(nenhum)"
@@ -2865,17 +3040,18 @@ namespace Obj.Commands
             {
                 ["enabled"] = true,
                 ["module"] = "Obj.ValidatorModule.ValidatorFacade",
+                ["status"] = ok ? "ok" : "fail",
                 ["scope"] = extractionScope,
                 ["ok"] = ok,
                 ["ok_pair"] = okPair,
                 ["ok_a"] = okA,
                 ["ok_b"] = okB,
-                ["reason"] = reason,
+                ["reason"] = string.IsNullOrWhiteSpace(reason) ? "executed" : reason,
                 ["reason_pair"] = reasonPair,
                 ["reason_a"] = reasonA ?? "",
                 ["reason_b"] = reasonB ?? ""
             };
-            onStepOutput?.Invoke(6, "validator", "ok", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            onStepOutput?.Invoke(6, "validator", ok ? "ok" : "fail", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.ValidatorModule.ValidatorFacade",
                 ["scope"] = extractionScope,
@@ -2884,7 +3060,7 @@ namespace Obj.Commands
                 ["ok_pair"] = okPair,
                 ["ok_a"] = okA,
                 ["ok_b"] = okB,
-                ["reason"] = reason,
+                ["reason"] = string.IsNullOrWhiteSpace(reason) ? "executed" : reason,
                 ["reason_pair"] = reasonPair,
                 ["policy_strict_money_a"] = policyChangedA,
                 ["policy_strict_money_b"] = policyChangedB
@@ -2934,11 +3110,31 @@ namespace Obj.Commands
             if (extraction is Dictionary<string, object> extractionDict)
             {
                 extractionDict["probe"] = probePayload;
+                if (!extractionDict.TryGetValue("module_status", out var statusObj) || statusObj is not Dictionary<string, object> moduleStatus)
+                {
+                    moduleStatus = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                    extractionDict["module_status"] = moduleStatus;
+                }
+                moduleStatus["probe"] = BuildModuleStatusLine(
+                    probePayload,
+                    "Obj.RootProbe.ExtractionProbeModule",
+                    "probe_not_executed");
                 return;
             }
 
             if (extraction is Dictionary<string, object?> extractionNullableDict)
+            {
                 extractionNullableDict["probe"] = probePayload;
+                if (!extractionNullableDict.TryGetValue("module_status", out var statusObj) || statusObj is not Dictionary<string, object> moduleStatus)
+                {
+                    moduleStatus = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                    extractionNullableDict["module_status"] = moduleStatus;
+                }
+                moduleStatus["probe"] = BuildModuleStatusLine(
+                    probePayload,
+                    "Obj.RootProbe.ExtractionProbeModule",
+                    "probe_not_executed");
+            }
         }
 
         private static void PrintProbeSummary(Dictionary<string, object> probePayload)
@@ -2981,6 +3177,52 @@ namespace Obj.Commands
             {
                 // best-effort only
             }
+        }
+
+        private static void PrintModuleStatusSummary(JsonElement root)
+        {
+            if (!root.TryGetProperty("module_status", out var moduleStatus) || moduleStatus.ValueKind != JsonValueKind.Object)
+                return;
+
+            var orderedModules = new[] { "honorarios", "repairer", "validator", "probe" };
+            var printed = false;
+
+            foreach (var key in orderedModules)
+            {
+                if (!moduleStatus.TryGetProperty(key, out var item) || item.ValueKind != JsonValueKind.Object)
+                    continue;
+
+                var moduleName = item.TryGetProperty("module", out var moduleEl) ? moduleEl.GetString() ?? "" : "";
+                var rawStatus = item.TryGetProperty("status", out var statusEl) ? statusEl.GetString() ?? "" : "";
+                var reason = item.TryGetProperty("reason", out var reasonEl) ? reasonEl.GetString() ?? "" : "";
+                var statusNorm = (rawStatus ?? "").Trim().ToLowerInvariant();
+                var normalizedStatus = statusNorm switch
+                {
+                    "ok" => "ok",
+                    "skipped" => "skipped",
+                    "fail" => "fail",
+                    _ => "fail"
+                };
+
+                var color = normalizedStatus switch
+                {
+                    "ok" => AnsiOk,
+                    "skipped" => AnsiSoft,
+                    _ => AnsiErr
+                };
+
+                if (!printed)
+                {
+                    Console.WriteLine(Colorize("[MODULE STATUS]", AnsiInfo));
+                    printed = true;
+                }
+
+                Console.WriteLine(
+                    $"  {Colorize(key + ":", AnsiWarn)} {Colorize(normalizedStatus, color)} reason=\"{(string.IsNullOrWhiteSpace(reason) ? "(n/a)" : reason)}\" modulo={ColorizeModuleChain(moduleName)}");
+            }
+
+            if (printed)
+                Console.WriteLine();
         }
 
         private static void PrintExtractionSummary(object? extraction, bool detailed)
@@ -3045,6 +3287,8 @@ namespace Obj.Commands
                         PrintSideValuesCompact(parsed, "pdf_b", "RESULTADO FINAL (CAMPOS ALVO B)");
                     }
                 }
+
+                PrintModuleStatusSummary(root);
 
                 if (!detailed)
                     return;
@@ -4341,11 +4585,16 @@ namespace Obj.Commands
             Console.WriteLine("obs: OBJ_TEXTOPSALIGN_INPUTS não é suportado e aborta a execução; use sempre --inputs explícito (aliases :D/:Q/@M-*).");
         }
 
-        private static void WriteStackedOutput(string aPath, List<ObjectsTextOpsDiff.AlignDebugReport> reports, string outPath)
+        private static void WriteStackedOutput(string aPath, List<ObjectsTextOpsDiff.AlignDebugReport> reports, string outPath, string defaultOutputPrefix)
         {
             var baseA = Path.GetFileNameWithoutExtension(aPath);
             if (string.IsNullOrWhiteSpace(outPath))
-                outPath = Path.Combine("outputs", "align_ranges", $"{baseA}__STACK__textops_align.txt");
+            {
+                var prefix = string.IsNullOrWhiteSpace(defaultOutputPrefix)
+                    ? $"{SanitizeFileToken(baseA)}__STACK"
+                    : defaultOutputPrefix;
+                outPath = Path.Combine("outputs", "align_ranges", $"{prefix}__textops_align.txt");
+            }
 
             Directory.CreateDirectory(Path.GetDirectoryName(outPath) ?? ".");
 
