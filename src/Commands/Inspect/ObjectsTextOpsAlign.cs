@@ -72,6 +72,26 @@ namespace Obj.Commands
             Console.WriteLine();
         }
 
+        private static void PrintResolvedParameters(params (string Key, string Value)[] items)
+        {
+            Console.WriteLine(Colorize("[PARAMETROS]", AnsiInfo));
+            foreach (var (key, value) in items)
+                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize(value ?? "", AnsiSoft)}");
+            Console.WriteLine();
+        }
+
+        private static void PrintBoolParameters(params (string Key, bool Value)[] flags)
+        {
+            Console.WriteLine(Colorize("[PARAMETROS BOOL]", AnsiInfo));
+            foreach (var (key, value) in flags)
+            {
+                var text = value ? "true" : "false";
+                var color = value ? AnsiOk : AnsiSoft;
+                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize(text, color)}");
+            }
+            Console.WriteLine();
+        }
+
         private static string ResolveModuleColor(string moduleName)
         {
             var norm = (moduleName ?? "").Trim().ToLowerInvariant();
@@ -935,6 +955,55 @@ namespace Obj.Commands
             {
                 ShowHelp();
                 return;
+            }
+
+            if (!ReturnUtils.IsEnabled())
+            {
+                PrintResolvedParameters(
+                    ("output_mode", outputMode.ToString()),
+                    ("inputs_count", inputs.Count.ToString(CultureInfo.InvariantCulture)),
+                    ("inputs", inputs.Count == 0 ? "(vazio)" : string.Join(" | ", inputs)),
+                    ("pageA", pageA.ToString(CultureInfo.InvariantCulture)),
+                    ("pageB", pageB.ToString(CultureInfo.InvariantCulture)),
+                    ("objA", objA.ToString(CultureInfo.InvariantCulture)),
+                    ("objB", objB.ToString(CultureInfo.InvariantCulture)),
+                    ("doc_key", string.IsNullOrWhiteSpace(docKey) ? "(vazio)" : docKey),
+                    ("ops", opFilter.Count == 0 ? "(vazio)" : string.Join(",", opFilter)),
+                    ("backoff", backoff.ToString(CultureInfo.InvariantCulture)),
+                    ("top", top.ToString(CultureInfo.InvariantCulture)),
+                    ("min_sim", ReportUtils.F(minSim, 3)),
+                    ("band", band.ToString(CultureInfo.InvariantCulture)),
+                    ("min_len_ratio", ReportUtils.F(minLenRatio, 3)),
+                    ("len_penalty", ReportUtils.F(lenPenalty, 3)),
+                    ("anchor_sim", ReportUtils.F(anchorMinSim, 3)),
+                    ("anchor_len", ReportUtils.F(anchorMinLenRatio, 3)),
+                    ("gap_penalty", ReportUtils.F(gapPenalty, 3)),
+                    ("alinhamento_top", alignTop.ToString(CultureInfo.InvariantCulture)),
+                    ("probe_file", string.IsNullOrWhiteSpace(probeFile) ? "(vazio)" : probeFile),
+                    ("probe_page", probePage.ToString(CultureInfo.InvariantCulture)),
+                    ("probe_side", string.IsNullOrWhiteSpace(probeSide) ? "(vazio)" : probeSide),
+                    ("probe_max_fields", probeMaxFields.ToString(CultureInfo.InvariantCulture)),
+                    ("run_from", runFromStep.ToString(CultureInfo.InvariantCulture)),
+                    ("run_to", runToStep.ToString(CultureInfo.InvariantCulture)),
+                    ("step_output_dir", string.IsNullOrWhiteSpace(stepOutputDir) ? "(vazio)" : stepOutputDir),
+                    ("out_path", string.IsNullOrWhiteSpace(outPath) ? "(vazio)" : outPath)
+                );
+
+                PrintBoolParameters(
+                    ("return_mode", ReturnUtils.IsEnabled()),
+                    ("out_specified", outSpecified),
+                    ("show_alignment", showAlign),
+                    ("pageA_user", pageAUser),
+                    ("pageB_user", pageBUser),
+                    ("objA_user", objAUser),
+                    ("objB_user", objBUser),
+                    ("use_back", useBack),
+                    ("side_specified", sideSpecified),
+                    ("allow_stack", allowStack),
+                    ("probe_enabled", probeEnabled),
+                    ("step_output_echo", stepOutputEcho),
+                    ("step_output_save", stepOutputSave)
+                );
             }
 
             if (inputs.Count < 2)
