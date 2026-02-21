@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using Obj.Commands;
 using Obj.DocDetector;
@@ -23,6 +25,11 @@ namespace Obj.OperCli
                 ShowHelp();
                 return 0;
             }
+
+            var rawMode = (args[0] ?? "").Trim();
+            var rawRest = args.Length > 1 ? args[1..] : Array.Empty<string>();
+            if (IsBuildAlignExeMode(rawMode))
+                return ExecuteBuildAlignExe(rawRest);
 
             InitLogger(args);
             args = ApplyGlobalOutputConfig(args);
@@ -151,6 +158,252 @@ namespace Obj.OperCli
             if (ObjectsTextOpsAlign.LastExitCode != 0)
                 return ObjectsTextOpsAlign.LastExitCode;
             return Environment.ExitCode != 0 ? Environment.ExitCode : 0;
+        }
+
+        private static bool IsBuildAlignExeMode(string mode)
+        {
+            return string.Equals(mode, "build-align-exe", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(mode, "build-exe", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static int ExecuteBuildAlignExe(string[] args)
+        {
+            var rid = "win-x64";
+            var config = "Release";
+            var noRestore = false;
+            string? repoRootArg = null;
+
+            for (var i = 0; i < args.Length; i++)
+            {
+                var arg = (args[i] ?? "").Trim();
+                if (arg.Equals("--help", StringComparison.OrdinalIgnoreCase) || arg.Equals("-h", StringComparison.OrdinalIgnoreCase))
+                {
+                    ShowBuildAlignExeHelp();
+                    return 0;
+                }
+                if (arg.Equals("--rid", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    rid = (args[++i] ?? "").Trim();
+                    continue;
+                }
+                if (arg.StartsWith("--rid=", StringComparison.OrdinalIgnoreCase))
+                {
+                    rid = (arg.Split('=', 2)[1] ?? "").Trim();
+                    continue;
+                }
+                if (arg.Equals("--config", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    config = (args[++i] ?? "").Trim();
+                    continue;
+                }
+                if (arg.StartsWith("--config=", StringComparison.OrdinalIgnoreCase))
+                {
+                    config = (arg.Split('=', 2)[1] ?? "").Trim();
+                    continue;
+                }
+                if (arg.Equals("--repo-root", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    repoRootArg = args[++i];
+                    continue;
+                }
+                if (arg.StartsWith("--repo-root=", StringComparison.OrdinalIgnoreCase))
+                {
+                    repoRootArg = arg.Split('=', 2)[1];
+                    continue;
+                }
+                if (arg.Equals("--no-restore", StringComparison.OrdinalIgnoreCase))
+                {
+                    noRestore = true;
+                    continue;
+                }
+
+                Console.Error.WriteLine($"Argumento não suportado: {arg}");
+                ShowBuildAlignExeHelp();
+                return 1;
+            }
+
+            var repoRoot = ResolveRepoRoot(repoRootArg);
+            if (string.IsNullOrWhiteSpace(repoRoot))
+            {
+                Console.Error.WriteLine("Não foi possível localizar a raiz do repositório (arquivo cli/OperCli/OperCli.csproj).");
+                return 2;
+            }
+
+            var csprojPath = Path.Combine(repoRoot, "cli", "OperCli", "OperCli.csproj");
+            if (!File.Exists(csprojPath))
+            {
+                Console.Error.WriteLine($"Projeto não encontrado: {csprojPath}");
+                return 2;
+            }
+
+            var publishOutDir = Path.Combine(repoRoot, "cli", "OperCli", "publish", rid);
+            Directory.CreateDirectory(publishOutDir);
+            Console.WriteLine("[BUILD-ALIGN-EXE] iniciando publish");
+            Console.WriteLine($"  repo_root: {repoRoot}");
+            Console.WriteLine($"  project:   {csprojPath}");
+            Console.WriteLine($"  rid:       {rid}");
+            Console.WriteLine($"  config:    {config}");
+            Console.WriteLine($"  out:       {publishOutDir}");
+
+            var publishArgs = new List<string>
+            {
+                "publish",
+                Quote(csprojPath),
+                "-c", Quote(config),
+                "-r", Quote(rid),
+                "--self-contained", "true",
+                "-p:PublishSingleFile=true",
+                "-o", Quote(publishOutDir),
+                "--ignore-failed-sources",
+                "/p:RestoreIgnoreFailedSources=true",
+                "/p:NuGetAudit=false",
+                "/p:OPERPDF_SKIP_ROOT_COPY=1"
+            };
+            if (noRestore)
+                publishArgs.Add("--no-restore");
+
+            var code = RunProcess(
+                "dotnet",
+                string.Join(" ", publishArgs),
+                repoRoot);
+            if (code != 0)
+            {
+                Console.Error.WriteLine($"Publish falhou com código {code}.");
+                return code;
+            }
+
+            var publishedExe = Path.Combine(publishOutDir, "operpdf.exe");
+            if (!File.Exists(publishedExe))
+            {
+                Console.Error.WriteLine($"Executável não encontrado após publish: {publishedExe}");
+                return 3;
+            }
+
+            var alignRoot = Path.Combine(repoRoot, "align.exe");
+            var operpdfRoot = Path.Combine(repoRoot, "operpdf.exe");
+            var alignCli = Path.Combine(repoRoot, "cli", "align.exe");
+            var operpdfCli = Path.Combine(repoRoot, "cli", "operpdf.exe");
+
+            Directory.CreateDirectory(Path.Combine(repoRoot, "cli"));
+            CopyWithFallback(publishedExe, alignRoot, "align.exe");
+            CopyWithFallback(publishedExe, operpdfRoot, "operpdf.exe");
+            CopyWithFallback(publishedExe, alignCli, "cli/align.exe");
+            CopyWithFallback(publishedExe, operpdfCli, "cli/operpdf.exe");
+
+            Console.WriteLine("[BUILD-ALIGN-EXE] concluído");
+            Console.WriteLine($"  align.exe: {alignRoot}");
+            return 0;
+        }
+
+        private static string ResolveRepoRoot(string? repoRootArg)
+        {
+            if (!string.IsNullOrWhiteSpace(repoRootArg))
+            {
+                try
+                {
+                    var full = Path.GetFullPath(repoRootArg);
+                    if (File.Exists(Path.Combine(full, "cli", "OperCli", "OperCli.csproj")))
+                        return full;
+                }
+                catch
+                {
+                    return "";
+                }
+            }
+
+            var probes = new List<string>();
+            try
+            {
+                probes.Add(Directory.GetCurrentDirectory());
+            }
+            catch
+            {
+                // ignore
+            }
+            try
+            {
+                probes.Add(AppContext.BaseDirectory);
+            }
+            catch
+            {
+                // ignore
+            }
+
+            foreach (var probe in probes)
+            {
+                var found = FindRepoRootFromPath(probe);
+                if (!string.IsNullOrWhiteSpace(found))
+                    return found;
+            }
+
+            return "";
+        }
+
+        private static string FindRepoRootFromPath(string? startPath)
+        {
+            if (string.IsNullOrWhiteSpace(startPath))
+                return "";
+
+            DirectoryInfo? dir;
+            try
+            {
+                dir = new DirectoryInfo(Path.GetFullPath(startPath));
+                if (File.Exists(dir.FullName))
+                    dir = dir.Parent;
+            }
+            catch
+            {
+                return "";
+            }
+
+            while (dir != null)
+            {
+                var csproj = Path.Combine(dir.FullName, "cli", "OperCli", "OperCli.csproj");
+                if (File.Exists(csproj))
+                    return dir.FullName;
+                dir = dir.Parent;
+            }
+            return "";
+        }
+
+        private static void CopyWithFallback(string sourcePath, string destinationPath, string label)
+        {
+            try
+            {
+                File.Copy(sourcePath, destinationPath, true);
+                Console.WriteLine($"  [ok] {label}");
+            }
+            catch (IOException ex)
+            {
+                var fallback = destinationPath + ".new";
+                File.Copy(sourcePath, fallback, true);
+                Console.WriteLine($"  [warn] não foi possível sobrescrever {label}: {ex.Message}");
+                Console.WriteLine($"  [warn] salvo em: {fallback}");
+            }
+        }
+
+        private static int RunProcess(string fileName, string arguments, string workingDirectory)
+        {
+            using var process = new Process();
+            process.StartInfo.FileName = fileName;
+            process.StartInfo.Arguments = arguments;
+            process.StartInfo.WorkingDirectory = workingDirectory;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.RedirectStandardError = false;
+
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode;
+        }
+
+        private static string Quote(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return "\"\"";
+            if (!text.Contains(" ", StringComparison.Ordinal) && !text.Contains("\t", StringComparison.Ordinal))
+                return text;
+            return $"\"{text.Replace("\"", "\\\"", StringComparison.Ordinal)}\"";
         }
 
         private static bool IsHelp(string arg)
@@ -299,6 +552,7 @@ namespace Obj.OperCli
             Console.WriteLine("  textopsfixed-requerimento  fixos requerimento");
             Console.WriteLine("  build-anchor-model-despacho  gera PDF de âncoras do modelo de despacho");
             Console.WriteLine("  build-merged-page          gera PDF com duas páginas combinadas em uma página grande");
+            Console.WriteLine("  build-align-exe            publica e atualiza align.exe na raiz");
             Console.WriteLine();
             Console.WriteLine("Global");
             Console.WriteLine("  return/--return [arquivo.json]  JSON puro + salva em io/arquivo.json");
@@ -314,6 +568,26 @@ namespace Obj.OperCli
             Console.WriteLine("  operpdf textopsfixed-despacho --inputs :D20 --inputs :Q200");
             Console.WriteLine("  operpdf build-anchor-model-despacho --model reference/models/tjpb_despacho_model.pdf --out reference/models/tjpb_despacho_anchor_model.pdf");
             Console.WriteLine("  operpdf build-merged-page --input models/nossos/despacho_p1-2.pdf --page-a 1 --page-b 2 --layout vertical");
+            Console.WriteLine("  operpdf build-align-exe");
+            Console.WriteLine("  operpdf build-align-exe --rid win-x64 --config Release");
+        }
+
+        private static void ShowBuildAlignExeHelp()
+        {
+            Console.WriteLine("Uso: operpdf build-align-exe [opções]");
+            Console.WriteLine("Alias: build-exe");
+            Console.WriteLine();
+            Console.WriteLine("Faz publish e atualiza os executáveis:");
+            Console.WriteLine("  ./align.exe");
+            Console.WriteLine("  ./operpdf.exe");
+            Console.WriteLine("  ./cli/align.exe");
+            Console.WriteLine("  ./cli/operpdf.exe");
+            Console.WriteLine();
+            Console.WriteLine("Opções:");
+            Console.WriteLine("  --rid <RID>             padrão: win-x64");
+            Console.WriteLine("  --config <CONFIG>       padrão: Release");
+            Console.WriteLine("  --repo-root <caminho>   força raiz do repositório");
+            Console.WriteLine("  --no-restore            publica sem restore");
         }
     }
 }

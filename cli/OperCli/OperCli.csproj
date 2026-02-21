@@ -33,7 +33,7 @@
              Exclude="**/bin/**;**/obj/**;../../cli/OperCli/**;../../tools/**;../../modules/DocDetector/**/*Runner*.cs;../../modules/DocDetector/Detectors/WeightedDespachoDetector.cs;../../modules/ExtractionModule/TypedFieldExtractor.cs;../../modules/ExtractionModule/TjpbDespachoExtractor/Commands/**/*.cs" />
   </ItemGroup>
 
-  <Target Name="CopyOperPdfToRoot" AfterTargets="Build">
+  <Target Name="CopyOperPdfToRoot" AfterTargets="Build" Condition="'$(OPERPDF_SKIP_ROOT_COPY)'!='1'">
     <PropertyGroup>
       <OperPdfRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</OperPdfRootDir>
       <OperPdfRepoDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))</OperPdfRepoDir>
@@ -73,7 +73,7 @@
           Condition="Exists('$(TargetDir)$(AssemblyName).exe')" />
   </Target>
 
-  <Target Name="CopyOperPdfPublishToRoot" AfterTargets="Publish">
+  <Target Name="CopyOperPdfPublishToRoot" AfterTargets="Publish" Condition="'$(OPERPDF_SKIP_ROOT_COPY)'!='1'">
     <PropertyGroup>
       <OperPdfRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/..'))</OperPdfRootDir>
       <OperPdfRepoDir>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../..'))</OperPdfRepoDir>
