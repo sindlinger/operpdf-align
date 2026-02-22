@@ -1914,7 +1914,10 @@ namespace Obj.Commands
                 {
                     PrintHumanSummary(report, top, outputMode);
                     PrintAlignmentList(report, alignTop, showDiff: true);
-                    PrintAlignmentToExtractionPayload(report);
+                    PrintAlignmentToExtractionPayload(
+                        report,
+                        outputMode == OutputMode.All ? null : processingReport,
+                        outputMode);
                 }
 
                 Dictionary<string, object>? deferredProbePayload = null;
@@ -5556,7 +5559,10 @@ namespace Obj.Commands
             }
         }
 
-        private static void PrintAlignmentToExtractionPayload(ObjectsTextOpsDiff.AlignDebugReport report)
+        private static void PrintAlignmentToExtractionPayload(
+            ObjectsTextOpsDiff.AlignDebugReport report,
+            ObjectsTextOpsDiff.AlignDebugReport? processingReport,
+            OutputMode outputMode)
         {
             var opRangeA = BuildOpRange(report.RangeA);
             var opRangeB = BuildOpRange(report.RangeB);
@@ -5576,6 +5582,23 @@ namespace Obj.Commands
             Console.WriteLine(string.IsNullOrWhiteSpace(valueFullA) ? Colorize("  (vazio)", AnsiSoft) : valueFullA);
             Console.WriteLine($"  {Colorize("value_full_segundo:", AnsiWarn)}");
             Console.WriteLine(string.IsNullOrWhiteSpace(valueFullB) ? Colorize("  (vazio)", AnsiSoft) : valueFullB);
+
+            if (processingReport != null && outputMode != OutputMode.All)
+            {
+                var execOpRangeA = BuildOpRange(processingReport.RangeA);
+                var execOpRangeB = BuildOpRange(processingReport.RangeB);
+                var execValueFullA = BuildValueFullFromBlocks(processingReport.BlocksA, processingReport.RangeA);
+                var execValueFullB = BuildValueFullFromBlocks(processingReport.BlocksB, processingReport.RangeB);
+
+                Console.WriteLine();
+                Console.WriteLine($"  {Colorize("payload_execucao_real:", AnsiWarn)} {Colorize("modo parcial usa report completo (anchors+alignments) para parser", AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("op_range_primeiro_execucao:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(execOpRangeA) ? "(vazio)" : execOpRangeA, AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("op_range_segundo_execucao:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(execOpRangeB) ? "(vazio)" : execOpRangeB, AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("len_value_full_primeiro_execucao:", AnsiWarn)} {Colorize(execValueFullA.Length.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("len_value_full_segundo_execucao:", AnsiWarn)} {Colorize(execValueFullB.Length.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("anchors_execucao:", AnsiWarn)} {Colorize(processingReport.Anchors.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+                Console.WriteLine($"  {Colorize("pairs_execucao:", AnsiWarn)} {Colorize(processingReport.Alignments.Count.ToString(CultureInfo.InvariantCulture), AnsiSoft)}");
+            }
             Console.WriteLine();
         }
 
