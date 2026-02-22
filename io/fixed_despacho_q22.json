@@ -1,0 +1,2295 @@
+﻿{
+  "Label": "single_page",
+  "PdfA": "Documento_24_p090-091__merged_p1p2.pdf",
+  "PdfB": "2021050735.pdf",
+  "RoleA": "template_modelo",
+  "RoleB": "pdf_alvo_extracao",
+  "PageA": 1,
+  "PageB": 10,
+  "ObjA": 5,
+  "ObjB": 88,
+  "Backoff": 2,
+  "MinSim": 0.12,
+  "Band": 2,
+  "MinLenRatio": 0.2,
+  "LenPenalty": 0.4,
+  "AnchorMinSim": 0,
+  "AnchorMinLenRatio": 0,
+  "GapPenalty": -0.2,
+  "Anchors": [
+    {
+      "AIndex": 2,
+      "BIndex": 2,
+      "Score": 1,
+      "Kind": "anchor",
+      "A": {
+        "Index": 3,
+        "StartOp": 3,
+        "EndOp": 3,
+        "Text": "Processo nº 2022.158.112",
+        "Pattern": "WWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 3,
+        "StartOp": 3,
+        "EndOp": 3,
+        "Text": "Processo nº 2021.050.735",
+        "Pattern": "WWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 3,
+      "BIndex": 3,
+      "Score": 1,
+      "Kind": "anchor",
+      "A": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Requerente: Juízo da 1ª Vara da Comarca de Mamanguape",
+        "Pattern": "WWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 4,
+        "StartOp": 4,
+        "EndOp": 4,
+        "Text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Piancó",
+        "Pattern": "WWWWWWWWWW",
+        "MaxTokenLen": 11,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 4,
+      "BIndex": 4,
+      "Score": 1,
+      "Kind": "anchor",
+      "A": {
+        "Index": 5,
+        "StartOp": 5,
+        "EndOp": 5,
+        "Text": "Interessada: Christine Maria Batista de Brito Lyra – Perita Médica Neurologista",
+        "Pattern": "WWWWWWW1WWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 5,
+        "StartOp": 5,
+        "EndOp": 5,
+        "Text": "Interessada: Claudia Cristina Studart Leal - Médica",
+        "Pattern": "WWWWW1W",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 17,
+      "BIndex": 5,
+      "Score": 1,
+      "Kind": "anchor",
+      "A": {
+        "Index": 18,
+        "StartOp": 18,
+        "EndOp": 18,
+        "Text": "À Gerência de Programação Orçamentária deste Tribunal, a fim de que seja emitida nota de",
+        "Pattern": "1WWWWWW1WWWWWWW",
+        "MaxTokenLen": 12,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 6,
+        "StartOp": 6,
+        "EndOp": 6,
+        "Text": "Os presente s autos versam sobre solicitação de reserva orçamentária, no valor de R$ 370, 00",
+        "Pattern": "WW1WWWWWWWWWWWWW",
+        "MaxTokenLen": 13,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 23,
+      "BIndex": 8,
+      "Score": 1,
+      "Kind": "anchor",
+      "A": {
+        "Index": 24,
+        "StartOp": 24,
+        "EndOp": 24,
+        "Text": "movido por JOÃO BATISTA DE OLIVEIRA, CPF 161.978.874-87,",
+        "Pattern": "WWWWWWWW",
+        "MaxTokenLen": 15,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 9,
+        "StartOp": 9,
+        "EndOp": 9,
+        "Text": "Processo nº 0800318-38.2018.8.15.1161, movido por Mara do Socorro da Silva, CPF",
+        "Pattern": "WWWWWWWWWWW",
+        "MaxTokenLen": 26,
+        "OpsLabel": "Tj"
+      }
+    },
+    {
+      "AIndex": 29,
+      "BIndex": 12,
+      "Score": 0.9528004179728318,
+      "Kind": "anchor",
+      "A": {
+        "Index": 30,
+        "StartOp": 30,
+        "EndOp": 30,
+        "Text": "Diretoria Especial do Tribunal de Justiça do Estado da Paraíba, em João Pessoa, 17 de setembro",
+        "Pattern": "WWWWWWWWWWWWWWWW",
+        "MaxTokenLen": 9,
+        "OpsLabel": "Tj"
+      },
+      "B": {
+        "Index": 13,
+        "StartOp": 13,
+        "EndOp": 13,
+        "Text": "pela Resolução nº 12, de 10 de março de 2021, publicada no Diário da Justiça Eletrônico deste",
+        "Pattern": "WWWWWWWWWWWWWWWWW",
+        "MaxTokenLen": 10,
+        "OpsLabel": "Tj"
+      }
+    }
+  ],
+  "HelperDiagnostics": {
+    "HitsA": 11,
+    "HitsB": 6,
+    "Candidates": 9,
+    "Accepted": 6,
+    "Rejected": 10,
+    "UsedInFinalAnchors": 6,
+    "AppliedToSegmentation": false,
+    "AnchorMode": "diagnostic_auto+helper",
+    "Decisions": [
+      {
+        "AIndex": 3,
+        "BIndex": 8,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "low_similarity",
+        "Score": -0.11846153846153856
+      },
+      {
+        "AIndex": 10,
+        "BIndex": 3,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "low_similarity",
+        "Score": -0.06952727272727272
+      },
+      {
+        "AIndex": 11,
+        "BIndex": 3,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "low_similarity",
+        "Score": -0.01321212121212123
+      },
+      {
+        "AIndex": 11,
+        "BIndex": 8,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "low_similarity",
+        "Score": -0.03343589743589742
+      },
+      {
+        "AIndex": 23,
+        "BIndex": 3,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "low_similarity",
+        "Score": -0.06952727272727272
+      },
+      {
+        "AIndex": 24,
+        "BIndex": 3,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "low_similarity",
+        "Score": -0.06838095238095238
+      },
+      {
+        "AIndex": 24,
+        "BIndex": 8,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "low_similarity",
+        "Score": -0.09958974358974365
+      },
+      {
+        "AIndex": 2,
+        "BIndex": 2,
+        "Key": "processo_judicial",
+        "Status": "accepted",
+        "Reason": "selected",
+        "Score": 1
+      },
+      {
+        "AIndex": 3,
+        "BIndex": 3,
+        "Key": "promovente",
+        "Status": "accepted",
+        "Reason": "selected",
+        "Score": 1
+      },
+      {
+        "AIndex": 4,
+        "BIndex": 4,
+        "Key": "perito",
+        "Status": "accepted",
+        "Reason": "selected",
+        "Score": 1
+      },
+      {
+        "AIndex": 10,
+        "BIndex": 8,
+        "Key": "promovente",
+        "Status": "rejected",
+        "Reason": "non_monotonic_pruned",
+        "Score": 1
+      },
+      {
+        "AIndex": 15,
+        "BIndex": 12,
+        "Key": "data",
+        "Status": "rejected",
+        "Reason": "non_monotonic_pruned",
+        "Score": 0.9867398119122257
+      },
+      {
+        "AIndex": 17,
+        "BIndex": 5,
+        "Key": "valor_de",
+        "Status": "accepted",
+        "Reason": "selected",
+        "Score": 1
+      },
+      {
+        "AIndex": 23,
+        "BIndex": 8,
+        "Key": "promovente",
+        "Status": "accepted",
+        "Reason": "selected",
+        "Score": 1
+      },
+      {
+        "AIndex": 26,
+        "BIndex": 5,
+        "Key": "valor_de",
+        "Status": "rejected",
+        "Reason": "non_monotonic_pruned",
+        "Score": 0.9807628004179727
+      },
+      {
+        "AIndex": 29,
+        "BIndex": 12,
+        "Key": "data",
+        "Status": "accepted",
+        "Reason": "selected",
+        "Score": 0.9528004179728318
+      }
+    ]
+  },
+  "BlocksA": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "Poder Judiciário do Estado da Paraíba",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "Diretoria Especial",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2022.158.112",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 1ª Vara da Comarca de Mamanguape",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessada: Christine Maria Batista de Brito Lyra – Perita Médica Neurologista",
+      "Pattern": "WWWWWWW1WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "CHRISTIN E LYRA@GMAIL.COM",
+      "Pattern": "W1W",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "no valor de R$ 370, 00 (trezentos e setenta reais)) ) ,",
+      "Pattern": "WWWWWWW1WW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "em favor da Perita Médica Neurologista, Christine Maria Batista de Brito",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "Lyra, CPF 225.572.294-15, com inscrição no PIS/PASEP sob nº 17013990440,",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "nos autos do processo nº 0001189-59.2010.8.15.0231,",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "movido por JOÃO BATISTA DE OLIVEIRA, CPF 161.978.874-87,",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "em face do INSTITUTO NACIONAL DO SEGURO SOCIAL, CNPJ",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "29.979.036/0001-40,",
+      "Pattern": "W",
+      "MaxTokenLen": 19,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "perante o Juízo da 1ª Vara da Comarca de Mamanguape.",
+      "Pattern": "W1WWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "Em razão do exposto, autorizo a despesa, escudado pelo inciso IV, Parágrafo 1º do Ato nº",
+      "Pattern": "WWWWW1WWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "03/2021, da Presidência deste Tribunal, publicado no Diário da Justiça Eletrônico deste Estado,",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "do dia 12 de fevereiro de 2021, que delegou atribuições ao Diretor Especial.",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "À Gerência de Programação Orçamentária deste Tribunal, a fim de que seja emitida nota de",
+      "Pattern": "1WWWWWW1WWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "empenho,",
+      "Pattern": "W",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "no valor de R$ 370, 00 (trezentos e setenta reais)) ) ,",
+      "Pattern": "WWWWWWW1WW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "em favor da Perita Médica Neurologista, Christine Maria Batista de Brito Lyra,",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "CPF 225.572.294-15, com inscrição no PIS/PASEP sob nº 17013990440,",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "nos autos do processo nº 0001189-59.2010.8.15.0231,",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "movido por JOÃO BATISTA DE OLIVEIRA, CPF 161.978.874-87,",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "em face do INSTITUTO NACIONAL DO SEGURO SOCIAL, CNPJ 29.979.036/0001-40,",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 19,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "perante o Juízo da 1ª Vara da Comarca de Mamanguape.",
+      "Pattern": "W1WWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Emitida a nota de empenho respectiva, sejam os autos devolvidos a esta Diretoria, para ciência",
+      "Pattern": "W1WWWWWWWW1WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "do perito nomeado, a fim de providenciar o encaminhamento da nota fiscal da perícia realizada",
+      "Pattern": "WWW1WWW1WWWWWWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 29,
+      "StartOp": 29,
+      "EndOp": 29,
+      "Text": "Cientifique-se o Juízo requisitante do inteiro teor da presente decisão, cuja cópia servirá de ofício.",
+      "Pattern": "W1WWWWWWWWWWWWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 30,
+      "StartOp": 30,
+      "EndOp": 30,
+      "Text": "Diretoria Especial do Tribunal de Justiça do Estado da Paraíba, em João Pessoa, 17 de setembro",
+      "Pattern": "WWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 31,
+      "StartOp": 31,
+      "EndOp": 31,
+      "Text": "de 2024.",
+      "Pattern": "WW",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 32,
+      "StartOp": 32,
+      "EndOp": 32,
+      "Text": "Robson de Lima Cananéa – Diretor Especial",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 33,
+      "StartOp": 33,
+      "EndOp": 33,
+      "Text": "Documento 24 página 2 assinado, do processo nº 2022158112, nos termos da Lei 11.419. ADME.67725.56271.54129.61828-2 Documento 24 página 1 assinado, do processo nº 2022158112, nos termos da Lei 11.419. ADME.67725.56271.54129.61828-2",
+      "Pattern": "WWW1WWWWWWWWWWWWWW1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 34,
+      "StartOp": 34,
+      "EndOp": 34,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 17/09/2024 13: 55 Robson de Lima Cananea [419.454.334-34] em 17/09/2024 13: 55",
+      "Pattern": "WWWWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "BlocksB": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "TRIBUNAL DE JUSTIÇA DO esta DO DA para ÍBA",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "DIRE TORIA ESPE CIAL",
+      "Pattern": "W1WW1W",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2021.050.735",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Piancó",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessada: Claudia Cristina Studart Leal - Médica",
+      "Pattern": "WWWWW1W",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "Os presente s autos versam sobre solicitação de reserva orçamentária, no valor de R$ 370, 00",
+      "Pattern": "WW1WWWWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "(trezentos e setenta reais)) ) , para suportar o encargo relativo à despesa decorrente de honorários",
+      "Pattern": "W1WW1WW1WW1WWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "da Perita Médica nomeada, Claudia Cristina Studart Leal, para realização de perícia nos autos do",
+      "Pattern": "WWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "Processo nº 0800318-38.2018.8.15.1161, movido por Mara do Socorro da Silva, CPF",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "037.349.624-98, em face de Francisca Maria da Silva, CPF 345.922.908-01, em curso perante o",
+      "Pattern": "WWWWWWWWWWWWW1",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "Juízo da 2ª Vara Mista da Comarca de Piancó.",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "Ressalte-se que a Resolução nº 09/2017, deste Tribunal, de 21 de junho de 2017, modificada",
+      "Pattern": "WW1WWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "pela Resolução nº 12, de 10 de março de 2021, publicada no Diário da Justiça Eletrônico deste",
+      "Pattern": "WWWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "esta do, do dia 11 imediato, disciplinou, no âmbito da Justiça esta dual da para íba de primeiro e",
+      "Pattern": "WWWWWWWWWWWWWWWWWW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "segundo graus, os procedimentos relativos ao pagamento dos honorários periciais, nos casos em",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "que a parte goze da gratuidade da justiça.",
+      "Pattern": "W1WWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "No § 1º, do art. 4º, da mencionada resolução, restou a nota do que os valor es a serem pagos pelo s",
+      "Pattern": "W1WWWWWWWW1WWWWWW1WWW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "serviços de perícia de responsabilidade de beneficiário da gratuidade da justiça, na hipótese do",
+      "Pattern": "WWWWWWWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "art. 95, § 3º, II, do Código de Processo Civil, são os fixados na Tabela constante no Anexo da",
+      "Pattern": "WW1WWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Resolução 232, de 13 de julho de 2016, do Conselho Nacional de Justiça.",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "Em seu art. 5º, ressalvou que o juiz, ao fixar os honorários, Poder á ultrapassar o limite fixado na",
+      "Pattern": "WWWWWW1WWWWWW1W1WWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "tabela em anexo, em até 05 (cinco) vezes, desde que de forma fundamentada e atendendo ao",
+      "Pattern": "WWWWWWWWWWWWW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "grau de Especial ização do perito, à complexidade da matéria, o lugar eo tempo exigidos para a",
+      "Pattern": "WWWWWW1WWW1WWWWW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "pr esta ção do serviço, ficando, nesse caso, o pagamento condicionado à aprovação pelo",
+      "Pattern": "WWWWWWWW1WW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "Conselho da Magistratura.",
+      "Pattern": "WWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "O Ato 99/2017, da Presidência deste Tribunal, à sua vez, dispôs sobre o procedimento das",
+      "Pattern": "1WWWWWW1WWWW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "requisições de pagamento de honorários de perito s, oriundas de Processo s judiciais em",
+      "Pattern": "WWWWWWWWWWW1WW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "tramitação sob o pálio da justiça gratuita, no âmbito da Justiça esta dual da para íba de primeiro e",
+      "Pattern": "WW1WWWWWWWWWWWWWWW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 29,
+      "StartOp": 29,
+      "EndOp": 29,
+      "Text": "Documento 2 página 1 assinado, do processo nº 2021050735, nos termos da Lei 11.419. ADME.11657.90862.90261.31121-9",
+      "Pattern": "W1W1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 30,
+      "StartOp": 30,
+      "EndOp": 30,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 13/05/2021 14: 26",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "Alignments": [],
+  "VariableBlocksA": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "Poder Judiciário do Estado da Paraíba",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "Diretoria Especial",
+      "Pattern": "WW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2022.158.112",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 1ª Vara da Comarca de Mamanguape",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessada: Christine Maria Batista de Brito Lyra – Perita Médica Neurologista",
+      "Pattern": "WWWWWWW1WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "CHRISTIN E LYRA@GMAIL.COM",
+      "Pattern": "W1W",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "no valor de R$ 370, 00 (trezentos e setenta reais)) ) ,",
+      "Pattern": "WWWWWWW1WW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "em favor da Perita Médica Neurologista, Christine Maria Batista de Brito",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "Lyra, CPF 225.572.294-15, com inscrição no PIS/PASEP sob nº 17013990440,",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "nos autos do processo nº 0001189-59.2010.8.15.0231,",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "movido por JOÃO BATISTA DE OLIVEIRA, CPF 161.978.874-87,",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "em face do INSTITUTO NACIONAL DO SEGURO SOCIAL, CNPJ",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "29.979.036/0001-40,",
+      "Pattern": "W",
+      "MaxTokenLen": 19,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "perante o Juízo da 1ª Vara da Comarca de Mamanguape.",
+      "Pattern": "W1WWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "Em razão do exposto, autorizo a despesa, escudado pelo inciso IV, Parágrafo 1º do Ato nº",
+      "Pattern": "WWWWW1WWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "03/2021, da Presidência deste Tribunal, publicado no Diário da Justiça Eletrônico deste Estado,",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "do dia 12 de fevereiro de 2021, que delegou atribuições ao Diretor Especial.",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "À Gerência de Programação Orçamentária deste Tribunal, a fim de que seja emitida nota de",
+      "Pattern": "1WWWWWW1WWWWWWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "empenho,",
+      "Pattern": "W",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "no valor de R$ 370, 00 (trezentos e setenta reais)) ) ,",
+      "Pattern": "WWWWWWW1WW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "em favor da Perita Médica Neurologista, Christine Maria Batista de Brito Lyra,",
+      "Pattern": "WWWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "CPF 225.572.294-15, com inscrição no PIS/PASEP sob nº 17013990440,",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "nos autos do processo nº 0001189-59.2010.8.15.0231,",
+      "Pattern": "WWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "movido por JOÃO BATISTA DE OLIVEIRA, CPF 161.978.874-87,",
+      "Pattern": "WWWWWWWW",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "em face do INSTITUTO NACIONAL DO SEGURO SOCIAL, CNPJ 29.979.036/0001-40,",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 19,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "perante o Juízo da 1ª Vara da Comarca de Mamanguape.",
+      "Pattern": "W1WWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "Emitida a nota de empenho respectiva, sejam os autos devolvidos a esta Diretoria, para ciência",
+      "Pattern": "W1WWWWWWWW1WWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "do perito nomeado, a fim de providenciar o encaminhamento da nota fiscal da perícia realizada",
+      "Pattern": "WWW1WWW1WWWWWWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 29,
+      "StartOp": 29,
+      "EndOp": 29,
+      "Text": "Cientifique-se o Juízo requisitante do inteiro teor da presente decisão, cuja cópia servirá de ofício.",
+      "Pattern": "W1WWWWWWWWWWWWW",
+      "MaxTokenLen": 14,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 30,
+      "StartOp": 30,
+      "EndOp": 30,
+      "Text": "Diretoria Especial do Tribunal de Justiça do Estado da Paraíba, em João Pessoa, 17 de setembro",
+      "Pattern": "WWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 31,
+      "StartOp": 31,
+      "EndOp": 31,
+      "Text": "de 2024.",
+      "Pattern": "WW",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 32,
+      "StartOp": 32,
+      "EndOp": 32,
+      "Text": "Robson de Lima Cananéa – Diretor Especial",
+      "Pattern": "WWWW1WW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 33,
+      "StartOp": 33,
+      "EndOp": 33,
+      "Text": "Documento 24 página 2 assinado, do processo nº 2022158112, nos termos da Lei 11.419. ADME.67725.56271.54129.61828-2 Documento 24 página 1 assinado, do processo nº 2022158112, nos termos da Lei 11.419. ADME.67725.56271.54129.61828-2",
+      "Pattern": "WWW1WWWWWWWWWWWWWW1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 34,
+      "StartOp": 34,
+      "EndOp": 34,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 17/09/2024 13: 55 Robson de Lima Cananea [419.454.334-34] em 17/09/2024 13: 55",
+      "Pattern": "WWWWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "VariableBlocksB": [
+    {
+      "Index": 1,
+      "StartOp": 1,
+      "EndOp": 1,
+      "Text": "TRIBUNAL DE JUSTIÇA DO esta DO DA para ÍBA",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 8,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 2,
+      "StartOp": 2,
+      "EndOp": 2,
+      "Text": "DIRE TORIA ESPE CIAL",
+      "Pattern": "W1WW1W",
+      "MaxTokenLen": 5,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 3,
+      "StartOp": 3,
+      "EndOp": 3,
+      "Text": "Processo nº 2021.050.735",
+      "Pattern": "WWW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 4,
+      "StartOp": 4,
+      "EndOp": 4,
+      "Text": "Requerente: Juízo da 2ª Vara Mista da Comarca de Piancó",
+      "Pattern": "WWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 5,
+      "StartOp": 5,
+      "EndOp": 5,
+      "Text": "Interessada: Claudia Cristina Studart Leal - Médica",
+      "Pattern": "WWWWW1W",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 6,
+      "StartOp": 6,
+      "EndOp": 6,
+      "Text": "Os presente s autos versam sobre solicitação de reserva orçamentária, no valor de R$ 370, 00",
+      "Pattern": "WW1WWWWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 7,
+      "StartOp": 7,
+      "EndOp": 7,
+      "Text": "(trezentos e setenta reais)) ) , para suportar o encargo relativo à despesa decorrente de honorários",
+      "Pattern": "W1WW1WW1WW1WWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 8,
+      "StartOp": 8,
+      "EndOp": 8,
+      "Text": "da Perita Médica nomeada, Claudia Cristina Studart Leal, para realização de perícia nos autos do",
+      "Pattern": "WWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 9,
+      "StartOp": 9,
+      "EndOp": 9,
+      "Text": "Processo nº 0800318-38.2018.8.15.1161, movido por Mara do Socorro da Silva, CPF",
+      "Pattern": "WWWWWWWWWWW",
+      "MaxTokenLen": 26,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 10,
+      "StartOp": 10,
+      "EndOp": 10,
+      "Text": "037.349.624-98, em face de Francisca Maria da Silva, CPF 345.922.908-01, em curso perante o",
+      "Pattern": "WWWWWWWWWWWWW1",
+      "MaxTokenLen": 15,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 11,
+      "StartOp": 11,
+      "EndOp": 11,
+      "Text": "Juízo da 2ª Vara Mista da Comarca de Piancó.",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 7,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 12,
+      "StartOp": 12,
+      "EndOp": 12,
+      "Text": "Ressalte-se que a Resolução nº 09/2017, deste Tribunal, de 21 de junho de 2017, modificada",
+      "Pattern": "WW1WWWWWWWWWWWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 13,
+      "StartOp": 13,
+      "EndOp": 13,
+      "Text": "pela Resolução nº 12, de 10 de março de 2021, publicada no Diário da Justiça Eletrônico deste",
+      "Pattern": "WWWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 14,
+      "StartOp": 14,
+      "EndOp": 14,
+      "Text": "esta do, do dia 11 imediato, disciplinou, no âmbito da Justiça esta dual da para íba de primeiro e",
+      "Pattern": "WWWWWWWWWWWWWWWWWW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 15,
+      "StartOp": 15,
+      "EndOp": 15,
+      "Text": "segundo graus, os procedimentos relativos ao pagamento dos honorários periciais, nos casos em",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 16,
+      "StartOp": 16,
+      "EndOp": 16,
+      "Text": "que a parte goze da gratuidade da justiça.",
+      "Pattern": "W1WWWWWW",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 17,
+      "StartOp": 17,
+      "EndOp": 17,
+      "Text": "No § 1º, do art. 4º, da mencionada resolução, restou a nota do que os valor es a serem pagos pelo s",
+      "Pattern": "W1WWWWWWWW1WWWWWW1WWW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 18,
+      "StartOp": 18,
+      "EndOp": 18,
+      "Text": "serviços de perícia de responsabilidade de beneficiário da gratuidade da justiça, na hipótese do",
+      "Pattern": "WWWWWWWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 19,
+      "StartOp": 19,
+      "EndOp": 19,
+      "Text": "art. 95, § 3º, II, do Código de Processo Civil, são os fixados na Tabela constante no Anexo da",
+      "Pattern": "WW1WWWWWWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 20,
+      "StartOp": 20,
+      "EndOp": 20,
+      "Text": "Resolução 232, de 13 de julho de 2016, do Conselho Nacional de Justiça.",
+      "Pattern": "WWWWWWWWWWWWW",
+      "MaxTokenLen": 9,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 21,
+      "StartOp": 21,
+      "EndOp": 21,
+      "Text": "Em seu art. 5º, ressalvou que o juiz, ao fixar os honorários, Poder á ultrapassar o limite fixado na",
+      "Pattern": "WWWWWW1WWWWWW1W1WWW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 22,
+      "StartOp": 22,
+      "EndOp": 22,
+      "Text": "tabela em anexo, em até 05 (cinco) vezes, desde que de forma fundamentada e atendendo ao",
+      "Pattern": "WWWWWWWWWWWWW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 23,
+      "StartOp": 23,
+      "EndOp": 23,
+      "Text": "grau de Especial ização do perito, à complexidade da matéria, o lugar eo tempo exigidos para a",
+      "Pattern": "WWWWWW1WWW1WWWWW1",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 24,
+      "StartOp": 24,
+      "EndOp": 24,
+      "Text": "pr esta ção do serviço, ficando, nesse caso, o pagamento condicionado à aprovação pelo",
+      "Pattern": "WWWWWWWW1WW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 25,
+      "StartOp": 25,
+      "EndOp": 25,
+      "Text": "Conselho da Magistratura.",
+      "Pattern": "WWW",
+      "MaxTokenLen": 13,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 26,
+      "StartOp": 26,
+      "EndOp": 26,
+      "Text": "O Ato 99/2017, da Presidência deste Tribunal, à sua vez, dispôs sobre o procedimento das",
+      "Pattern": "1WWWWWW1WWWW1WW",
+      "MaxTokenLen": 12,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 27,
+      "StartOp": 27,
+      "EndOp": 27,
+      "Text": "requisições de pagamento de honorários de perito s, oriundas de Processo s judiciais em",
+      "Pattern": "WWWWWWWWWWW1WW",
+      "MaxTokenLen": 11,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 28,
+      "StartOp": 28,
+      "EndOp": 28,
+      "Text": "tramitação sob o pálio da justiça gratuita, no âmbito da Justiça esta dual da para íba de primeiro e",
+      "Pattern": "WW1WWWWWWWWWWWWWWW1",
+      "MaxTokenLen": 10,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 29,
+      "StartOp": 29,
+      "EndOp": 29,
+      "Text": "Documento 2 página 1 assinado, do processo nº 2021050735, nos termos da Lei 11.419. ADME.11657.90862.90261.31121-9",
+      "Pattern": "W1W1WWWWWWWWWWW",
+      "MaxTokenLen": 30,
+      "OpsLabel": "Tj"
+    },
+    {
+      "Index": 30,
+      "StartOp": 30,
+      "EndOp": 30,
+      "Text": "Robson de Lima Cananea [419.454.334-34] em 13/05/2021 14: 26",
+      "Pattern": "WWWWWWWWW",
+      "MaxTokenLen": 16,
+      "OpsLabel": "Tj"
+    }
+  ],
+  "FixedPairs": [],
+  "RangeA": {
+    "StartOp": 0,
+    "EndOp": 0,
+    "HasValue": true
+  },
+  "RangeB": {
+    "StartOp": 0,
+    "EndOp": 0,
+    "HasValue": true
+  },
+  "Extraction": {
+    "status": "ok",
+    "doc_key": "despacho",
+    "doc_type": "DESPACHO",
+    "map_path": "/mnt/c/git/operpdf-textopsalign/modules/PatternModules/registry/alignrange_fields/tjpb_despacho.yml",
+    "band": "single_page",
+    "parsed": {
+      "pdf_b": {
+        "values": {
+          "PROCESSO_ADMINISTRATIVO": "",
+          "PROCESSO_JUDICIAL": "",
+          "COMARCA": "",
+          "VARA": "",
+          "PROMOVENTE": "",
+          "PROMOVIDO": "",
+          "PERITO": "",
+          "CPF_PERITO": "",
+          "ESPECIALIDADE": "",
+          "ESPECIE_DA_PERICIA": "",
+          "VALOR_ARBITRADO_JZ": "",
+          "VALOR_ARBITRADO_CM": "",
+          "DATA_DESPESA": "",
+          "VALOR_ARBITRADO_DE": ""
+        },
+        "fields": {
+          "PROCESSO_ADMINISTRATIVO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PROCESSO_JUDICIAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "COMARCA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VARA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PROMOVENTE": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PROMOVIDO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "PERITO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "CPF_PERITO": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "ESPECIALIDADE": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "ESPECIE_DA_PERICIA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_JZ": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head|policy:validator:strict_found",
+            "Module": "parser|validator",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_CM": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "front_head",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "DATA_DESPESA": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "back_signature",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_DE": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "back_tail",
+            "Module": "parser",
+            "OpRange": "",
+            "Obj": 88,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          },
+          "VALOR_ARBITRADO_FINAL": {
+            "ValueRaw": "",
+            "Value": "",
+            "Source": "policy:validator:strict_found",
+            "Module": "validator",
+            "OpRange": "",
+            "Obj": 0,
+            "Status": "NOT_FOUND",
+            "BBox": null
+          }
+        }
+      },
+      "pdf_a_reference": {
+        "role": "template_modelo",
+        "scope": "alignment_reference_only"
+      }
+    },
+    "pipeline": {
+      "step_modules": {
+        "1_detection_selection": "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+        "2_alignment": "Obj.Align.ObjectsTextOpsDiff",
+        "3_1_prepare": "ObjectsTextOpsAlign + DocumentValidationRules",
+        "3_2_crop": "ObjectsTextOpsAlign.BuildValueFullFromBlocks",
+        "3_3_yaml_parser": "Obj.Commands.ObjectsMapFields",
+        "3_4_honorarios": "Obj.Honorarios.HonorariosFacade",
+        "3_5_repairer": "Obj.ValidationCore.ValidationRepairer",
+        "3_6_validator": "Obj.ValidatorModule.ValidatorFacade",
+        "3_7_probe_optional": "Obj.RootProbe.ExtractionProbeModule",
+        "4_output": "ObjectsTextOpsAlign + JsonSerializer"
+      },
+      "scope": "target_b_only(model_a_reference)",
+      "target_side": "pdf_b",
+      "merge_policy": "single_band",
+      "values_origin_note": "Somente parsed.pdf_b.values é considerado saída de extração; o lado de modelo/template fica como referência de alinhamento.",
+      "run": {
+        "requested_max_step": 8,
+        "executed_until_step": 6,
+        "stopped_before_step": 0,
+        "scope": "target_b_only(model_a_reference)",
+        "target_side": "pdf_b"
+      }
+    },
+    "value_flow": {
+      "pdf_b": {
+        "PROCESSO_ADMINISTRATIVO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "PROCESSO_JUDICIAL": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "COMARCA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "VARA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "PROMOVENTE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "PROMOVIDO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "CPF_PERITO": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "ESPECIALIDADE": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "ESPECIE_DA_PERICIA": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head",
+          "module": "parser",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "VALOR_ARBITRADO_JZ": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "front_head|policy:validator:strict_found",
+          "module": "parser|validator",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 88
+        },
+        "VALOR_ARBITRADO_FINAL": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado",
+          "source": "policy:validator:strict_found",
+          "module": "validator",
+          "status": "NOT_FOUND",
+          "op_range": "",
+          "obj": 0
+        },
+        "FATOR": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        },
+        "VALOR_TABELADO_ANEXO_I": {
+          "parser": "",
+          "derived_candidate": "",
+          "final": "",
+          "applied": false,
+          "decision": "nao_encontrado"
+        }
+      }
+    },
+    "validator": {
+      "enabled": true,
+      "module": "Obj.ValidatorModule.ValidatorFacade",
+      "status": "fail",
+      "scope": "target_b_only(model_a_reference)",
+      "ok": false,
+      "ok_pair": false,
+      "ok_a": false,
+      "ok_b": false,
+      "reason": "missing:PROCESSO_ADMINISTRATIVO",
+      "reason_pair": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing:PROCESSO_ADMINISTRATIVO",
+      "reason_a": "missing:PROCESSO_ADMINISTRATIVO",
+      "reason_b": "missing:PROCESSO_ADMINISTRATIVO"
+    },
+    "repairer": {
+      "enabled": true,
+      "module": "Obj.ValidationCore.ValidationRepairer",
+      "status": "fail",
+      "reason": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing:PROCESSO_ADMINISTRATIVO",
+      "apply_a": false,
+      "apply_b": false,
+      "ok_a": false,
+      "ok_b": false,
+      "reason_a": "missing:PROCESSO_ADMINISTRATIVO",
+      "reason_b": "missing:PROCESSO_ADMINISTRATIVO",
+      "changed_a": [],
+      "changed_b": [],
+      "legacy_mirror_a": true,
+      "legacy_mirror_b": true
+    },
+    "honorarios": {
+      "enabled": true,
+      "module": "Obj.Honorarios.HonorariosFacade",
+      "status": "ok",
+      "reason": "executed",
+      "apply_a": true,
+      "apply_b": true,
+      "pdf_a": {
+        "doc_type": "DESPACHO",
+        "derived_valor": "",
+        "derived_values": {},
+        "status": "missing_especialidade",
+        "source": "values",
+        "especialidade": "",
+        "especialidade_source": "fields",
+        "especie_da_pericia": "",
+        "valor_field": "",
+        "valor_raw": "",
+        "fator": "",
+        "entry_id": "",
+        "area": "",
+        "perito_name_source": "",
+        "perito_cpf_source": "",
+        "derivations": [],
+        "valor_tabelado_anexo_i": "",
+        "valor_normalized": "",
+        "confidence": 0
+      },
+      "pdf_b": {
+        "doc_type": "DESPACHO",
+        "derived_valor": "",
+        "derived_values": {},
+        "status": "missing_especialidade",
+        "source": "values",
+        "especialidade": "",
+        "especialidade_source": "fields",
+        "especie_da_pericia": "",
+        "valor_field": "",
+        "valor_raw": "",
+        "fator": "",
+        "entry_id": "",
+        "area": "",
+        "perito_name_source": "",
+        "perito_cpf_source": "",
+        "derivations": [],
+        "valor_tabelado_anexo_i": "",
+        "valor_normalized": "",
+        "confidence": 0
+      }
+    },
+    "probe": {
+      "enabled": true,
+      "module": "Obj.RootProbe.ExtractionProbeModule",
+      "status": "ok",
+      "pdf": "/mnt/c/Users/pichau/Desktop/geral_pdf/quarentena/2021050735.pdf",
+      "page": 10,
+      "side": "pdf_b",
+      "fields_total": 14,
+      "fields_checked": 0,
+      "found": 0,
+      "missing": 0,
+      "items": [],
+      "page_text_len": 2315,
+      "page_text_sample": "tribunal de justica do estado da paraiba diretoria especial processo nº 2021.050.735 requerente: juizo da 2ª vara mista da comarca de pianco interessada: claudia cristina studart leal - medica os presentes autos versam sobre",
+      "reason": "executed"
+    },
+    "module_status": {
+      "honorarios": {
+        "module": "Obj.Honorarios.HonorariosFacade",
+        "status": "ok",
+        "reason": "executed"
+      },
+      "repairer": {
+        "module": "Obj.ValidationCore.ValidationRepairer",
+        "status": "fail",
+        "reason": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing:PROCESSO_ADMINISTRATIVO"
+      },
+      "validator": {
+        "module": "Obj.ValidatorModule.ValidatorFacade",
+        "status": "fail",
+        "reason": "missing:PROCESSO_ADMINISTRATIVO"
+      },
+      "probe": {
+        "module": "Obj.RootProbe.ExtractionProbeModule",
+        "status": "ok",
+        "reason": "executed"
+      }
+    }
+  },
+  "PipelineStages": [
+    {
+      "step": 1,
+      "stage_key": "detection_selection",
+      "stage": "detecção e seleção",
+      "status": "ok",
+      "timestamp_utc": "2026-02-21T19:35:55.4760929Z",
+      "payload": {
+        "module": "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+        "role_a": "template_modelo",
+        "role_b": "pdf_alvo_extracao",
+        "modelo_pdf": "Documento_24_p090-091__merged_p1p2.pdf",
+        "pdf_alvo_extracao": "2021050735.pdf",
+        "modelo_sel": "page=1 obj=5 source=despacho_front_auto",
+        "alvo_sel": "page=10 obj=88 source=despacho_front_auto",
+        "band": "single_page",
+        "ops": "Tj",
+        "params": "backoff=2 minSim=0.12 maxShiftOps=2 minLen=0.2"
+      }
+    },
+    {
+      "step": 2,
+      "stage_key": "alignment",
+      "stage": "alinhamento",
+      "status": "ok",
+      "timestamp_utc": "2026-02-21T19:35:56.8151607Z",
+      "payload": {
+        "module": "Obj.Align.ObjectsTextOpsDiff",
+        "anchors": 6,
+        "pairs": 0,
+        "fixed": 0,
+        "variable": 0,
+        "gaps": 0,
+        "range_a": "op0-op0",
+        "range_b": "op0-op0",
+        "helper_hits_a": 11,
+        "helper_hits_b": 6,
+        "helper_candidates": 9,
+        "helper_accepted": 6,
+        "helper_rejected": 10,
+        "helper_used": 6,
+        "helper_applied_to_segmentation": false,
+        "helper_anchor_mode": "diagnostic_auto+helper"
+      }
+    },
+    {
+      "step": 3,
+      "stage_key": "yaml_parser_fields",
+      "stage": "parser YAML (campos)",
+      "status": "ok",
+      "timestamp_utc": "2026-02-21T19:35:56.8356876Z",
+      "payload": {
+        "module": "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)",
+        "doc_key": "despacho",
+        "doc_type": "DESPACHO",
+        "scope": "target_b_only(model_a_reference)",
+        "target_side": "pdf_b",
+        "band": "single_page",
+        "map_path": "/mnt/c/git/operpdf-textopsalign/modules/PatternModules/registry/alignrange_fields/tjpb_despacho.yml",
+        "fields_a_non_empty": 0,
+        "fields_b_non_empty": 0,
+        "fields_target_non_empty": 0,
+        "merge_policy": "single_band"
+      }
+    },
+    {
+      "step": 4,
+      "stage_key": "honorarios",
+      "stage": "honorários",
+      "status": "ok",
+      "timestamp_utc": "2026-02-21T19:35:57.0863476Z",
+      "payload": {
+        "module": "Obj.Honorarios.HonorariosFacade",
+        "reason": "executed",
+        "scope": "target_b_only(model_a_reference)",
+        "target_side": "pdf_b",
+        "changed_keys_a": "(nenhum)",
+        "changed_keys_b": "(nenhum)",
+        "status_honorarios_a": "missing_especialidade",
+        "status_honorarios_b": "missing_especialidade",
+        "derived_valor_a": "",
+        "derived_valor_b": ""
+      }
+    },
+    {
+      "step": 5,
+      "stage_key": "repairer",
+      "stage": "reparador",
+      "status": "fail",
+      "timestamp_utc": "2026-02-21T19:35:57.2803676Z",
+      "payload": {
+        "module": "Obj.ValidationCore.ValidationRepairer",
+        "scope": "target_b_only(model_a_reference)",
+        "target_side": "pdf_b",
+        "repair_apply_a": false,
+        "repair_apply_b": false,
+        "repair_ok_a": false,
+        "repair_ok_b": false,
+        "repair_reason_a": "missing:PROCESSO_ADMINISTRATIVO",
+        "repair_reason_b": "missing:PROCESSO_ADMINISTRATIVO",
+        "reason": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing:PROCESSO_ADMINISTRATIVO"
+      }
+    },
+    {
+      "step": 6,
+      "stage_key": "validator",
+      "stage": "validador",
+      "status": "fail",
+      "timestamp_utc": "2026-02-21T19:35:57.2973401Z",
+      "payload": {
+        "module": "Obj.ValidatorModule.ValidatorFacade",
+        "scope": "target_b_only(model_a_reference)",
+        "target_side": "pdf_b",
+        "ok": false,
+        "ok_pair": false,
+        "ok_a": false,
+        "ok_b": false,
+        "reason": "missing:PROCESSO_ADMINISTRATIVO",
+        "reason_pair": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing:PROCESSO_ADMINISTRATIVO",
+        "policy_strict_money_a": [],
+        "policy_strict_money_b": []
+      }
+    },
+    {
+      "step": 7,
+      "stage_key": "probe",
+      "stage": "probe",
+      "status": "ok",
+      "timestamp_utc": "2026-02-21T19:35:57.3236865Z",
+      "payload": {
+        "enabled": true,
+        "module": "Obj.RootProbe.ExtractionProbeModule",
+        "status": "ok",
+        "pdf": "/mnt/c/Users/pichau/Desktop/geral_pdf/quarentena/2021050735.pdf",
+        "page": 10,
+        "side": "pdf_b",
+        "fields_total": 14,
+        "fields_checked": 0,
+        "found": 0,
+        "missing": 0,
+        "items": [],
+        "page_text_len": 2315,
+        "page_text_sample": "tribunal de justica do estado da paraiba diretoria especial processo nº 2021.050.735 requerente: juizo da 2ª vara mista da comarca de pianco interessada: claudia cristina studart leal - medica os presentes autos versam sobre",
+        "reason": "executed"
+      }
+    }
+  ],
+  "ReturnInfo": {
+    "schema_version": "operpdf.return.v1",
+    "command": "textopsfixed",
+    "output_mode": "FixedOnly",
+    "return_enabled": true,
+    "io_file": "/mnt/c/git/operpdf-textopsalign/io/fixed_despacho_q22.json",
+    "generated_at_utc": "2026-02-21T19:35:57.3248761Z"
+  },
+  "ReturnView": {
+    "mode": "FixedOnly",
+    "selected_rule": "fixed",
+    "counts": {
+      "all": 0,
+      "selected": 0,
+      "all_by_kind": {},
+      "selected_by_kind": {}
+    },
+    "selected_alignment_indexes": [],
+    "selected_preview_top20": [],
+    "extraction_summary": {
+      "status": "ok",
+      "doc_key": "despacho",
+      "doc_type": "DESPACHO",
+      "band": "single_page",
+      "scope": "target_b_only(model_a_reference)",
+      "target_side": "pdf_b",
+      "fields_non_empty_a": 0,
+      "fields_non_empty_b": 0,
+      "fields_non_empty_target": 0,
+      "validator_ok": false,
+      "validator_reason": "missing:PROCESSO_ADMINISTRATIVO",
+      "honorarios_apply_a": true,
+      "honorarios_apply_b": true
+    },
+    "pipeline_stage_outputs": [
+      {
+        "step": 1,
+        "stage_key": "detection_selection",
+        "stage": "detecção e seleção",
+        "status": "ok",
+        "timestamp_utc": "2026-02-21T19:35:55.4760929Z",
+        "payload": {
+          "module": "Obj.DocDetector + ObjectsFindDespacho + ContentsStreamPicker",
+          "role_a": "template_modelo",
+          "role_b": "pdf_alvo_extracao",
+          "modelo_pdf": "Documento_24_p090-091__merged_p1p2.pdf",
+          "pdf_alvo_extracao": "2021050735.pdf",
+          "modelo_sel": "page=1 obj=5 source=despacho_front_auto",
+          "alvo_sel": "page=10 obj=88 source=despacho_front_auto",
+          "band": "single_page",
+          "ops": "Tj",
+          "params": "backoff=2 minSim=0.12 maxShiftOps=2 minLen=0.2"
+        }
+      },
+      {
+        "step": 2,
+        "stage_key": "alignment",
+        "stage": "alinhamento",
+        "status": "ok",
+        "timestamp_utc": "2026-02-21T19:35:56.8151607Z",
+        "payload": {
+          "module": "Obj.Align.ObjectsTextOpsDiff",
+          "anchors": 6,
+          "pairs": 0,
+          "fixed": 0,
+          "variable": 0,
+          "gaps": 0,
+          "range_a": "op0-op0",
+          "range_b": "op0-op0",
+          "helper_hits_a": 11,
+          "helper_hits_b": 6,
+          "helper_candidates": 9,
+          "helper_accepted": 6,
+          "helper_rejected": 10,
+          "helper_used": 6,
+          "helper_applied_to_segmentation": false,
+          "helper_anchor_mode": "diagnostic_auto+helper"
+        }
+      },
+      {
+        "step": 3,
+        "stage_key": "yaml_parser_fields",
+        "stage": "parser YAML (campos)",
+        "status": "ok",
+        "timestamp_utc": "2026-02-21T19:35:56.8356876Z",
+        "payload": {
+          "module": "Obj.Commands.ObjectsMapFields (alignrange_fields/*.yml)",
+          "doc_key": "despacho",
+          "doc_type": "DESPACHO",
+          "scope": "target_b_only(model_a_reference)",
+          "target_side": "pdf_b",
+          "band": "single_page",
+          "map_path": "/mnt/c/git/operpdf-textopsalign/modules/PatternModules/registry/alignrange_fields/tjpb_despacho.yml",
+          "fields_a_non_empty": 0,
+          "fields_b_non_empty": 0,
+          "fields_target_non_empty": 0,
+          "merge_policy": "single_band"
+        }
+      },
+      {
+        "step": 4,
+        "stage_key": "honorarios",
+        "stage": "honorários",
+        "status": "ok",
+        "timestamp_utc": "2026-02-21T19:35:57.0863476Z",
+        "payload": {
+          "module": "Obj.Honorarios.HonorariosFacade",
+          "reason": "executed",
+          "scope": "target_b_only(model_a_reference)",
+          "target_side": "pdf_b",
+          "changed_keys_a": "(nenhum)",
+          "changed_keys_b": "(nenhum)",
+          "status_honorarios_a": "missing_especialidade",
+          "status_honorarios_b": "missing_especialidade",
+          "derived_valor_a": "",
+          "derived_valor_b": ""
+        }
+      },
+      {
+        "step": 5,
+        "stage_key": "repairer",
+        "stage": "reparador",
+        "status": "fail",
+        "timestamp_utc": "2026-02-21T19:35:57.2803676Z",
+        "payload": {
+          "module": "Obj.ValidationCore.ValidationRepairer",
+          "scope": "target_b_only(model_a_reference)",
+          "target_side": "pdf_b",
+          "repair_apply_a": false,
+          "repair_apply_b": false,
+          "repair_ok_a": false,
+          "repair_ok_b": false,
+          "repair_reason_a": "missing:PROCESSO_ADMINISTRATIVO",
+          "repair_reason_b": "missing:PROCESSO_ADMINISTRATIVO",
+          "reason": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing:PROCESSO_ADMINISTRATIVO"
+        }
+      },
+      {
+        "step": 6,
+        "stage_key": "validator",
+        "stage": "validador",
+        "status": "fail",
+        "timestamp_utc": "2026-02-21T19:35:57.2973401Z",
+        "payload": {
+          "module": "Obj.ValidatorModule.ValidatorFacade",
+          "scope": "target_b_only(model_a_reference)",
+          "target_side": "pdf_b",
+          "ok": false,
+          "ok_pair": false,
+          "ok_a": false,
+          "ok_b": false,
+          "reason": "missing:PROCESSO_ADMINISTRATIVO",
+          "reason_pair": "A:missing:PROCESSO_ADMINISTRATIVO | B:missing:PROCESSO_ADMINISTRATIVO",
+          "policy_strict_money_a": [],
+          "policy_strict_money_b": []
+        }
+      },
+      {
+        "step": 7,
+        "stage_key": "probe",
+        "stage": "probe",
+        "status": "ok",
+        "timestamp_utc": "2026-02-21T19:35:57.3236865Z",
+        "payload": {
+          "enabled": true,
+          "module": "Obj.RootProbe.ExtractionProbeModule",
+          "status": "ok",
+          "pdf": "/mnt/c/Users/pichau/Desktop/geral_pdf/quarentena/2021050735.pdf",
+          "page": 10,
+          "side": "pdf_b",
+          "fields_total": 14,
+          "fields_checked": 0,
+          "found": 0,
+          "missing": 0,
+          "items": [],
+          "page_text_len": 2315,
+          "page_text_sample": "tribunal de justica do estado da paraiba diretoria especial processo nº 2021.050.735 requerente: juizo da 2ª vara mista da comarca de pianco interessada: claudia cristina studart leal - medica os presentes autos versam sobre",
+          "reason": "executed"
+        }
+      }
+    ],
+    "run_range": "1-8"
+  }
+}

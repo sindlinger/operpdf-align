@@ -1,0 +1,84 @@
+﻿{
+  "source_pdf": "/mnt/c/git/operpdf-textopsalign/models/aliases/certidao/tjpb_certidao_conselho_model.pdf",
+  "output_pdf": "/mnt/c/git/operpdf-textopsalign/models/aliases/masked/tjpb_certidao_masked_model.pdf",
+  "generated_at_utc": "2026-02-21T20:05:53.5418915Z",
+  "anchors_total": 10,
+  "pages": [
+    {
+      "page": 1,
+      "count": 10,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO",
+          "x": 247.068,
+          "y": 703.446,
+          "height": 10.799988
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Belmont, Juiz de Direito da 8.\u00B0 Vara C\u00EDvel da Comarca da Capital,",
+          "x": 242.47,
+          "y": 614.097,
+          "height": 8.099976
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Belmont, Juiz de Direito da 8.\u00B0 Vara C\u00EDvel da Comarca da Capital,",
+          "x": 306.47,
+          "y": 614.097,
+          "height": 8.099976
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Solicita\u00E7\u00E3o de pagamento de honor\u00E1rios periciais \u00E0 Perita Engenheira Marta Liane",
+          "x": 242.272,
+          "y": 603.747,
+          "height": 8.099976
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Solicita\u00E7\u00E3o de pagamento de honor\u00E1rios periciais \u00E0 Perita Engenheira Marta Liane",
+          "x": 306.272,
+          "y": 603.747,
+          "height": 8.099976
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "de Almeida Ramalho Loureiro, por per\u00EDcia realizada no Processo n\u00B0 0028841-",
+          "x": 242.166,
+          "y": 593.197,
+          "height": 8.099976
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "de Almeida Ramalho Loureiro, por per\u00EDcia realizada no Processo n\u00B0 0028841-",
+          "x": 336.16602,
+          "y": 593.197,
+          "height": 8.099976
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "sti\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, no dia",
+          "x": 290.288,
+          "y": 282.94598,
+          "height": 10.800018
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Documento 13 p\u00E1gina 5 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.78481.02261.91085.11344-4",
+          "x": 574.256,
+          "y": 25,
+          "height": 6
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 13 p\u00E1gina 5 assinado, do processo n\u00BA 2018198741, nos termos da Lei 11.419. ADME.78481.02261.91085.11344-4",
+          "x": 668.256,
+          "y": 25,
+          "height": 6
+        }
+      ]
+    }
+  ]
+}

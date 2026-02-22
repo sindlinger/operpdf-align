@@ -1,0 +1,621 @@
+﻿{
+  "source_pdf": "/mnt/c/git/operpdf-textopsalign/models/aliases/requerimento/tjpb_requerimento_model.pdf",
+  "output_pdf": "/mnt/c/git/operpdf-textopsalign/models/aliases/masked/tjpb_requerimento_masked_model.pdf",
+  "generated_at_utc": "2026-02-21T20:05:54.0455217Z",
+  "anchors_total": 73,
+  "pages": [
+    {
+      "page": 3,
+      "count": 8,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Tribunal de Justi\u00E7a da Para\u00EDba",
+          "x": 100.76,
+          "y": 790.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "A\u00C7\u00C3O PENAL - PROCEDIMENTO ORDIN\u00C1RIO",
+          "x": 75.731995,
+          "y": 689.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Vara \u00DAnica de Pocinhos",
+          "x": 117.928,
+          "y": 673.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Pedido de liminar ou antecipa\u00E7\u00E3o de tutela?",
+          "x": 36,
+          "y": 561.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "Delegacia de Comarca de Pocinhos (AUTORIDADE)",
+          "x": 38,
+          "y": 524.03705,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Delegacia de Comarca de Pocinhos (AUTORIDADE)",
+          "x": 114.4,
+          "y": 524.03705,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "MINIST\u00C9RIO P\u00DABLICO DO ESTADO DA PARAIBA (AUTOR)",
+          "x": 38,
+          "y": 508.537,
+          "height": 8.325012
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "LUCIANO DA SILVA COSTA (REU)",
+          "x": 38,
+          "y": 493.037,
+          "height": 8.325012
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "count": 8,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO DA PARA\u00CDBA",
+          "x": 56.90036,
+          "y": 669.15814,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "VARA \u00DANICA DA COMARCA DE POCINHOS",
+          "x": 56.90036,
+          "y": 633.37354,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "VARA \u00DANICA DA COMARCA DE POCINHOS",
+          "x": 120.90036,
+          "y": 633.37354,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "A\u00C7\u00C3O PENAL - PROCEDIMENTO ORDIN\u00C1RIO (283)",
+          "x": 91.76241,
+          "y": 536.9055,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "AUTORIDADE: DELEGACIA DE COMARCA DE POCINHOSAUTOR: MINIST\u00C9RIO",
+          "x": 56.90036,
+          "y": 465.34518,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "AUTORIDADE: DELEGACIA DE COMARCA DE POCINHOSAUTOR: MINIST\u00C9RIO",
+          "x": 133.30035,
+          "y": 465.34518,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "REU: LUCIANO DA SILVA COSTA",
+          "x": 56.90036,
+          "y": 417.37473,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: Carmen Helen Agra de Brito - 22/04/2025 11:15:55",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "count": 1,
+      "anchors": [
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: Carmen Helen Agra de Brito - 22/04/2025 11:15:55",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "count": 5,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Sobre a avalia\u00E7\u00E3o psicol\u00F3gica, adote a serventia as seguintes dilig\u00EAncias:",
+          "x": 92.84307,
+          "y": 710.8995,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "09/2017 do Tribunal de Justi\u00E7a da Para\u00EDba",
+          "x": 175.50865,
+          "y": 401.85898,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "embargos de declara\u00E7\u00E3o opostos no Id. Num.\u00A0111208951.",
+          "x": 56.90036,
+          "y": 306.31342,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "[Documento datado e assinado eletronicamente - art. 2\u00BA, lei 11.419/2006]",
+          "x": 125.9216,
+          "y": 115.67913,
+          "height": 9.488663
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: Carmen Helen Agra de Brito - 22/04/2025 11:15:55",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        }
+      ]
+    },
+    {
+      "page": 7,
+      "count": 1,
+      "anchors": [
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: Carmen Helen Agra de Brito - 22/04/2025 11:15:55",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "count": 8,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Tribunal de Justi\u00E7a da Para\u00EDba",
+          "x": 100.76,
+          "y": 790.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "A\u00C7\u00C3O PENAL - PROCEDIMENTO ORDIN\u00C1RIO",
+          "x": 75.731995,
+          "y": 689.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Vara \u00DAnica de Pocinhos",
+          "x": 117.928,
+          "y": 673.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Pedido de liminar ou antecipa\u00E7\u00E3o de tutela?",
+          "x": 36,
+          "y": 561.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "Delegacia de Comarca de Pocinhos (AUTORIDADE)",
+          "x": 38,
+          "y": 524.03705,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Delegacia de Comarca de Pocinhos (AUTORIDADE)",
+          "x": 114.4,
+          "y": 524.03705,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "MINIST\u00C9RIO P\u00DABLICO DO ESTADO DA PARAIBA (AUTOR)",
+          "x": 38,
+          "y": 508.537,
+          "height": 8.325012
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "LUCIANO DA SILVA COSTA (REU)",
+          "x": 38,
+          "y": 493.037,
+          "height": 8.325012
+        }
+      ]
+    },
+    {
+      "page": 11,
+      "count": 8,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "PODER JUDICI\u00C1RIO DA PARA\u00CDBA",
+          "x": 56.90036,
+          "y": 669.15814,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "VARA \u00DANICA DA COMARCA DE POCINHOS",
+          "x": 56.90036,
+          "y": 633.37354,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "VARA \u00DANICA DA COMARCA DE POCINHOS",
+          "x": 120.90036,
+          "y": 633.37354,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "A\u00C7\u00C3O PENAL - PROCEDIMENTO ORDIN\u00C1RIO (283)",
+          "x": 91.76241,
+          "y": 536.9055,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "AUTORIDADE: DELEGACIA DE COMARCA DE POCINHOSAUTOR: MINIST\u00C9RIO",
+          "x": 56.90036,
+          "y": 465.34518,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "AUTORIDADE: DELEGACIA DE COMARCA DE POCINHOSAUTOR: MINIST\u00C9RIO",
+          "x": 133.30035,
+          "y": 465.34518,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "REU: LUCIANO DA SILVA COSTA",
+          "x": 56.90036,
+          "y": 417.37473,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: Carmen Helen Agra de Brito - 22/05/2025 11:33:18",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "count": 3,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "determinada a realiza\u00E7\u00E3o de avalia\u00E7\u00E3o psicol\u00F3gica e oitiva sem dano da menor - Id. Num.\u00A0110666940.",
+          "x": 56.90036,
+          "y": 392.43182,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Embargos de declara\u00E7\u00E3o opostos pela Defesa - Id. Num.\u00A0111208951.",
+          "x": 92.84307,
+          "y": 298.07233,
+          "height": 9.488647
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: Carmen Helen Agra de Brito - 22/05/2025 11:33:18",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        }
+      ]
+    },
+    {
+      "page": 13,
+      "count": 4,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "horas, para a realiza\u00E7\u00E3o da avalia\u00E7\u00E3o psicol\u00F3gica na vitima.\u0022",
+          "x": 56.90036,
+          "y": 703.18555,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "provimento parcial aos embargos de declara\u00E7\u00E3o - Id. Num.\u00A0111731743.",
+          "x": 56.90036,
+          "y": 608.82605,
+          "height": 9.4887085
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "[Documento datado e assinado eletronicamente - art. 2\u00BA, lei 11.419/2006]",
+          "x": 56.90036,
+          "y": 131.69563,
+          "height": 9.752228
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Assinado eletronicamente por: Carmen Helen Agra de Brito - 22/05/2025 11:33:18",
+          "x": 60,
+          "y": 31.551,
+          "height": 6.4750004
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "count": 1,
+      "anchors": [
+        {
+          "label": "ANC_PERITO",
+          "text": "Peritos",
+          "x": 86.53246,
+          "y": 740.4312,
+          "height": 6.1657715
+        }
+      ]
+    },
+    {
+      "page": 16,
+      "count": 2,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Despacho Autoriza\u00E7\u00E3o da despesa (0184230)         SEI 009203-14.2025.8.15 / pg. 16",
+          "x": 108.21501,
+          "y": 7.9300003,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "Despacho Autoriza\u00E7\u00E3o da despesa (0184230)         SEI 009203-14.2025.8.15 / pg. 16",
+          "x": 215.41501,
+          "y": 7.9300003,
+          "height": 9.25
+        }
+      ]
+    },
+    {
+      "page": 17,
+      "count": 2,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Despacho Autoriza\u00E7\u00E3o da despesa (0184230)         SEI 009203-14.2025.8.15 / pg. 17",
+          "x": 108.21501,
+          "y": 7.9300003,
+          "height": 9.25
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "Despacho Autoriza\u00E7\u00E3o da despesa (0184230)         SEI 009203-14.2025.8.15 / pg. 17",
+          "x": 215.41501,
+          "y": 7.9300003,
+          "height": 9.25
+        }
+      ]
+    },
+    {
+      "page": 18,
+      "count": 8,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Tribunal de Justi\u00E7a da Para\u00EDba",
+          "x": 100.76,
+          "y": 790.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "A\u00C7\u00C3O PENAL - PROCEDIMENTO ORDIN\u00C1RIO",
+          "x": 75.731995,
+          "y": 689.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Vara \u00DAnica de Pocinhos",
+          "x": 117.928,
+          "y": 673.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Pedido de liminar ou antecipa\u00E7\u00E3o de tutela?",
+          "x": 36,
+          "y": 561.12305,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "Delegacia de Comarca de Pocinhos (AUTORIDADE)",
+          "x": 38,
+          "y": 524.03705,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Delegacia de Comarca de Pocinhos (AUTORIDADE)",
+          "x": 114.4,
+          "y": 524.03705,
+          "height": 8.324951
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "MINIST\u00C9RIO P\u00DABLICO DO ESTADO DA PARAIBA (AUTOR)",
+          "x": 38,
+          "y": 508.537,
+          "height": 8.325012
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "LUCIANO DA SILVA COSTA (REU)",
+          "x": 38,
+          "y": 493.037,
+          "height": 8.325012
+        }
+      ]
+    },
+    {
+      "page": 21,
+      "count": 2,
+      "anchors": [
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF",
+          "x": 691.23883,
+          "y": 211.49396,
+          "height": 14.639999
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Anexo e-mail - perito (0184399)         SEI 009203-14.2025.8.15 / pg. 21",
+          "x": 263.09,
+          "y": 7.9300003,
+          "height": 9.25
+        }
+      ]
+    },
+    {
+      "page": 22,
+      "count": 1,
+      "anchors": [
+        {
+          "label": "ANC_PERITO",
+          "text": "Anexo e-mail - perito (0184399)         SEI 009203-14.2025.8.15 / pg. 22",
+          "x": 263.09,
+          "y": 7.9300003,
+          "height": 9.25
+        }
+      ]
+    },
+    {
+      "page": 23,
+      "count": 9,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Diretoria de Fiscaliza\u00E7\u00E3o - DFIS/SEFIN - R",
+          "x": 98.60706,
+          "y": 783.2928,
+          "height": 8.975647
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": ", n\u00BA 113, Esta\u00E7\u00E3o V",
+          "x": 323.30563,
+          "y": 783.2928,
+          "height": 8.975647
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF/CNPJ",
+          "x": 31.393953,
+          "y": 601.4262,
+          "height": 7.343689
+        },
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "JOAO PESSOA TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA",
+          "x": 31.393953,
+          "y": 525.7261,
+          "height": 9.791626
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "JOAO PESSOA TRIBUNAL DE JUSTICA DO ESTADO DA PARAIBA",
+          "x": 98.99396,
+          "y": 525.7261,
+          "height": 9.791626
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF/CNPJ",
+          "x": 31.393953,
+          "y": 514.7213,
+          "height": 7.343689
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Pra\u00E7a Jo\u00E3o Pessoa, s/n - Centro - CEP: 58013-140 - Jo\u00E3o Pessoa - PB",
+          "x": 31.393953,
+          "y": 478.81738,
+          "height": 8.975647
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo n\u00BA 0800263-60.2025.8.15.0541",
+          "x": 31.393953,
+          "y": 407.10034,
+          "height": 7.6085205
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Import\u00E2ncia empenhada em favor da perita psic\u00F3loga Aline Santos Soares, pela realiza\u00E7\u00E3o da per\u00EDcia nos autos do Processo SEI n\u00BA",
+          "x": 31.393953,
+          "y": 392.31345,
+          "height": 7.6085205
+        }
+      ]
+    },
+    {
+      "page": 24,
+      "count": 2,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "forma\u00E7\u00E3o",
+          "x": 241.38371,
+          "y": 523.9407,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "D/Transac\u00E3o",
+          "x": 238.22484,
+          "y": 105.97414,
+          "height": 6
+        }
+      ]
+    }
+  ]
+}

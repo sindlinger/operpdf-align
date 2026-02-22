@@ -1,0 +1,176 @@
+﻿{
+  "source_pdf": "C:\\git\\operpdf-textopsalign\\models\\aliases\\despacho_strict\\tjpb_despacho_model.backup.pdf",
+  "source_profile": "C:\\git\\operpdf-textopsalign\\modules\\PatternModules\\registry\\anchor_model_profiles\\tjpb_despacho.yml",
+  "output_pdf": "C:\\git\\operpdf-textopsalign\\models\\aliases\\despacho_strict\\tjpb_despacho_model.pdf",
+  "generated_at_utc": "2026-02-21T23:52:42.4046808Z",
+  "anchors_total": 23,
+  "pages": [
+    {
+      "page": 1,
+      "count": 23,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Poder Judici\u00E1rio do Estado da Para\u00EDba",
+          "x": 36,
+          "y": 1495.102,
+          "height": 12.949951
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial",
+          "x": 36,
+          "y": 1483.102,
+          "height": 12.949951
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo n\u00BA 2022.158.112",
+          "x": 36,
+          "y": 1435.516,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Processo n\u00BA 2022.158.112",
+          "x": 130,
+          "y": 1435.516,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Requerente: Ju\u00EDzo da 1\u00AA Vara da Comarca de Mamanguape",
+          "x": 36,
+          "y": 1417.516,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Requerente: Ju\u00EDzo da 1\u00AA Vara da Comarca de Mamanguape",
+          "x": 100,
+          "y": 1417.516,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "Interessada:",
+          "x": 36,
+          "y": 1399.516,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "Christine Maria Batista de Brito Lyra \u2013 Perita M\u00E9dica Neurologist",
+          "x": 116.8,
+          "y": 1399.102,
+          "height": 12.949951
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "no valor de R$ 370,00",
+          "x": 36,
+          "y": 1327.516,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "em favor da Perita M\u00E9dica Neurologista,",
+          "x": 35.999992,
+          "y": 1309.102,
+          "height": 12.949951
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "Lyra, CPF 225.572.294-15,",
+          "x": 36,
+          "y": 1291.102,
+          "height": 12.949951
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "do processo n\u00BA 0001189-",
+          "x": 93.277,
+          "y": 1275.266,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "do processo n\u00BA 0001189-",
+          "x": 187.27701,
+          "y": 1275.266,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "movido por JO\u00C3O BATISTA DE OLIVEIRA, CPF",
+          "x": 36,
+          "y": 1259.837,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "movido por JO\u00C3O BATISTA DE OLIVEIRA, CPF",
+          "x": 112.4,
+          "y": 1259.837,
+          "height": 11.099976
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Documento 24 p\u00E1gina 1 assinado, do processo n\u00BA 2022158112, nos termos da Lei 11.419. ADME.67725.56271.54129.61828-2",
+          "x": 574.256,
+          "y": 867,
+          "height": 6
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "to, autorizo a despesa, escudado pelo inciso IV, Par\u00E1grafo 1\u00BA do A",
+          "x": 147.647,
+          "y": 785.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "ibui\u00E7\u00F5es ao Diretor Especial.",
+          "x": 297.488,
+          "y": 749.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "no valor de R$ 370,00 (trezentos e setenta reais),",
+          "x": 36,
+          "y": 662.126,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "perante o Ju\u00EDzo da 1\u00AA Vara da Com",
+          "x": 36,
+          "y": 484.392,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 17 de setembro",
+          "x": 36,
+          "y": 358.392,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "Diretoria Especial do Tribunal de Justi\u00E7a do Estado da Para\u00EDba, em Jo\u00E3o Pessoa, 17 de setembro",
+          "x": 108,
+          "y": 358.392,
+          "height": 11.100006
+        },
+        {
+          "label": "ANC_ASSINATURA",
+          "text": "Robson de Lima Canan\u00E9a \u2013 Diretor Especial",
+          "x": 36,
+          "y": 304.392,
+          "height": 11.100006
+        }
+      ]
+    }
+  ]
+}
