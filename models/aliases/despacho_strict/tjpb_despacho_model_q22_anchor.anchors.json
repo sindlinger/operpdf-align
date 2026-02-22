@@ -1,0 +1,189 @@
+{
+  "source_pdf": "models/aliases/despacho_strict/tjpb_despacho_model.pdf",
+  "source_profile": "C:/git/operpdf-textopsalign/io/tmp_tjpb_despacho_no_sequence.yml",
+  "output_pdf": "C:/git/operpdf-textopsalign/models/aliases/despacho_strict/tjpb_despacho_model_q22_anchor.pdf",
+  "generated_at_utc": "2026-02-22T04:35:24.2308504Z",
+  "anchors_total": 24,
+  "pages": [
+    {
+      "page": 1,
+      "count": 12,
+      "anchors": [
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Tribunal de Justiça do Estado da Paraíba",
+          "x": 187.44,
+          "y": 647.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial",
+          "x": 248.82,
+          "y": 629.516,
+          "height": 11.100037
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo nº 2022.000.000",
+          "x": 36,
+          "y": 575.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Requerente: Juízo da 1ª Vara da Comarca de CCCCCCCC",
+          "x": 36,
+          "y": 557.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Comarca de CCCCCCCC",
+          "x": 36,
+          "y": 545.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_INTERESSADO",
+          "text": "Interessada: PPPPP PPPPP PPPPP PPPPP - Perita Médica Neurologista",
+          "x": 36,
+          "y": 539.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "no valor de R$ 000,00",
+          "x": 36,
+          "y": 485.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "movido por AAAAA AAAAAAA AAAAA AA",
+          "x": 36,
+          "y": 473.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "em favor da Perita Médica Neurologista PPPPP PPPPP PPPPP",
+          "x": 36,
+          "y": 467.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Processo nº 0000000-00.0000.0.00.0000",
+          "x": 36,
+          "y": 449.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF 000.000.000-00, com inscrição no PIS/PASEP sob nº 00000000000",
+          "x": 36,
+          "y": 431.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "em face de AAAAA AAAAAAA AAAAA AA",
+          "x": 36,
+          "y": 419.723,
+          "height": 10.175018
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "count": 12,
+      "anchors": [
+        {
+          "label": "ANC_PROCESSO_JUDICIAL",
+          "text": "Processo nº 0000000-00.0000.0.00.0000",
+          "x": 36,
+          "y": 767.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_CPF_PERITO",
+          "text": "CPF 000.000.000-00, com inscrição no PIS/PASEP sob nº 00000000000",
+          "x": 36,
+          "y": 731.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PERITO",
+          "text": "em favor da Perita Médica Neurologista PPPPP PPPPP PPPPP",
+          "x": 36,
+          "y": 713.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROMOVENTE",
+          "text": "movido por AAAAA AAAAAAA AAAAA AA",
+          "x": 36,
+          "y": 641.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_VALOR_JZ",
+          "text": "no valor de R$ 000,00",
+          "x": 36,
+          "y": 551.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROCESSO_ADMIN",
+          "text": "Processo nº 2022.000.000",
+          "x": 36,
+          "y": 515.723,
+          "height": 10.174988
+        },
+        {
+          "label": "ANC_PROMOVIDO",
+          "text": "em face de AAAAA AAAAAAA AAAAA AA",
+          "x": 36,
+          "y": 497.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_VARA",
+          "text": "Requerente: Juízo da 1ª Vara da Comarca de CCCCCCCC",
+          "x": 36,
+          "y": 479.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_COMARCA",
+          "text": "Comarca de CCCCCCCC",
+          "x": 36,
+          "y": 467.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_TRIBUNAL",
+          "text": "Tribunal de Justiça do Estado da Paraíba",
+          "x": 36,
+          "y": 299.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_DIRETORIA",
+          "text": "Diretoria Especial",
+          "x": 36,
+          "y": 287.723,
+          "height": 10.175018
+        },
+        {
+          "label": "ANC_DATA_DESPESA",
+          "text": "João Pessoa, 00 de abril de 2024",
+          "x": 36,
+          "y": 275.723,
+          "height": 10.175018
+        }
+      ]
+    }
+  ]
+}
