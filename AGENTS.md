@@ -94,9 +94,9 @@ Para qualquer ajuste:
 
 ## Testes Mínimos por Mudança
 Rodar sempre:
-- `./align.exe textopsalign-despacho --inputs @MODEL --inputs :Q22 --probe`
-- `./align.exe textopsvar-despacho --inputs @MODEL --inputs :Q22 --probe`
-- `./align.exe textopsfixed-despacho --inputs @MODEL --inputs :Q22 --probe`
+- `./align.exe textopsalign-despacho --inputs @M-DESP --inputs :Q22 --probe`
+- `./align.exe textopsvar-despacho --inputs @M-DESP --inputs :Q22 --probe`
+- `./align.exe textopsfixed-despacho --inputs @M-DESP --inputs :Q22 --probe`
 
 E, quando alteração for comum a outros docs, repetir para certidão/requerimento.
 

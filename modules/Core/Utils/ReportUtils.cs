@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Obj.Utils
 {
@@ -10,13 +11,16 @@ namespace Obj.Utils
         private const string Reset = "\u001b[0m";
         private const string Blue = "\u001b[38;5;39m";
         private const string Orange = "\u001b[38;5;208m";
+        private const string Gray = "\u001b[38;5;250m";
+        private const string GraySoft = "\u001b[38;5;246m";
+        private static readonly Regex AnsiRegex = new(@"\u001b\[[0-9;]*m", RegexOptions.Compiled);
 
         public static void WriteSummary(string title, IEnumerable<(string Key, string Value)> items)
         {
-            Console.WriteLine(title);
+            Console.WriteLine(StyleIfPlain(title, Gray));
             foreach (var (key, value) in items)
             {
-                Console.WriteLine($"  {key}: {value}");
+                Console.WriteLine($"  {StyleIfPlain(key + ":", GraySoft)} {StyleIfPlain(value ?? "", Gray)}");
             }
         }
 
@@ -42,19 +46,19 @@ namespace Obj.Utils
 
             var widths = new int[headers.Length];
             for (int i = 0; i < headers.Length; i++)
-                widths[i] = headers[i].Length;
+                widths[i] = VisibleLength(headers[i]);
             foreach (var row in data)
             {
                 for (int i = 0; i < headers.Length && i < row.Length; i++)
                 {
-                    widths[i] = Math.Max(widths[i], row[i]?.Length ?? 0);
+                    widths[i] = Math.Max(widths[i], VisibleLength(row[i] ?? ""));
                 }
             }
 
-            Console.WriteLine(title);
-            Console.WriteLine(FormatRow(headers, widths));
+            Console.WriteLine(StyleIfPlain(title, Gray));
+            Console.WriteLine(StyleIfPlain(FormatRow(headers, widths), GraySoft));
             foreach (var row in data)
-                Console.WriteLine(FormatRow(row, widths));
+                Console.WriteLine(StyleIfPlain(FormatRow(row, widths), Gray));
         }
 
         public static (double Low, double High, double Cut, int LowCount, int HighCount) KMeans1D(IReadOnlyList<double> values, int maxIter = 50)
@@ -103,9 +107,26 @@ namespace Obj.Utils
             for (int i = 0; i < widths.Length; i++)
             {
                 var cell = i < row.Length ? row[i] ?? "" : "";
-                parts[i] = cell.PadRight(widths[i] + 2);
+                var pad = Math.Max(0, widths[i] - VisibleLength(cell));
+                parts[i] = cell + new string(' ', pad + 2);
             }
             return string.Join("", parts).TrimEnd();
+        }
+
+        private static int VisibleLength(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return 0;
+            return AnsiRegex.Replace(value, "").Length;
+        }
+
+        private static string StyleIfPlain(string value, string color)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "";
+            return value.Contains("\u001b[", StringComparison.Ordinal)
+                ? value
+                : $"{color}{value}{Reset}";
         }
     }
 }

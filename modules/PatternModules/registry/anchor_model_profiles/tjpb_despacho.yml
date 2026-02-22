@@ -6,10 +6,9 @@ anchor_rules:
     max_per_page: 1
   - label: ANC_PROCESSO_ADMIN
     needles:
-      - processo n
-      - processon
       - processo nº
-    max_per_page: 2
+      - processo n
+    max_per_page: 1
   - label: ANC_REQUERENTE
     needles:
       - "requerente:"
@@ -20,50 +19,54 @@ anchor_rules:
     max_per_page: 1
   - label: ANC_PERITO
     needles:
+      - em favor da
       - perito
       - perita
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_ESPECIALIDADE
     needles:
       - assistente social
       - engenheiro
       - grafotecnico
       - especialidade
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_VALOR_JZ
     needles:
       - valor de r$
       - no valor de
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_CPF_PERITO
     needles:
       - cpf
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_PROCESSO_JUDICIAL
     needles:
-      - pericia nos autos
-      - acao
-      - processo n
-    max_per_page: 2
+      - nos autos do processo
+      - autos do processo
+      - processo judicial
+    max_per_page: 1
   - label: ANC_PROMOVENTE
     needles:
       - movido por
       - autor
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_PROMOVIDO
     needles:
       - em face de
+      - em face do
+      - face de
+      - face do
+      - face
       - reu
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_VARA
     needles:
       - juizo da
-      - vara
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_COMARCA
     needles:
       - comarca
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_ENCAMINHE
     needles:
       - encaminhem-se
@@ -72,17 +75,15 @@ anchor_rules:
   - label: ANC_DIRETORIA
     needles:
       - diretoria especial
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_ASSINATURA
     needles:
       - documento assinado eletronicamente
-      - diretor especial
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_DATA_DESPESA
     needles:
       - joao pessoa
-      - assinado
-    max_per_page: 2
+    max_per_page: 1
   - label: ANC_VERIFICADOR
     needles:
       - codigo verificador
@@ -95,31 +96,31 @@ placeholder_rules:
     max_per_page: 1
   - tag: "<PROCESSO_JUDICIAL>"
     label: ANC_PROCESSO_JUDICIAL
-    max_per_page: 2
+    max_per_page: 1
   - tag: "<VARA>"
     label: ANC_VARA
-    max_per_page: 3
+    max_per_page: 1
   - tag: "<COMARCA>"
     label: ANC_COMARCA
-    max_per_page: 3
+    max_per_page: 1
   - tag: "<PERITO>"
     label: ANC_PERITO
-    max_per_page: 3
+    max_per_page: 1
   - tag: "<CPF_PERITO>"
     label: ANC_CPF_PERITO
-    max_per_page: 2
+    max_per_page: 1
   - tag: "<PROMOVENTE>"
     label: ANC_PROMOVENTE
-    max_per_page: 2
+    max_per_page: 1
   - tag: "<PROMOVIDO>"
     label: ANC_PROMOVIDO
-    max_per_page: 2
+    max_per_page: 1
   - tag: "<ESPECIALIDADE>"
     label: ANC_ESPECIALIDADE
-    max_per_page: 2
+    max_per_page: 1
   - tag: "<ESPECIE_DA_PERICIA>"
     label: ANC_ESPECIE_PERICIA
-    max_per_page: 2
+    max_per_page: 1
   - tag: "<VALOR_ARBITRADO_JZ>"
     label: ANC_VALOR_JZ
     max_per_page: 1
@@ -128,7 +129,7 @@ placeholder_rules:
     max_per_page: 1
   - tag: "<DATA_DESPESA>"
     label: ANC_DATA_DESPESA
-    max_per_page: 2
+    max_per_page: 1
 
 render_text:
   placeholder:
@@ -175,26 +176,58 @@ render_text:
     ANC_VERIFICADOR: "codigo verificador"
 
   masked:
-    ANC_TRIBUNAL: "PPPPP PPPPP PPP PPPPPPP"
-    ANC_DIRETORIA: "PPPPPPPPP PPPPPPP"
+    ANC_TRIBUNAL: "Tribunal de Justiça do Estado da Paraíba"
+    ANC_DIRETORIA: "Diretoria Especial"
     ANC_PROCESSO_ADMIN: "Processo nº 2022.000.000"
     ANC_PROCESSO_JUDICIAL: "Processo nº 0000000-00.0000.0.00.0000"
-    ANC_REQUERENTE: "Requerente: Juizo da 0ª VVVV da CCCCCCC de CCCCCCCC"
-    ANC_INTERESSADO: "Interessad: Pppppppp Ppppppp Pppp pp Ppppp - Perita Medica Neurologista"
-    ANC_VARA: "perante o Juizo da 0ª VVVV da CCCCCCC de CCCCCCCC"
+    ANC_REQUERENTE: "Requerente: Juízo da 1ª Vara da Comarca de CCCCCCCC"
+    ANC_INTERESSADO: "Interessada: PPPPP PPPPP PPPPP PPPPP - Perita Médica Neurologista"
+    ANC_VARA: "perante o Juízo da 0ª Vara da Comarca de CCCCCCCC."
     ANC_COMARCA: "Comarca de CCCCCCCC"
-    ANC_PERITO: "em favor da Perita Medica Neurologista Pppppppp Ppppppp Pppp pp Ppppp"
+    ANC_PERITO: "em favor da Perita Médica Neurologista PPPPP PPPPP PPPPP,"
     ANC_CPF_PERITO: "CPF 000.000.000-00"
     ANC_PROMOVENTE: "movido por AAAAA AAAAAAA AAAAA AA"
-    ANC_PROMOVIDO: "em face do BBBBB BBBBBBB BBBBB BB"
-    ANC_ESPECIALIDADE: "Perita Medica Neurologista"
-    ANC_ESPECIE_PERICIA: "Pericia PPPPP"
-    ANC_VALOR_JZ: "no valor de R$ 000,00"
-    ANC_VALOR_DE: "no valor de R$ 000,00"
-    ANC_DATA_DESPESA: "00 de PPPPP de 0000"
-    ANC_ASSINATURA: "Documento assinado"
+    ANC_PROMOVIDO: "em face de AAAAA AAAAAAA AAAAA AA"
+    ANC_ESPECIALIDADE: "Perita Médica Neurologista"
+    ANC_ESPECIE_PERICIA: "perícia PPPPP PPPPP"
+    ANC_VALOR_JZ: "no valor de R$ 000,00 (PPPPP e PPPPPP reais)"
+    ANC_VALOR_DE: "no valor de R$ 000,00 (PPPPP e PPPPPP reais)"
+    ANC_DATA_DESPESA: "João Pessoa, 00 de abril de 2024"
+    ANC_ASSINATURA: "Documento assinado eletronicamente"
     ANC_ENCAMINHE: "Encaminhe-se"
     ANC_VERIFICADOR: "Codigo verificador 00000000"
+
+  masked_sequence:
+    - "Tribunal de Justiça do Estado da Paraíba"
+    - "Diretoria Especial"
+    - ""
+    - "Despacho nº 000000/00"
+    - "Processo nº 2022.000.000"
+    - "Processonº 2021.000.000"
+    - ""
+    - "Requerente: Juízo da 1ª Vara da Comarca de CCCCCCCC"
+    - "Requerente: Juízo da 4ª Vara Cível da Comarca de CCCCCCCC"
+    - "Interessada: PPPPP PPPPP PPPPP PPPPP - Perita Médica Neurologista"
+    - "Interessado: PPPPP PPPPP PPPPP - perito grafotécnico"
+    - ""
+    - "CPF 000.000.000-00, com inscrição no PIS/PASEP sob nº 00000000000"
+    - "CPF 000.000.000-00, com inscrição no PIS/PASEP sob nº 00000000000"
+    - ""
+    - "no valor de R$ 000,00 (PPPPP e PPPPPP reais)"
+    - "no valor de R$ 000,00 (PPPPP e PPPPPP reais)"
+    - ""
+    - "movido por AAAAA AAAAAAA AAAAA AA"
+    - "movido por AAAAA AAAAAAA AAAAA AA"
+    - ""
+    - "em face de AAAAA AAAAAAA AAAAA AA"
+    - "em face de AAAAA AAAAAAA AAAAA AA"
+    - ""
+    - "perante a 4ª Vara Cível da Comarca de CCCCCCCC."
+    - "perante o Juízo da 1ª Vara da Comarca de CCCCCCCC."
+    - ""
+    - "perante o Juízo da 0ª Vara da Comarca de CCCCCCCC"
+    - ""
+    - "João Pessoa, 00 de abril de 2024"
 
 defaults:
   placeholder_text: "ANCORA"

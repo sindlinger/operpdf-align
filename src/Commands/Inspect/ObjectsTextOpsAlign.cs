@@ -32,6 +32,16 @@ namespace Obj.Commands
         private const string AnsiWarn = AnsiClaudeOrange;
         private const string AnsiErr = "\u001b[1;91m";
         private const string AnsiSoft = "\u001b[38;5;246m";
+        private const string AnsiGray = "\u001b[38;5;250m";
+        private const string AnsiGrayDark = "\u001b[38;5;244m";
+        private const string AnsiStageDetection = AnsiDodgeBlue;
+        private const string AnsiStageAlignment = "\u001b[38;5;166m";
+        private const string AnsiStageParser = "\u001b[38;5;37m";
+        private const string AnsiStageHonorarios = "\u001b[38;5;108m";
+        private const string AnsiStageRepairer = "\u001b[38;5;141m";
+        private const string AnsiStageValidator = "\u001b[38;5;174m";
+        private const string AnsiStageProbe = "\u001b[38;5;81m";
+        private const string AnsiStageOutput = "\u001b[38;5;245m";
 
         internal enum OutputMode
         {
@@ -51,26 +61,106 @@ namespace Obj.Commands
             return $"{color}{text}{AnsiReset}";
         }
 
+        private static bool HasAnsiColor(string? text)
+        {
+            return !string.IsNullOrWhiteSpace(text) &&
+                   text!.Contains("\u001b[", StringComparison.Ordinal);
+        }
+
+        private static string GrayIfPlain(string? text, string fallbackColor = AnsiGray)
+        {
+            var value = text ?? "";
+            if (value.Length == 0)
+                return "";
+            return HasAnsiColor(value) ? value : Colorize(value, fallbackColor);
+        }
+
+        private static int ParsePipelineStep(string? stepText)
+        {
+            var raw = stepText ?? "";
+            if (raw.Length == 0)
+                return 0;
+            var match = Regex.Match(raw, @"etapa\s+(\d+)\s*/\s*8", RegexOptions.IgnoreCase);
+            if (!match.Success)
+                return 0;
+            return int.TryParse(match.Groups[1].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var step)
+                ? step
+                : 0;
+        }
+
+        private static string ResolvePipelineStepColor(int step)
+        {
+            return step switch
+            {
+                1 => AnsiStageDetection,
+                2 => AnsiStageAlignment,
+                3 => AnsiStageParser,
+                4 => AnsiStageHonorarios,
+                5 => AnsiStageRepairer,
+                6 => AnsiStageValidator,
+                7 => AnsiStageProbe,
+                8 => AnsiStageOutput,
+                _ => AnsiInfo
+            };
+        }
+
+        private static string ResolveStageColorByMessage(string? message)
+        {
+            var norm = (message ?? "").Trim().ToLowerInvariant();
+            if (norm.Contains("detecção", StringComparison.Ordinal) || norm.Contains("deteccao", StringComparison.Ordinal))
+                return AnsiStageDetection;
+            if (norm.Contains("alinhamento", StringComparison.Ordinal))
+                return AnsiStageAlignment;
+            if (norm.Contains("extração", StringComparison.Ordinal) || norm.Contains("extracao", StringComparison.Ordinal))
+                return AnsiStageParser;
+            return AnsiInfo;
+        }
+
+        private static string ResolvePairKindColor(string? kind)
+        {
+            var norm = (kind ?? "").Trim().ToLowerInvariant();
+            if (norm == "fixed")
+                return AnsiOk;
+            if (norm == "variable")
+                return AnsiWarn;
+            if (norm.StartsWith("gap", StringComparison.Ordinal))
+                return AnsiGrayDark;
+            if (norm == "anchor")
+                return AnsiDodgeBlue;
+            return AnsiGray;
+        }
+
         private static void PrintStage(string message)
         {
-            Console.WriteLine(Colorize($"[STAGE] {message}", AnsiInfo));
+            Console.WriteLine(Colorize($"[STAGE] {message}", ResolveStageColorByMessage(message)));
         }
 
         private static void PrintPipelineStep(string step, string nextStep, params (string Key, string Value)[] values)
         {
-            Console.WriteLine(Colorize($"[PIPELINE] {step}", AnsiInfo));
+            var stepIndex = ParsePipelineStep(step);
+            var stepColor = ResolvePipelineStepColor(stepIndex);
+            Console.WriteLine(Colorize($"[PIPELINE] {step}", stepColor));
             foreach (var (key, value) in values)
             {
                 var formattedValue = value ?? "";
+                var keyColor = AnsiGrayDark;
                 if (string.Equals(key, "modulo", StringComparison.OrdinalIgnoreCase) ||
                     string.Equals(key, "module", StringComparison.OrdinalIgnoreCase))
+                {
                     formattedValue = ColorizeModuleChain(formattedValue);
+                    keyColor = stepColor;
+                }
                 else if (string.Equals(key, "scope", StringComparison.OrdinalIgnoreCase))
-                    formattedValue = Colorize(formattedValue, AnsiCodexBlue);
-                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {formattedValue}");
+                    formattedValue = GrayIfPlain(formattedValue, AnsiGrayDark);
+                else
+                    formattedValue = GrayIfPlain(formattedValue);
+                Console.WriteLine($"  {Colorize(key + ":", keyColor)} {formattedValue}");
             }
             if (!string.IsNullOrWhiteSpace(nextStep))
-                Console.WriteLine($"  {Colorize("usa no próximo:", AnsiWarn)} {Colorize(nextStep, AnsiSoft)}");
+            {
+                var nextColor = ResolvePipelineStepColor(ParsePipelineStep(nextStep));
+                Console.WriteLine($"  {Colorize("usa no próximo:", AnsiGrayDark)} {GrayIfPlain(nextStep, nextColor)}");
+            }
             Console.WriteLine();
         }
 
@@ -78,7 +168,7 @@ namespace Obj.Commands
         {
             Console.WriteLine(Colorize("[PARAMETROS]", AnsiInfo));
             foreach (var (key, value) in items)
-                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize(value ?? "", AnsiSoft)}");
+                Console.WriteLine($"  {Colorize(key + ":", AnsiGrayDark)} {Colorize(value ?? "", AnsiGray)}");
             Console.WriteLine();
         }
 
@@ -89,7 +179,7 @@ namespace Obj.Commands
             {
                 var text = value ? "true" : "false";
                 var color = value ? AnsiOk : AnsiSoft;
-                Console.WriteLine($"  {Colorize(key + ":", AnsiWarn)} {Colorize(text, color)}");
+                Console.WriteLine($"  {Colorize(key + ":", AnsiGrayDark)} {Colorize(text, color)}");
             }
             Console.WriteLine();
         }
@@ -140,26 +230,27 @@ namespace Obj.Commands
         {
             var norm = (moduleName ?? "").Trim().ToLowerInvariant();
             if (norm.Length == 0)
-                return AnsiSoft;
+                return AnsiGrayDark;
             if (norm.Contains("docdetector", StringComparison.Ordinal) ||
                 norm.Contains("finddespacho", StringComparison.Ordinal) ||
                 norm.Contains("contentsstreampicker", StringComparison.Ordinal))
-                return AnsiCodexBlue;
+                return AnsiStageDetection;
             if (norm.Contains("align", StringComparison.Ordinal) || norm.Contains("textopsdiff", StringComparison.Ordinal))
-                return "\u001b[38;5;75m";
-            if (norm.Contains("objectsmapfields", StringComparison.Ordinal))
-                return "\u001b[38;5;44m";
+                return AnsiStageAlignment;
+            if (norm.Contains("objectsmapfields", StringComparison.Ordinal) ||
+                norm.Contains("documentvalidationrules", StringComparison.Ordinal))
+                return AnsiStageParser;
             if (norm.Contains("honorarios", StringComparison.Ordinal))
-                return "\u001b[38;5;71m";
+                return AnsiStageHonorarios;
             if (norm.Contains("validationrepairer", StringComparison.Ordinal) || norm.Contains("repairer", StringComparison.Ordinal))
-                return "\u001b[38;5;141m";
+                return AnsiStageRepairer;
             if (norm.Contains("validator", StringComparison.Ordinal))
-                return "\u001b[38;5;203m";
+                return AnsiStageValidator;
             if (norm.Contains("probe", StringComparison.Ordinal))
-                return "\u001b[38;5;111m";
+                return AnsiStageProbe;
             if (norm.Contains("jsonserializer", StringComparison.Ordinal))
-                return "\u001b[38;5;250m";
-            return "\u001b[38;5;153m";
+                return AnsiStageOutput;
+            return AnsiGrayDark;
         }
 
         private static string ColorizeModuleChain(string moduleChain)
@@ -195,6 +286,15 @@ namespace Obj.Commands
             }
 
             return sb.ToString();
+        }
+
+        private static void PrintAlignSectionHeader(string sectionName, ObjectsTextOpsDiff.AlignDebugReport report, string moduleName)
+        {
+            var section = string.IsNullOrWhiteSpace(sectionName) ? "INFO" : sectionName.Trim().ToUpperInvariant();
+            Console.WriteLine(Colorize($"[ALIGN][{section}]", AnsiStageAlignment));
+            Console.WriteLine($"  {Colorize("module:", AnsiStageAlignment)} {ColorizeModuleChain(moduleName)}");
+            Console.WriteLine($"  {Colorize("modelo_pdf:", AnsiGrayDark)} {GrayIfPlain($"{report.PdfA} p{report.PageA} o{report.ObjA}")}");
+            Console.WriteLine($"  {Colorize("pdf_alvo:", AnsiGrayDark)} {GrayIfPlain($"{report.PdfB} p{report.PageB} o{report.ObjB}")}");
         }
 
         private static string ResolveStageKey(int step)
@@ -4774,7 +4874,7 @@ namespace Obj.Commands
             Console.WriteLine("  --log[=N]  = lista ALINHAMENTO detalhada; N linhas (0 = todas).");
             Console.WriteLine("  padrão     = saída compacta (ALINHAMENTO -> CAMPOS + RESULTADO FINAL).");
             Console.WriteLine($"  gap penalty: fixo interno ({ReportUtils.F(FixedGapPenalty, 2)}). --gap não é aceito.");
-            Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @MODEL --inputs :Q22");
+            Console.WriteLine("atalho: run N-M (sem --), ex.: textopsalign-despacho run 1-4 --inputs @M-DESP --inputs :Q22");
             Console.WriteLine("run/--run com etapa >=7 ativa probe automaticamente (use --no-probe para desativar).");
             Console.WriteLine("aliases de modelo por tipo: @M-DES/@M-DESP (despacho), @M-CER (certidao), @M-REQ (requerimento). Modo estrito: somente OBJPDF_ALIAS_M_DES_DIR / OBJPDF_ALIAS_M_CER_DIR / OBJPDF_ALIAS_M_REQ_DIR (sem fallback).");
             Console.WriteLine("env: OBJ_TEXTOPSALIGN_* (defaults), ex.: OBJ_TEXTOPSALIGN_MIN_SIM=0.15 OBJ_TEXTOPSALIGN_PROBE=1 OBJ_TEXTOPSALIGN_RUN=1-4");
@@ -4868,10 +4968,11 @@ namespace Obj.Commands
                 summary.Add(("helperMode", string.IsNullOrWhiteSpace(helper.AnchorMode) ? "(n/a)" : helper.AnchorMode));
             }
             summary.Add(("anchorsReported", report.Anchors.Count.ToString(CultureInfo.InvariantCulture)));
+            PrintAlignSectionHeader("SUMMARY", report, "Obj.Align.ObjectsTextOpsDiff");
             ReportUtils.WriteSummary("TEXTOPS ALIGN", summary);
             Console.WriteLine();
 
-            Console.WriteLine(Colorize("ALIGN-HELPER", AnsiCodexBlue));
+            PrintAlignSectionHeader("HELPER", report, "Obj.Align.ObjectsTextOpsDiff");
             if (helper == null)
             {
                 Console.WriteLine($"  {Colorize("sem dados de helper para este alinhamento", AnsiSoft)}");
@@ -4896,7 +4997,7 @@ namespace Obj.Commands
                     })
                     .ToList();
                 if (acceptedRows.Count > 0)
-                    ReportUtils.WriteTable(Colorize("ALIGN-HELPER ACCEPTED (COMPLETO)", AnsiOk), new[] { "key", "Aidx", "Bidx", "score", "reason" }, acceptedRows);
+                    ReportUtils.WriteTable(Colorize("[ALIGN][HELPER][ACCEPTED]", AnsiOk), new[] { "key", "Aidx", "Bidx", "score", "reason" }, acceptedRows);
 
                 var rejectedRows = helper.Decisions
                     .Where(d => string.Equals(d.Status, "rejected", StringComparison.OrdinalIgnoreCase))
@@ -4914,14 +5015,15 @@ namespace Obj.Commands
                     })
                     .ToList();
                 if (rejectedRows.Count > 0)
-                    ReportUtils.WriteTable(Colorize("ALIGN-HELPER REJECTED (COMPLETO)", AnsiErr), new[] { "key", "Aidx", "Bidx", "score", "reason" }, rejectedRows);
+                    ReportUtils.WriteTable(Colorize("[ALIGN][HELPER][REJECTED]", AnsiErr), new[] { "key", "Aidx", "Bidx", "score", "reason" }, rejectedRows);
                 if (acceptedRows.Count == 0 && rejectedRows.Count == 0)
                     Console.WriteLine($"  {Colorize("sem decisões registradas", AnsiSoft)}");
 
                 Console.WriteLine();
             }
 
-            Console.WriteLine(Colorize("ANCHORS (COMPLETO)", AnsiDodgeBlue));
+            PrintAlignSectionHeader("ANCHORS", report, "Obj.Align.ObjectsTextOpsDiff");
+            Console.WriteLine(Colorize("[ANCHORS] (COMPLETO)", AnsiDodgeBlue));
             if (report.Anchors.Count > 0)
             {
                 foreach (var a in report.Anchors)
@@ -4937,20 +5039,36 @@ namespace Obj.Commands
             var varPairs = report.Alignments
                 .Where(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            if (showVariables && varPairs.Count > 0)
+            if (showVariables)
             {
-                Console.WriteLine(Colorize("VARIAVEIS (DMP)", AnsiClaudeOrange));
-                foreach (var p in varPairs)
-                    PrintAlignPair(p, showDiff: p.A != null && p.B != null);
+                PrintAlignSectionHeader("VARIAVEIS", report, "Obj.Align.ObjectsTextOpsDiff");
+                Console.WriteLine(Colorize("[VARIAVEIS] (DMP)", AnsiClaudeOrange));
+                if (varPairs.Count > 0)
+                {
+                    foreach (var p in varPairs)
+                        PrintAlignPair(p, showDiff: p.A != null && p.B != null);
+                }
+                else
+                {
+                    Console.WriteLine($"  {Colorize("sem pares variáveis neste alinhamento", AnsiSoft)}");
+                }
                 Console.WriteLine();
             }
 
             // Mostrar fixos (âncoras naturais).
-            if (showFixed && report.FixedPairs.Count > 0)
+            if (showFixed)
             {
-                Console.WriteLine(Colorize("FIXOS", AnsiOk));
-                foreach (var p in report.FixedPairs)
-                    PrintAlignPair(p, showDiff: false);
+                PrintAlignSectionHeader("FIXOS", report, "Obj.Align.ObjectsTextOpsDiff");
+                Console.WriteLine(Colorize("[FIXOS] (DMP)", AnsiOk));
+                if (report.FixedPairs.Count > 0)
+                {
+                    foreach (var p in report.FixedPairs)
+                        PrintAlignPair(p, showDiff: false);
+                }
+                else
+                {
+                    Console.WriteLine($"  {Colorize("sem pares fixos neste alinhamento", AnsiSoft)}");
+                }
                 Console.WriteLine();
             }
 
@@ -5061,7 +5179,8 @@ namespace Obj.Commands
             var valueFullA = BuildValueFullFromBlocks(report.BlocksA, report.RangeA);
             var valueFullB = BuildValueFullFromBlocks(report.BlocksB, report.RangeB);
 
-            Console.WriteLine(Colorize("ALIGN->EXTRACAO (PAYLOAD COMPLETO)", AnsiCodexBlue));
+            PrintAlignSectionHeader("PAYLOAD", report, "Obj.Align.ObjectsTextOpsDiff");
+            Console.WriteLine(Colorize("[ALIGN->EXTRACAO] (PAYLOAD COMPLETO)", AnsiStageParser));
             Console.WriteLine($"  {Colorize("interpretação:", AnsiWarn)} {Colorize("primeiro=lado A (modelo/referência) | segundo=lado B (pdf alvo)", AnsiSoft)}");
             Console.WriteLine($"  {Colorize("op_range_primeiro:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(opRangeA) ? "(vazio)" : opRangeA, AnsiSoft)}");
             Console.WriteLine($"  {Colorize("op_range_segundo:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(opRangeB) ? "(vazio)" : opRangeB, AnsiSoft)}");
@@ -5087,6 +5206,7 @@ namespace Obj.Commands
             if (indexed.Count == 0)
                 return;
 
+            PrintAlignSectionHeader("TOP", report, "Obj.Align.ObjectsTextOpsDiff");
             var rows = indexed
                 .Select(x => new[]
                 {
@@ -5099,7 +5219,7 @@ namespace Obj.Commands
                     ShortInlineText(x.pair.B?.Text ?? "<gap>")
                 })
                 .ToList();
-            ReportUtils.WriteTable(Colorize("ALINHAMENTO HUMANO (TOP)", AnsiCodexBlue), new[] { "idx", "kind", "score", "A_op", "B_op", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B") }, rows);
+            ReportUtils.WriteTable(Colorize("ALINHAMENTO HUMANO (TOP)", AnsiStageAlignment), new[] { "idx", "kind", "score", "A_op", "B_op", ReportUtils.BlueLabel("A"), ReportUtils.OrangeLabel("B") }, rows);
             Console.WriteLine();
         }
 
@@ -5121,9 +5241,10 @@ namespace Obj.Commands
             var bRange = b != null ? FormatOpRange(b.StartOp, b.EndOp) : "-";
             var aText = a?.Text ?? "<gap>";
             var bText = b?.Text ?? "<gap>";
-            Console.WriteLine($"[{pair.Kind}] score={pair.Score:F2}");
-            Console.WriteLine($"  A op{aRange} \"{aText}\"");
-            Console.WriteLine($"  B op{bRange} \"{bText}\"");
+            var kindColor = ResolvePairKindColor(pair.Kind);
+            Console.WriteLine(Colorize($"[{pair.Kind}] score={pair.Score:F2}", kindColor));
+            Console.WriteLine($"  {Colorize($"A op{aRange}", AnsiGrayDark)} {GrayIfPlain($"\"{aText}\"")}");
+            Console.WriteLine($"  {Colorize($"B op{bRange}", AnsiGrayDark)} {GrayIfPlain($"\"{bText}\"")}");
             if (showDiff)
                 PrintFixedVarSegments(aText, bText);
         }
@@ -5139,7 +5260,8 @@ namespace Obj.Commands
             if (list.Count == 0)
                 return;
 
-            Console.WriteLine(Colorize("ALINHAMENTO (COMPLETO)", AnsiCodexBlue));
+            PrintAlignSectionHeader("ALINHAMENTO", report, "Obj.Align.ObjectsTextOpsDiff");
+            Console.WriteLine(Colorize("[ALINHAMENTO] (COMPLETO)", AnsiStageAlignment));
             for (int i = 0; i < list.Count; i++)
             {
                 var pair = list[i];
@@ -5149,9 +5271,10 @@ namespace Obj.Commands
                 var bIdx = b != null ? b.Index.ToString(CultureInfo.InvariantCulture) : "-";
                 var aRange = a != null ? FormatOpRange(a.StartOp, a.EndOp) : "-";
                 var bRange = b != null ? FormatOpRange(b.StartOp, b.EndOp) : "-";
-                Console.WriteLine($"[{i + 1:D3}] {pair.Kind} score={pair.Score:F2} A({aIdx}) op{aRange} | B({bIdx}) op{bRange}");
-                Console.WriteLine($"  A: \"{a?.Text ?? "<gap>"}\"");
-                Console.WriteLine($"  B: \"{b?.Text ?? "<gap>"}\"");
+                var kindColor = ResolvePairKindColor(pair.Kind);
+                Console.WriteLine(Colorize($"[{i + 1:D3}] {pair.Kind} score={pair.Score:F2} A({aIdx}) op{aRange} | B({bIdx}) op{bRange}", kindColor));
+                Console.WriteLine($"  {Colorize("A:", AnsiGrayDark)} {GrayIfPlain($"\"{a?.Text ?? "<gap>"}\"")}");
+                Console.WriteLine($"  {Colorize("B:", AnsiGrayDark)} {GrayIfPlain($"\"{b?.Text ?? "<gap>"}\"")}");
                 if (showDiff && pair.Kind == "variable")
                     PrintFixedVarSegments(a?.Text ?? "", b?.Text ?? "");
             }
@@ -5188,8 +5311,8 @@ namespace Obj.Commands
                     varB.Clear();
                     return;
                 }
-                Console.WriteLine($"    VAR A: \"{a}\"");
-                Console.WriteLine($"    VAR B: \"{b}\"");
+                Console.WriteLine($"    {Colorize("VAR A:", AnsiGrayDark)} {GrayIfPlain($"\"{a}\"")}");
+                Console.WriteLine($"    {Colorize("VAR B:", AnsiGrayDark)} {GrayIfPlain($"\"{b}\"")}");
                 varA.Clear();
                 varB.Clear();
             }
@@ -5201,7 +5324,7 @@ namespace Obj.Commands
                     FlushVar();
                     var fixedText = diff.text.Trim();
                     if (fixedText.Length >= minFixedLen)
-                        Console.WriteLine($"    FIXO: \"{fixedText}\"");
+                        Console.WriteLine($"    {Colorize("FIXO:", AnsiGrayDark)} {GrayIfPlain($"\"{fixedText}\"")}");
                     continue;
                 }
                 if (diff.operation == Operation.DELETE)

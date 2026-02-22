@@ -71,6 +71,7 @@ namespace Obj.Commands
             public Dictionary<string, string> Placeholder { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             public Dictionary<string, string> AnchorPhrase { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             public Dictionary<string, string> Masked { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            public List<string> MaskedSequence { get; set; } = new List<string>();
         }
 
         public sealed class DefaultsProfile
@@ -434,20 +435,28 @@ namespace Obj.Commands
                     var widthHint = Math.Max(58f, Math.Min(220f, ("[" + p.Label + "]").Length * 4.4f));
                     var rowKey = (int)Math.Round(p.Y / 6f);
                     var x = p.X;
+                    var y = p.Y;
+                    List<(float X, float W)> rowSlots;
 
-                    if (!slotsByRow.TryGetValue(rowKey, out var rowSlots))
+                    while (true)
                     {
-                        rowSlots = new List<(float X, float W)>();
-                        slotsByRow[rowKey] = rowSlots;
-                    }
-                    else
-                    {
-                        foreach (var slot in rowSlots.OrderBy(s => s.X))
+                        if (!slotsByRow.TryGetValue(rowKey, out rowSlots))
                         {
-                            var minX = slot.X + slot.W + 6f;
-                            if (x < minX && x + widthHint > slot.X - 3f)
-                                x = minX;
+                            rowSlots = new List<(float X, float W)>();
+                            slotsByRow[rowKey] = rowSlots;
+                            break;
                         }
+
+                        var overlaps = rowSlots.Any(slot =>
+                            x < slot.X + slot.W + 3f &&
+                            x + widthHint > slot.X - 3f);
+
+                        if (!overlaps)
+                            break;
+
+                        // Se houver colisão horizontal na mesma linha, desce uma linha visual.
+                        rowKey -= 2;
+                        y -= 12f;
                     }
 
                     rowSlots.Add((x, widthHint));
@@ -457,7 +466,7 @@ namespace Obj.Commands
                         Label = p.Label,
                         MatchedText = p.MatchedText,
                         X = x,
-                        Y = p.Y,
+                        Y = y,
                         Height = p.Height
                     });
                 }
@@ -482,14 +491,47 @@ namespace Obj.Commands
                 using var canvas = new Canvas(pdfCanvas, size);
                 canvas.SetFont(font).SetFontSize(8).SetFontColor(textColor);
 
+                if (renderMode == RenderMode.Masked && profile.RenderText.MaskedSequence.Count > 0)
+                {
+                    if (pageNum == 1)
+                        DrawMaskedSequence(canvas, size, profile.RenderText.MaskedSequence);
+                    continue;
+                }
+
                 foreach (var anchor in placements.Where(p => p.Page == pageNum))
                 {
                     var text = ResolveAnchorRenderText(anchor, renderMode, profile);
-                    var widthHint = Math.Max(32f, Math.Min(280f, text.Length * 4.8f));
+                    var widthHint = Math.Max(32f, text.Length * 4.8f);
+                    var maxWidth = Math.Max(32f, size.GetWidth() - 20f);
+                    if (widthHint > maxWidth)
+                        widthHint = maxWidth;
                     var x = Clamp(anchor.X, 10f, size.GetWidth() - widthHint - 10f);
                     var y = Clamp(anchor.Y, 10f, size.GetHeight() - 14f);
                     canvas.ShowTextAligned(text, x, y + 0.5f, TextAlignment.LEFT, VerticalAlignment.BOTTOM, 0f);
                 }
+            }
+        }
+
+        private static void DrawMaskedSequence(Canvas canvas, iText.Kernel.Geom.Rectangle pageSize, IReadOnlyList<string> lines)
+        {
+            var x = 36f;
+            var y = pageSize.GetHeight() - 90f;
+            const float lineHeight = 12f;
+
+            foreach (var raw in lines)
+            {
+                if (y < 24f)
+                    break;
+
+                var line = raw ?? "";
+                if (line.Length == 0)
+                {
+                    y -= lineHeight;
+                    continue;
+                }
+
+                canvas.ShowTextAligned(line, x, y, TextAlignment.LEFT, VerticalAlignment.BOTTOM, 0f);
+                y -= lineHeight;
             }
         }
 
@@ -605,6 +647,9 @@ namespace Obj.Commands
                 profile.RenderText.Placeholder = NormalizeMap(profile.RenderText.Placeholder);
                 profile.RenderText.AnchorPhrase = NormalizeMap(profile.RenderText.AnchorPhrase);
                 profile.RenderText.Masked = NormalizeMap(profile.RenderText.Masked);
+                profile.RenderText.MaskedSequence = (profile.RenderText.MaskedSequence ?? new List<string>())
+                    .Select(v => v ?? "")
+                    .ToList();
                 profile.AnchorRules = profile.AnchorRules
                     .Where(v => !string.IsNullOrWhiteSpace(v.Label))
                     .Select(v => new AnchorRule
@@ -681,6 +726,8 @@ namespace Obj.Commands
 
         private static float Clamp(float value, float min, float max)
         {
+            if (max < min)
+                max = min;
             if (value < min) return min;
             if (value > max) return max;
             return value;

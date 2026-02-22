@@ -58,7 +58,7 @@ namespace Obj.OperCli
                 string.Equals(mode, "align-despacho", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsalign", args);
-                ObjectsTextOpsAlign.Execute(ForceDoc(rest, "despacho"));
+                ObjectsTextOpsAlign.Execute(ForceDocAndTypedModel(rest, "despacho", "@M-DESP"));
                 return ResolveProcessExitCode();
             }
 
@@ -66,7 +66,7 @@ namespace Obj.OperCli
                 string.Equals(mode, "align-certidao", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsalign", args);
-                ObjectsTextOpsAlign.Execute(ForceDoc(rest, "certidao_conselho"));
+                ObjectsTextOpsAlign.Execute(ForceDocAndTypedModel(rest, "certidao_conselho", "@M-CER"));
                 return ResolveProcessExitCode();
             }
 
@@ -74,7 +74,7 @@ namespace Obj.OperCli
                 string.Equals(mode, "align-requerimento", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsalign", args);
-                ObjectsTextOpsAlign.Execute(ForceDoc(rest, "requerimento_honorarios"));
+                ObjectsTextOpsAlign.Execute(ForceDocAndTypedModel(rest, "requerimento_honorarios", "@M-REQ"));
                 return ResolveProcessExitCode();
             }
 
@@ -88,21 +88,21 @@ namespace Obj.OperCli
             if (string.Equals(mode, "textopsvar-despacho", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsvar", args);
-                ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "despacho"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
+                ObjectsTextOpsAlign.ExecuteWithMode(ForceDocAndTypedModel(rest, "despacho", "@M-DESP"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
                 return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsvar-certidao", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsvar", args);
-                ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "certidao_conselho"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
+                ObjectsTextOpsAlign.ExecuteWithMode(ForceDocAndTypedModel(rest, "certidao_conselho", "@M-CER"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
                 return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsvar-requerimento", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsvar", args);
-                ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "requerimento_honorarios"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
+                ObjectsTextOpsAlign.ExecuteWithMode(ForceDocAndTypedModel(rest, "requerimento_honorarios", "@M-REQ"), ObjectsTextOpsAlign.OutputMode.VariablesOnly);
                 return ResolveProcessExitCode();
             }
 
@@ -116,21 +116,21 @@ namespace Obj.OperCli
             if (string.Equals(mode, "textopsfixed-despacho", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsfixed", args);
-                ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "despacho"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
+                ObjectsTextOpsAlign.ExecuteWithMode(ForceDocAndTypedModel(rest, "despacho", "@M-DESP"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
                 return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsfixed-certidao", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsfixed", args);
-                ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "certidao_conselho"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
+                ObjectsTextOpsAlign.ExecuteWithMode(ForceDocAndTypedModel(rest, "certidao_conselho", "@M-CER"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
                 return ResolveProcessExitCode();
             }
 
             if (string.Equals(mode, "textopsfixed-requerimento", StringComparison.OrdinalIgnoreCase))
             {
                 PrintCodePreviewIfNeeded("textopsfixed", args);
-                ObjectsTextOpsAlign.ExecuteWithMode(ForceDoc(rest, "requerimento_honorarios"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
+                ObjectsTextOpsAlign.ExecuteWithMode(ForceDocAndTypedModel(rest, "requerimento_honorarios", "@M-REQ"), ObjectsTextOpsAlign.OutputMode.FixedOnly);
                 return ResolveProcessExitCode();
             }
 
@@ -420,6 +420,104 @@ namespace Obj.OperCli
             result.Add("--doc");
             result.Add(forcedDoc);
             return result.ToArray();
+        }
+
+        private static string[] ForceDocAndTypedModel(string[] args, string forcedDoc, string typedModelAlias)
+        {
+            var stripped = StripDocArgs(args);
+            var passthrough = new List<string>(stripped.Length + 4);
+            var inputTokens = new List<string>();
+
+            for (var i = 0; i < stripped.Length; i++)
+            {
+                var arg = stripped[i] ?? "";
+                if (arg.Equals("--inputs", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i + 1 < stripped.Length)
+                    {
+                        AddInputTokens(stripped[++i], inputTokens);
+                    }
+                    continue;
+                }
+
+                if (arg.StartsWith("--inputs=", StringComparison.OrdinalIgnoreCase))
+                {
+                    var split = arg.Split('=', 2);
+                    AddInputTokens(split.Length == 2 ? split[1] : "", inputTokens);
+                    continue;
+                }
+
+                passthrough.Add(arg);
+            }
+
+            NormalizeTypedModelTokens(inputTokens, typedModelAlias);
+
+            var result = new List<string>(passthrough.Count + (inputTokens.Count * 2) + 4);
+            foreach (var token in inputTokens)
+            {
+                result.Add("--inputs");
+                result.Add(token);
+            }
+            result.AddRange(passthrough);
+            result.Add("--doc");
+            result.Add(forcedDoc);
+            return result.ToArray();
+        }
+
+        private static void AddInputTokens(string? raw, List<string> inputTokens)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return;
+
+            foreach (var part in raw.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                var token = part.Trim();
+                if (token.Length == 0)
+                    continue;
+                inputTokens.Add(token);
+            }
+        }
+
+        private static void NormalizeTypedModelTokens(List<string> inputTokens, string typedModelAlias)
+        {
+            for (var i = 0; i < inputTokens.Count; i++)
+            {
+                if (IsGlobalModelAliasToken(inputTokens[i]))
+                    inputTokens[i] = typedModelAlias;
+            }
+
+            if (inputTokens.Count == 0)
+            {
+                inputTokens.Add(typedModelAlias);
+                return;
+            }
+
+            if (inputTokens.Count == 1)
+            {
+                var only = inputTokens[0];
+                if (IsAnyTypedModelAliasToken(only))
+                {
+                    inputTokens[0] = typedModelAlias;
+                }
+                else
+                {
+                    inputTokens.Insert(0, typedModelAlias);
+                }
+                return;
+            }
+
+            inputTokens[0] = typedModelAlias;
+        }
+
+        private static bool IsGlobalModelAliasToken(string? token)
+        {
+            return string.Equals((token ?? "").Trim(), "@MODEL", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsAnyTypedModelAliasToken(string? token)
+        {
+            var t = (token ?? "").Trim();
+            return t.StartsWith("@M-", StringComparison.OrdinalIgnoreCase);
         }
 
         private static string[] StripDocArgs(string[] args)

@@ -201,13 +201,7 @@ namespace Obj.Utils
             if (!string.Equals(aliasResolved, v, StringComparison.Ordinal))
                 return aliasResolved;
 
-            if (!v.Equals("@MODEL", StringComparison.OrdinalIgnoreCase))
-                return value;
-
-            var envValue = Environment.GetEnvironmentVariable("OBJPDF_MODEL");
-            if (!string.IsNullOrWhiteSpace(envValue))
-                return envValue;
-
+            // Alias global @MODEL foi desativado. Use somente aliases tipados (@M-DESP/@M-CER/@M-REQ).
             return value;
         }
 
@@ -258,8 +252,11 @@ namespace Obj.Utils
                 if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir))
                     continue;
                 foreach (var file in Directory.EnumerateFiles(dir, "*.pdf", SearchOption.AllDirectories)
-                    .OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
+                    .OrderBy(GetTypedAliasPdfPriority)
+                    .ThenBy(p => p, StringComparer.OrdinalIgnoreCase))
                 {
+                    if (IsExcludedTypedAliasPdf(file))
+                        continue;
                     if (!IsValidPdfFile(file))
                         continue;
                     if (seen.Add(file))
@@ -268,6 +265,56 @@ namespace Obj.Utils
             }
 
             return files;
+        }
+
+        private static int GetTypedAliasPdfPriority(string path)
+        {
+            var name = (Path.GetFileName(path) ?? "").ToLowerInvariant();
+            var priority = 0;
+
+            // Keep canonical model names first, and push maintenance artifacts to the end.
+            if (name.EndsWith("_model.pdf", StringComparison.Ordinal) ||
+                name.EndsWith("-model.pdf", StringComparison.Ordinal) ||
+                name.EndsWith("model.pdf", StringComparison.Ordinal))
+            {
+                priority -= 20;
+            }
+
+            if (name.EndsWith(".masked.pdf", StringComparison.Ordinal))
+                priority += 300;
+
+            if (name.EndsWith(".backup.pdf", StringComparison.Ordinal))
+                priority += 400;
+
+            if (name.Contains(".tmp.", StringComparison.Ordinal) ||
+                name.StartsWith("tmp", StringComparison.Ordinal) ||
+                name.Contains("draft", StringComparison.Ordinal))
+            {
+                priority += 500;
+            }
+
+            return priority;
+        }
+
+        private static bool IsExcludedTypedAliasPdf(string path)
+        {
+            var name = (Path.GetFileName(path) ?? "").ToLowerInvariant();
+            if (name.Length == 0)
+                return false;
+
+            // Arquivos de manutenção não participam da seleção automática por alias.
+            if (name.EndsWith(".masked.pdf", StringComparison.Ordinal))
+                return true;
+            if (name.EndsWith(".backup.pdf", StringComparison.Ordinal))
+                return true;
+            if (name.Contains(".tmp.", StringComparison.Ordinal))
+                return true;
+            if (name.StartsWith("tmp", StringComparison.Ordinal))
+                return true;
+            if (name.Contains("draft", StringComparison.Ordinal))
+                return true;
+
+            return false;
         }
 
         private static IEnumerable<string> ResolveTypedModelDirs(ModelAliasKind kind)
