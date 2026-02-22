@@ -2322,6 +2322,68 @@ namespace Obj.Commands
                 && range.EndOp <= 0;
         }
 
+        private static bool HasUsableRange(ObjectsTextOpsDiff.AlignDebugRange? range)
+        {
+            return range != null
+                && range.HasValue
+                && range.StartOp > 0
+                && range.EndOp >= range.StartOp;
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugRange BuildFullRangeFromBlocks(List<ObjectsTextOpsDiff.AlignDebugBlock>? blocks)
+        {
+            if (blocks == null || blocks.Count == 0)
+            {
+                return new ObjectsTextOpsDiff.AlignDebugRange
+                {
+                    StartOp = 0,
+                    EndOp = 0,
+                    HasValue = false
+                };
+            }
+
+            var valid = blocks
+                .Where(b => b != null && b.StartOp > 0 && b.EndOp >= b.StartOp)
+                .ToList();
+            if (valid.Count == 0)
+            {
+                return new ObjectsTextOpsDiff.AlignDebugRange
+                {
+                    StartOp = 0,
+                    EndOp = 0,
+                    HasValue = false
+                };
+            }
+
+            return new ObjectsTextOpsDiff.AlignDebugRange
+            {
+                StartOp = valid.Min(b => b.StartOp),
+                EndOp = valid.Max(b => b.EndOp),
+                HasValue = true
+            };
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugRange ResolveRangeForParser(
+            ObjectsTextOpsDiff.AlignDebugRange? current,
+            IEnumerable<ObjectsTextOpsDiff.AlignDebugPair>? anchors,
+            bool useSideA,
+            List<ObjectsTextOpsDiff.AlignDebugBlock> blocks,
+            int backoff)
+        {
+            if (HasUsableRange(current))
+                return current!;
+
+            var anchorRange = BuildRangeFromPairs(
+                anchors ?? Enumerable.Empty<ObjectsTextOpsDiff.AlignDebugPair>(),
+                useSideA,
+                blocks,
+                backoff);
+            if (HasUsableRange(anchorRange))
+                return anchorRange;
+
+            return BuildFullRangeFromBlocks(blocks);
+        }
+
         private static void ApplyOutputModeToReport(ObjectsTextOpsDiff.AlignDebugReport report, OutputMode outputMode)
         {
             if (report == null || outputMode == OutputMode.All)
@@ -2633,10 +2695,17 @@ namespace Obj.Commands
             out string valueFullA,
             out string valueFullB)
         {
-            valueFullA = BuildValueFullFromBlocks(report.BlocksA, report.RangeA);
-            valueFullB = BuildValueFullFromBlocks(report.BlocksB, report.RangeB);
-            opRangeA = BuildOpRange(report.RangeA);
-            opRangeB = BuildOpRange(report.RangeB);
+            var rangeA = ResolveRangeForParser(report.RangeA, report.Anchors, useSideA: true, report.BlocksA, report.Backoff);
+            var rangeB = ResolveRangeForParser(report.RangeB, report.Anchors, useSideA: false, report.BlocksB, report.Backoff);
+
+            // Persist effective ranges for downstream logs/payloads.
+            report.RangeA = rangeA;
+            report.RangeB = rangeB;
+
+            valueFullA = BuildValueFullFromBlocks(report.BlocksA, rangeA);
+            valueFullB = BuildValueFullFromBlocks(report.BlocksB, rangeB);
+            opRangeA = BuildOpRange(rangeA);
+            opRangeB = BuildOpRange(rangeB);
 
             return ObjectsMapFields.TryExtractFromInlineSegments(
                 mapPath,
@@ -3955,24 +4024,33 @@ namespace Obj.Commands
                 var variableRowsExclusive = new List<(string Field, string Value, string OpRange)>();
                 var alignmentRowsExclusive = new List<(string Field, string Value, string OpRange)>();
                 var nonTextualRows = new List<(string Field, string Value, string OpRange, string Source, string Module, string Reason)>();
+                var forceFixedFallback = outputMode == OutputMode.FixedOnly && fixedRanges.Count == 0;
+                var forceVariableFallback = outputMode == OutputMode.VariablesOnly && variableRanges.Count == 0;
 
                 foreach (var row in allRows.OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase))
                 {
                     if (!row.HasTextualEvidence)
                     {
-                        nonTextualRows.Add((
-                            row.Field,
-                            row.Value,
-                            string.IsNullOrWhiteSpace(row.OpRange) ? "(sem op_range)" : row.OpRange,
-                            string.IsNullOrWhiteSpace(row.Source) ? "(sem source)" : row.Source,
-                            string.IsNullOrWhiteSpace(row.Module) ? "parser" : row.Module,
-                            BuildNonTextualReason(row)));
+                        if (outputMode == OutputMode.All)
+                        {
+                            nonTextualRows.Add((
+                                row.Field,
+                                row.Value,
+                                string.IsNullOrWhiteSpace(row.OpRange) ? "(sem op_range)" : row.OpRange,
+                                string.IsNullOrWhiteSpace(row.Source) ? "(sem source)" : row.Source,
+                                string.IsNullOrWhiteSpace(row.Module) ? "parser" : row.Module,
+                                BuildNonTextualReason(row)));
+                        }
                         continue;
                     }
 
                     var inFixed = InRanges(row, fixedRanges);
                     var inVariable = InRanges(row, variableRanges);
                     var inAlignment = InRanges(row, alignmentRanges);
+                    if (forceFixedFallback)
+                        inFixed = true;
+                    if (forceVariableFallback)
+                        inVariable = true;
                     var isHelperField = outputMode != OutputMode.FixedOnly && helperFields.Contains(row.Field);
                     var printable = (row.Field, row.Value, string.IsNullOrWhiteSpace(row.OpRange) ? "(vazio)" : row.OpRange);
 
@@ -3993,6 +4071,32 @@ namespace Obj.Commands
                         alignmentRowsExclusive.Add(printable);
                         continue;
                     }
+                }
+
+                // Fallback for partial modes when parser values exist but metadata rows are absent.
+                // This keeps diagnostic output useful instead of showing all sections as empty.
+                if (allRows.Count == 0 && valuesNode.ValueKind == JsonValueKind.Object)
+                {
+                    List<(string Field, string Value, string OpRange)> BuildRowsFromValuesNode()
+                    {
+                        var rows = new List<(string Field, string Value, string OpRange)>();
+                        foreach (var prop in valuesNode.EnumerateObject())
+                        {
+                            var value = prop.Value.ValueKind == JsonValueKind.String ? prop.Value.GetString() ?? "" : prop.Value.ToString();
+                            if (string.IsNullOrWhiteSpace(value))
+                                continue;
+                            rows.Add((prop.Name, value, "(sem op_range)"));
+                        }
+                        return rows
+                            .Distinct()
+                            .OrderBy(r => r.Field, StringComparer.OrdinalIgnoreCase)
+                            .ToList();
+                    }
+
+                    if (outputMode == OutputMode.FixedOnly && fixedRowsExclusive.Count == 0)
+                        fixedRowsExclusive = BuildRowsFromValuesNode();
+                    else if (outputMode == OutputMode.VariablesOnly && variableRowsExclusive.Count == 0)
+                        variableRowsExclusive = BuildRowsFromValuesNode();
                 }
 
                 fixedRowsExclusive = fixedRowsExclusive
@@ -4097,7 +4201,15 @@ namespace Obj.Commands
                 PrintFieldSection($"ALINHAMENTO -> CAMPOS (ALVO) [{modeLabel}]", AnsiInfo, alignmentRowsExclusive, alignmentEmptyReason);
 
                 Console.WriteLine(Colorize($"DERIVADOS/AJUSTADOS (SEM EVIDENCIA DIRETA) [{modeLabel}]", AnsiWarn));
-                if (nonTextualRows.Count == 0)
+                if (outputMode != OutputMode.All)
+                {
+                    if (nonTextualRows.Count == 0)
+                        Console.WriteLine($"  {Colorize("omitidos no modo parcial", AnsiSoft)}");
+                    else
+                        Console.WriteLine($"  {Colorize($"omitidos no modo parcial: {nonTextualRows.Count}", AnsiSoft)}");
+                    Console.WriteLine();
+                }
+                else if (nonTextualRows.Count == 0)
                 {
                     Console.WriteLine($"  {Colorize("nenhum campo nesta condição", AnsiSoft)}");
                     Console.WriteLine();
