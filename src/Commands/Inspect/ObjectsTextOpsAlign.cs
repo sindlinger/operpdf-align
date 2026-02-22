@@ -1909,6 +1909,7 @@ namespace Obj.Commands
                         aPath,
                         bPath,
                         docKey,
+                        outputMode: outputMode,
                         verbose: !ReturnUtils.IsEnabled(),
                         maxPipelineStep: runToStep,
                         pipelineContextItems: pipelineContextItems,
@@ -1944,7 +1945,7 @@ namespace Obj.Commands
                         var sideKey = probeUseA ? "pdf_a" : "pdf_b";
                         var effectiveProbeFile = string.IsNullOrWhiteSpace(probeFile) ? (probeUseA ? aPath : bPath) : probeFile;
                         var effectiveProbePage = probePage > 0 ? probePage : (probeUseA ? report.PageA : report.PageB);
-                        var probeValues = ReadValuesForProbe(report.Extraction, sideKey);
+                        var probeValues = ReadValuesForProbe(report.Extraction, sideKey, out var skippedNonTextualProbeFields);
 
                         if (!ReturnUtils.IsEnabled())
                         {
@@ -1957,7 +1958,8 @@ namespace Obj.Commands
                                     ("probe_target_pdf_side", sideKey),
                                     ("probe_file", effectiveProbeFile),
                                     ("probe_page", effectiveProbePage.ToString(CultureInfo.InvariantCulture)),
-                                    ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture)))
+                                    ("probe_fields", probeValues.Count.ToString(CultureInfo.InvariantCulture)),
+                                    ("probe_skipped_non_textual", skippedNonTextualProbeFields.Count.ToString(CultureInfo.InvariantCulture)))
                             );
                         }
 
@@ -1972,6 +1974,11 @@ namespace Obj.Commands
                         var probeStageStatus = string.Equals(probeRawStatus, "ok", StringComparison.OrdinalIgnoreCase) ? "ok" : "fail";
                         if (!probePayload.ContainsKey("reason"))
                             probePayload["reason"] = probeStageStatus == "ok" ? "executed" : (string.IsNullOrWhiteSpace(probeRawStatus) ? "probe_failed" : probeRawStatus);
+                        if (skippedNonTextualProbeFields.Count > 0)
+                        {
+                            probePayload["skipped_non_textual_count"] = skippedNonTextualProbeFields.Count;
+                            probePayload["skipped_non_textual_fields"] = skippedNonTextualProbeFields;
+                        }
 
                         AttachProbeToExtraction(report.Extraction, probePayload);
                         deferredProbePayload = probePayload;
@@ -2307,6 +2314,14 @@ namespace Obj.Commands
             };
         }
 
+        private static bool IsExplicitEmptyRange(ObjectsTextOpsDiff.AlignDebugRange? range)
+        {
+            return range != null
+                && range.HasValue
+                && range.StartOp <= 0
+                && range.EndOp <= 0;
+        }
+
         private static void ApplyOutputModeToReport(ObjectsTextOpsDiff.AlignDebugReport report, OutputMode outputMode)
         {
             if (report == null || outputMode == OutputMode.All)
@@ -2327,8 +2342,18 @@ namespace Obj.Commands
                 report.FixedPairs.Clear();
             }
 
-            report.RangeA = BuildRangeFromPairs(report.Alignments, useSideA: true, report.BlocksA, report.Backoff);
-            report.RangeB = BuildRangeFromPairs(report.Alignments, useSideA: false, report.BlocksB, report.Backoff);
+            var rangeA = BuildRangeFromPairs(report.Alignments, useSideA: true, report.BlocksA, report.Backoff);
+            var rangeB = BuildRangeFromPairs(report.Alignments, useSideA: false, report.BlocksB, report.Backoff);
+
+            // In partial output modes (fixed/variables), keep extraction payload usable.
+            // If selected pairs are empty but anchors exist, use anchor span as crop range.
+            if (IsExplicitEmptyRange(rangeA) && report.Anchors.Count > 0)
+                rangeA = BuildRangeFromPairs(report.Anchors, useSideA: true, report.BlocksA, report.Backoff);
+            if (IsExplicitEmptyRange(rangeB) && report.Anchors.Count > 0)
+                rangeB = BuildRangeFromPairs(report.Anchors, useSideA: false, report.BlocksB, report.Backoff);
+
+            report.RangeA = rangeA;
+            report.RangeB = rangeB;
         }
 
         private static string BuildOpRange(ObjectsTextOpsDiff.AlignDebugRange range)
@@ -2586,12 +2611,13 @@ namespace Obj.Commands
             string aPath,
             string bPath,
             string docKey,
+            OutputMode outputMode = OutputMode.All,
             bool verbose = false,
             int maxPipelineStep = PipelineLastStep,
             IReadOnlyList<(string Key, string Value)>? pipelineContextItems = null,
             Action<int, string, string, Dictionary<string, object>>? onStepOutput = null)
         {
-            return BuildExtractionPayload(report, null, aPath, bPath, docKey, verbose, maxPipelineStep, pipelineContextItems, onStepOutput);
+            return BuildExtractionPayload(report, null, aPath, bPath, docKey, outputMode, verbose, maxPipelineStep, pipelineContextItems, onStepOutput);
         }
 
         private static bool TryParseBandReport(
@@ -2658,6 +2684,7 @@ namespace Obj.Commands
             string aPath,
             string bPath,
             string docKey,
+            OutputMode outputMode = OutputMode.All,
             bool verbose = false,
             int maxPipelineStep = PipelineLastStep,
             IReadOnlyList<(string Key, string Value)>? pipelineContextItems = null,
@@ -2820,8 +2847,6 @@ namespace Obj.Commands
             };
             onStepOutput?.Invoke(3, "yaml_parser_fields", "ok", step3Payload);
 
-            var beforeHonorariosA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
-            var beforeHonorariosB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
             var trackedFields = new[]
             {
                 "PROCESSO_ADMINISTRATIVO",
@@ -2839,6 +2864,58 @@ namespace Obj.Commands
                 "FATOR",
                 "VALOR_TABELADO_ANEXO_I"
             };
+
+            // Partial output modes are diagnostic views (fixed-only/var-only). If no pair was selected
+            // for the requested mode, skip downstream semantic modules to avoid false negatives.
+            if (outputMode != OutputMode.All && report.Alignments.Count == 0)
+            {
+                var modeSkipReason = outputMode == OutputMode.FixedOnly
+                    ? "output_mode_fixed_without_pairs"
+                    : "output_mode_variables_without_pairs";
+                var modeSkipLabel = outputMode == OutputMode.FixedOnly ? "fixed-only" : "variables-only";
+
+                if (verbose)
+                {
+                    PrintPipelineStep(
+                        "etapa 4/8 - honorários (skip)",
+                        "etapa 8/8 - persistência e resumo",
+                        WithPipelineContext(
+                            effectivePipelineContext,
+                            ("modulo", "Obj.Honorarios.HonorariosFacade + Obj.ValidationCore.ValidationRepairer + Obj.ValidatorModule.ValidatorFacade"),
+                            ("reason", modeSkipReason),
+                            ("output_mode", modeSkipLabel),
+                            ("detail", "sem pares selecionados no modo parcial"))
+                    );
+                }
+
+                var skippedHonorarios = BuildSkippedModulePayload("Obj.Honorarios.HonorariosFacade", modeSkipReason);
+                var skippedRepairer = BuildSkippedModulePayload("Obj.ValidationCore.ValidationRepairer", modeSkipReason);
+                var skippedValidator = BuildSkippedModulePayload("Obj.ValidatorModule.ValidatorFacade", modeSkipReason);
+
+                onStepOutput?.Invoke(4, "honorarios", "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["module"] = "Obj.Honorarios.HonorariosFacade",
+                    ["reason"] = modeSkipReason,
+                    ["output_mode"] = modeSkipLabel
+                });
+                onStepOutput?.Invoke(5, "repairer", "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["module"] = "Obj.ValidationCore.ValidationRepairer",
+                    ["reason"] = modeSkipReason,
+                    ["output_mode"] = modeSkipLabel
+                });
+                onStepOutput?.Invoke(6, "validator", "skipped", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["module"] = "Obj.ValidatorModule.ValidatorFacade",
+                    ["reason"] = modeSkipReason,
+                    ["output_mode"] = modeSkipLabel
+                });
+
+                return BuildExtractionResult(6, skippedHonorarios, skippedRepairer, skippedValidator, null, null);
+            }
+
+            var beforeHonorariosA = new Dictionary<string, string>(valuesA, StringComparer.OrdinalIgnoreCase);
+            var beforeHonorariosB = new Dictionary<string, string>(valuesB, StringComparer.OrdinalIgnoreCase);
 
             Dictionary<string, object> BuildExtractionResult(
                 int executedUntilStep,
@@ -3070,6 +3147,17 @@ namespace Obj.Commands
             if (!string.IsNullOrWhiteSpace(repairB.Reason))
                 repairReasonParts.Add($"B:{repairB.Reason}");
             var repairPairReason = repairReasonParts.Count == 0 ? "executed" : string.Join(" | ", repairReasonParts);
+            var repairOk = string.Equals(extractionScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase)
+                ? repairA.Ok
+                : string.Equals(extractionScope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase)
+                    ? repairB.Ok
+                    : repairA.Ok && repairB.Ok;
+            var repairReason = string.Equals(extractionScope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase)
+                ? (repairA.Reason ?? "")
+                : string.Equals(extractionScope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase)
+                    ? (repairB.Reason ?? "")
+                    : repairPairReason;
+            var repairReasonEffective = string.IsNullOrWhiteSpace(repairReason) ? "executed" : repairReason;
 
             if (verbose)
             {
@@ -3096,12 +3184,14 @@ namespace Obj.Commands
             {
                 ["enabled"] = true,
                 ["module"] = "Obj.ValidationCore.ValidationRepairer",
-                ["status"] = repairA.Ok && repairB.Ok ? "ok" : "fail",
-                ["reason"] = repairPairReason,
+                ["status"] = repairOk ? "ok" : "fail",
+                ["reason"] = repairReasonEffective,
+                ["ok"] = repairOk,
                 ["apply_a"] = repairA.Applied,
                 ["apply_b"] = repairB.Applied,
                 ["ok_a"] = repairA.Ok,
                 ["ok_b"] = repairB.Ok,
+                ["reason_pair"] = repairPairReason,
                 ["reason_a"] = repairA.Reason,
                 ["reason_b"] = repairB.Reason,
                 ["changed_a"] = repairA.ChangedFields,
@@ -3109,18 +3199,20 @@ namespace Obj.Commands
                 ["legacy_mirror_a"] = repairA.LegacyMirrorMatchesCore,
                 ["legacy_mirror_b"] = repairB.LegacyMirrorMatchesCore
             };
-            onStepOutput?.Invoke(5, "repairer", repairA.Ok && repairB.Ok ? "ok" : "fail", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            onStepOutput?.Invoke(5, "repairer", repairOk ? "ok" : "fail", new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["module"] = "Obj.ValidationCore.ValidationRepairer",
                 ["scope"] = extractionScope,
                 ["target_side"] = targetSide,
+                ["ok"] = repairOk,
                 ["repair_apply_a"] = repairA.Applied,
                 ["repair_apply_b"] = repairB.Applied,
                 ["repair_ok_a"] = repairA.Ok,
                 ["repair_ok_b"] = repairB.Ok,
                 ["repair_reason_a"] = repairA.Reason ?? "",
                 ["repair_reason_b"] = repairB.Reason ?? "",
-                ["reason"] = repairPairReason
+                ["reason"] = repairReasonEffective,
+                ["reason_pair"] = repairPairReason
             });
             if (stepLimit <= 5)
             {
@@ -3214,9 +3306,10 @@ namespace Obj.Commands
             return BuildExtractionResult(6, honorariosPayload, repairerPayload, validatorPayload, honorariosA?.DerivedValues, honorariosB?.DerivedValues);
         }
 
-        private static Dictionary<string, string> ReadValuesForProbe(object? extraction, string sideKey)
+        private static Dictionary<string, string> ReadValuesForProbe(object? extraction, string sideKey, out List<string> skippedNonTextualFields)
         {
             var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            skippedNonTextualFields = new List<string>();
             if (extraction == null)
                 return values;
 
@@ -3229,6 +3322,22 @@ namespace Obj.Commands
                 if (!parsed.TryGetProperty(sideKey, out var side) || side.ValueKind != JsonValueKind.Object)
                     return values;
 
+                var nonTextualFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                JsonElement fieldsEl;
+                var hasFields = side.TryGetProperty("fields", out fieldsEl) || side.TryGetProperty("Fields", out fieldsEl);
+                if (hasFields && fieldsEl.ValueKind == JsonValueKind.Object)
+                {
+                    foreach (var fieldProp in fieldsEl.EnumerateObject())
+                    {
+                        if (fieldProp.Value.ValueKind != JsonValueKind.Object)
+                            continue;
+                        if (!TryGetFieldString(fieldProp.Value, "source", out var source))
+                            continue;
+                        if (source.IndexOf("derived", StringComparison.OrdinalIgnoreCase) >= 0)
+                            nonTextualFields.Add(fieldProp.Name);
+                    }
+                }
+
                 JsonElement valuesEl;
                 var hasValues = side.TryGetProperty("values", out valuesEl) || side.TryGetProperty("Values", out valuesEl);
                 if (!hasValues || valuesEl.ValueKind != JsonValueKind.Object)
@@ -3239,6 +3348,11 @@ namespace Obj.Commands
                     var value = prop.Value.ValueKind == JsonValueKind.String
                         ? (prop.Value.GetString() ?? "")
                         : prop.Value.ToString();
+                    if (nonTextualFields.Contains(prop.Name))
+                    {
+                        skippedNonTextualFields.Add(prop.Name);
+                        continue;
+                    }
                     values[prop.Name] = value ?? "";
                 }
             }
@@ -3248,6 +3362,23 @@ namespace Obj.Commands
             }
 
             return values;
+        }
+
+        private static bool TryGetFieldString(JsonElement obj, string key, out string value)
+        {
+            value = "";
+            if (obj.ValueKind != JsonValueKind.Object || string.IsNullOrWhiteSpace(key))
+                return false;
+
+            JsonElement valueEl;
+            var has = obj.TryGetProperty(key, out valueEl)
+                || obj.TryGetProperty(char.ToUpperInvariant(key[0]) + key.Substring(1), out valueEl)
+                || obj.TryGetProperty(key.ToUpperInvariant(), out valueEl);
+            if (!has)
+                return false;
+
+            value = valueEl.ValueKind == JsonValueKind.String ? valueEl.GetString() ?? "" : valueEl.ToString();
+            return true;
         }
 
         private static void AttachProbeToExtraction(object? extraction, Dictionary<string, object> probePayload)
@@ -3296,11 +3427,14 @@ namespace Obj.Commands
                 var checkedFields = probePayload.TryGetValue("fields_checked", out var checkedObj) ? checkedObj?.ToString() ?? "0" : "0";
                 var found = probePayload.TryGetValue("found", out var foundObj) ? foundObj?.ToString() ?? "0" : "0";
                 var missing = probePayload.TryGetValue("missing", out var missingObj) ? missingObj?.ToString() ?? "0" : "0";
+                var skippedNonTextual = probePayload.TryGetValue("skipped_non_textual_count", out var skippedObj) ? skippedObj?.ToString() ?? "0" : "0";
                 var ok = string.Equals(status, "ok", StringComparison.OrdinalIgnoreCase);
 
                 Console.WriteLine(Colorize(
                     $"[PROBE] {(ok ? "OK" : "FAIL")} side={side} file={Path.GetFileName(pdf)} page={page} found={found}/{checkedFields} missing={missing}",
                     ok ? AnsiOk : AnsiErr));
+                if (!string.Equals(skippedNonTextual, "0", StringComparison.Ordinal))
+                    Console.WriteLine($"  {Colorize("non_textual_skipped:", AnsiWarn)} {Colorize(skippedNonTextual, AnsiSoft)}");
 
                 if (probePayload.TryGetValue("items", out var itemsObj) && itemsObj is List<Dictionary<string, object>> items)
                 {
@@ -3444,6 +3578,19 @@ namespace Obj.Commands
 
                 if (root.TryGetProperty("validator", out var validator))
                 {
+                    var validatorStatus = validator.TryGetProperty("status", out var validatorStatusEl)
+                        ? (validatorStatusEl.GetString() ?? "")
+                        : "";
+                    var validatorStatusNorm = validatorStatus.Trim().ToLowerInvariant();
+                    if (validatorStatusNorm == "skipped")
+                    {
+                        var skipReason = validator.TryGetProperty("reason", out var skipReasonEl) ? skipReasonEl.GetString() ?? "" : "";
+                        Console.WriteLine(Colorize("[VALIDATOR]", AnsiSoft));
+                        Console.WriteLine($"  {Colorize("effective:", AnsiWarn)} {Colorize("skipped", AnsiSoft)} reason=\"{(string.IsNullOrWhiteSpace(skipReason) ? "(n/a)" : skipReason)}\"");
+                        Console.WriteLine();
+                        return;
+                    }
+
                     var vOk = validator.TryGetProperty("ok", out var vOkEl) && vOkEl.ValueKind == JsonValueKind.True;
                     var okPair = validator.TryGetProperty("ok_pair", out var okPairEl) && okPairEl.ValueKind == JsonValueKind.True;
                     var okA = validator.TryGetProperty("ok_a", out var okAEl) && okAEl.ValueKind == JsonValueKind.True;
@@ -3453,11 +3600,20 @@ namespace Obj.Commands
                     var reasonA = validator.TryGetProperty("reason_a", out var reasonAEl) ? reasonAEl.GetString() ?? "" : "";
                     var reasonB = validator.TryGetProperty("reason_b", out var reasonBEl) ? reasonBEl.GetString() ?? "" : "";
                     var color = vOk ? AnsiOk : AnsiErr;
+                    var pairReferenceOnly = string.Equals(scope, "target_b_only(model_a_reference)", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(scope, "target_a_only(model_b_reference)", StringComparison.OrdinalIgnoreCase);
+                    var pairLabel = pairReferenceOnly ? "reference_only" : (okPair ? "ok" : "fail");
+                    var pairColor = pairReferenceOnly ? AnsiSoft : (okPair ? AnsiOk : AnsiErr);
+                    var pairReasonDisplay = pairReferenceOnly
+                        ? (string.IsNullOrWhiteSpace(reasonPair)
+                            ? "reference_only:pair_non_gating_for_target_scope"
+                            : $"reference_only:{reasonPair}")
+                        : (string.IsNullOrWhiteSpace(reasonPair) ? "(ok)" : reasonPair);
                     Console.WriteLine(Colorize("[VALIDATOR]", color));
                     Console.WriteLine($"  {Colorize("scope:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(scope) ? "(n/a)" : scope, AnsiSoft)}");
                     Console.WriteLine($"  {Colorize("target_side:", AnsiWarn)} {Colorize(string.IsNullOrWhiteSpace(targetSide) ? "(n/a)" : targetSide, AnsiSoft)}");
                     Console.WriteLine($"  {Colorize("effective:", AnsiWarn)} {Colorize(vOk ? "ok" : "fail", color)} reason=\"{(string.IsNullOrWhiteSpace(reason) ? "(ok)" : reason)}\"");
-                    Console.WriteLine($"  {Colorize("pair:", AnsiWarn)} {Colorize(okPair ? "ok" : "fail", okPair ? AnsiOk : AnsiErr)} reason=\"{(string.IsNullOrWhiteSpace(reasonPair) ? "(ok)" : reasonPair)}\"");
+                    Console.WriteLine($"  {Colorize("pair:", AnsiWarn)} {Colorize(pairLabel, pairColor)} reason=\"{pairReasonDisplay}\"");
                     Console.WriteLine($"  {Colorize("pdf_a:", AnsiWarn)} {Colorize(okA ? "ok" : "fail", okA ? AnsiOk : AnsiErr)} reason=\"{(string.IsNullOrWhiteSpace(reasonA) ? "(ok)" : reasonA)}\"");
                     Console.WriteLine($"  {Colorize("pdf_b:", AnsiWarn)} {Colorize(okB ? "ok" : "fail", okB ? AnsiOk : AnsiErr)} reason=\"{(string.IsNullOrWhiteSpace(reasonB) ? "(ok)" : reasonB)}\"");
                 }

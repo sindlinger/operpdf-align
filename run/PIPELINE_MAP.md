@@ -244,3 +244,48 @@ Campos principais:
 - request: `sequence`, `command`, `module`, `forced_doc`, `typed_model_alias`, `args`, `started_utc`
 - response: `exit_code`, `duration_ms`, `stdout_path`, `stderr_path`, `stdout_len`, `stderr_len`
 
+---
+
+## 7) Artefatos de alinhamento (quem escreve, quem lê, e estado atual)
+
+### 7.1 Quem escreve `alignrange`/`textops_align`
+- `src/Commands/Inspect/ObjectsTextOpsAlign.cs:2041`
+  - grava `outputs/align_ranges/<prefix>__textops_align.json` (modo `textopsalign`/`OutputMode.All`).
+- `src/Commands/Inspect/ValidationPipeline/AlignRangeStage.cs:489`
+  - grava `outputs/align_ranges/<base>__textops_align.json`.
+- `src/Commands/Inspect/ValidationPipeline/PatternStage.cs:302`
+  - gera saída alinhada em `outputs/align_ranges/...__textops_align.json`.
+
+### 7.2 Quem lê `alignrange` por arquivo
+- `src/Commands/Inspect/ObjectsMapFields.cs:21`
+  - comando `mapfields` lê `--alignrange <arquivo>` + `--map <yaml>` e extrai campos.
+- `src/Commands/Inspect/ValidationPipeline/AlignRangeStage.cs:499`
+  - chama `mapfields` com arquivo de alignrange quando o estágio pede parse por arquivo.
+
+### 7.3 Fluxo usado hoje no `textopsalign-*` (pipeline principal)
+- `src/Commands/Inspect/ObjectsTextOpsAlign.cs:2623`
+  - usa `ObjectsMapFields.TryExtractFromInlineSegments(...)`.
+- Isso consome **direto da memória** (`value_full/op_range` do `AlignDebugReport`) sem depender de arquivo intermediário.
+
+### 7.4 Motivo da troca para inline no pipeline principal
+- Eliminar dependência de ordem de gravação/leitura em disco.
+- Reduzir risco de corrida/colisão de arquivo quando há execução orquestrada.
+- Permitir rastreio por etapa em memória (`stage payload`) antes da persistência final.
+
+### 7.5 Como “retornar” ao consumo por arquivo (quando necessário)
+- Caminho já existente e suportado:
+  1. Executar `textopsalign-*` para gerar `outputs/align_ranges/...__textops_align.json`.
+  2. Executar `mapfields --alignrange <arquivo> --map <yaml>`.
+- Esse modo **não foi removido**; apenas deixou de ser o caminho default do pipeline principal.
+
+---
+
+## 8) Situação de `objdiff` e `textopsdiff`
+
+- O comando `run` (textopsrun-*) **não** chama `objdiff` legado.
+  - Ele chama exclusivamente `ObjectsTextOpsAlign` em três modos (`align/var/fixed`).
+  - Referência: `cli/OperCli/Program.cs:206`, `cli/OperCli/Program.cs:303`.
+- O núcleo atual de alinhamento textual usado no pipeline é `ObjectsTextOpsDiff.ComputeAlignDebugForSelection`.
+  - Referência: `src/Commands/Inspect/ObjectsTextOpsAlign.cs:1767`.
+- O módulo legado `ObjectsTextOpsDiff.Execute(..., DiffMode.Both)` ainda existe e é usado em partes da `ValidationPipeline` para diagnóstico/recorte.
+  - Referência: `src/Commands/Inspect/ValidationPipeline/FindDespachoStage.cs:612`, `src/Commands/Inspect/ValidationPipeline/FindDespachoStage.cs:693`.

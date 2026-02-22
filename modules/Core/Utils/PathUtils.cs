@@ -286,6 +286,9 @@ namespace Obj.Utils
             if (name.EndsWith(".backup.pdf", StringComparison.Ordinal))
                 priority += 400;
 
+            if (name.Contains("anchor", StringComparison.Ordinal))
+                priority += 450;
+
             if (name.Contains(".tmp.", StringComparison.Ordinal) ||
                 name.StartsWith("tmp", StringComparison.Ordinal) ||
                 name.Contains("draft", StringComparison.Ordinal))
@@ -306,6 +309,8 @@ namespace Obj.Utils
             if (name.EndsWith(".masked.pdf", StringComparison.Ordinal))
                 return true;
             if (name.EndsWith(".backup.pdf", StringComparison.Ordinal))
+                return true;
+            if (name.Contains("anchor", StringComparison.Ordinal))
                 return true;
             if (name.Contains(".tmp.", StringComparison.Ordinal))
                 return true;

@@ -350,11 +350,16 @@ namespace Obj.TjpbDespachoExtractor.Utils
             var m = Regex.Match(r, @"\b(\d{1,2})\s+de\s+([A-Za-z]+)\s+de\s+(\d{4})\b", RegexOptions.IgnoreCase);
             if (m.Success)
             {
-                var day = int.Parse(m.Groups[1].Value);
+                if (!int.TryParse(m.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var day))
+                    return false;
                 var month = MonthFromPortuguese(m.Groups[2].Value);
-                var year = int.Parse(m.Groups[3].Value);
-                if (month >= 1 && month <= 12)
+                if (!int.TryParse(m.Groups[3].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var year))
+                    return false;
+                if (month >= 1 && month <= 12 && day >= 1 && year >= 1)
                 {
+                    var maxDay = DateTime.DaysInMonth(year, month);
+                    if (day > maxDay)
+                        return false;
                     var dt2 = new DateTime(year, month, day);
                     iso = dt2.ToString("yyyy-MM-dd");
                     return true;

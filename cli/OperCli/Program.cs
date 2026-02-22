@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using Obj.Align;
 using Obj.Commands;
 using Obj.DocDetector;
 using Obj.Utils;
@@ -185,7 +186,22 @@ namespace Obj.OperCli
 
         private static int ExecuteOrchestratedRun(string[] rest, string forcedDoc, string typedModelAlias, string docLabel)
         {
-            var normalizedArgs = ForceDocAndTypedModel(rest, forcedDoc, typedModelAlias);
+            var withLegacyObjDiff = false;
+            var filteredRest = new List<string>(rest.Length);
+            for (var i = 0; i < rest.Length; i++)
+            {
+                var arg = (rest[i] ?? "").Trim();
+                if (string.Equals(arg, "--with-objdiff", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(arg, "--objdiff", StringComparison.OrdinalIgnoreCase))
+                {
+                    withLegacyObjDiff = true;
+                    continue;
+                }
+
+                filteredRest.Add(rest[i]);
+            }
+
+            var normalizedArgs = ForceDocAndTypedModel(filteredRest.ToArray(), forcedDoc, typedModelAlias);
             var runDir = Path.Combine(Directory.GetCurrentDirectory(), "run");
             var ioDir = Path.Combine(runDir, "io");
             Directory.CreateDirectory(runDir);
@@ -203,18 +219,23 @@ namespace Obj.OperCli
             Console.WriteLine($"[RUN] sessão: {sessionId}");
             Console.WriteLine($"[RUN] logs: {sessionDir}");
 
-            var steps = new[]
+            var steps = new List<OrchestratedStep>();
+            if (withLegacyObjDiff)
             {
-                new OrchestratedStep("textopsalign-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=All)"),
-                new OrchestratedStep("textopsvar-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=VariablesOnly)"),
-                new OrchestratedStep("textopsfixed-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=FixedOnly)")
-            };
+                steps.Add(new OrchestratedStep(
+                    "objdiff-legacy-" + docLabel,
+                    "Obj.Align.ObjectsTextOpsDiff(DiffMode=Both)"));
+            }
+            steps.Add(new OrchestratedStep("textopsalign-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=All)"));
+            steps.Add(new OrchestratedStep("textopsvar-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=VariablesOnly)"));
+            steps.Add(new OrchestratedStep("textopsfixed-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=FixedOnly)"));
 
             var manifest = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
             {
                 ["session_id"] = sessionId,
                 ["doc"] = forcedDoc,
                 ["model_alias"] = typedModelAlias,
+                ["with_legacy_objdiff"] = withLegacyObjDiff,
                 ["created_utc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
                 ["args"] = normalizedArgs,
                 ["steps"] = new List<Dictionary<string, object>>()
@@ -222,7 +243,7 @@ namespace Obj.OperCli
             var manifestSteps = (List<Dictionary<string, object>>)manifest["steps"];
 
             var hasFailure = false;
-            for (var i = 0; i < steps.Length; i++)
+            for (var i = 0; i < steps.Count; i++)
             {
                 var step = steps[i];
                 var stepNumber = i + 1;
@@ -240,9 +261,9 @@ namespace Obj.OperCli
                 var requestPath = Path.Combine(sessionDir, $"{stepNumber:D2}_{SanitizeFileToken(step.CommandName)}__request.json");
                 File.WriteAllText(requestPath, JsonSerializer.Serialize(request, jsonOptions), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
-                Console.WriteLine($"[RUN] step {stepNumber}/3 -> {step.CommandName}");
+                Console.WriteLine($"[RUN] step {stepNumber}/{steps.Count} -> {step.CommandName}");
                 var stopwatch = Stopwatch.StartNew();
-                var (exitCode, stdout, stderr) = ExecuteOrchestratedStep(step.CommandName, normalizedArgs);
+                var (exitCode, stdout, stderr) = ExecuteOrchestratedStep(step.CommandName, normalizedArgs, forcedDoc);
                 stopwatch.Stop();
 
                 var stdoutPath = Path.Combine(sessionDir, $"{stepNumber:D2}_{SanitizeFileToken(step.CommandName)}__stdout.log");
@@ -300,7 +321,7 @@ namespace Obj.OperCli
             return hasFailure ? 1 : 0;
         }
 
-        private static (int ExitCode, string Stdout, string Stderr) ExecuteOrchestratedStep(string commandName, string[] args)
+        private static (int ExitCode, string Stdout, string Stderr) ExecuteOrchestratedStep(string commandName, string[] args, string forcedDoc)
         {
             var stdoutCapture = new StringWriter(CultureInfo.InvariantCulture);
             var stderrCapture = new StringWriter(CultureInfo.InvariantCulture);
@@ -328,6 +349,19 @@ namespace Obj.OperCli
                 {
                     ObjectsTextOpsAlign.ExecuteWithMode(args, ObjectsTextOpsAlign.OutputMode.FixedOnly);
                 }
+                else if (commandName.StartsWith("objdiff-legacy-", StringComparison.OrdinalIgnoreCase))
+                {
+                    var diffArgs = BuildLegacyObjDiffArgs(args, forcedDoc);
+                    if (diffArgs.Length == 0)
+                    {
+                        Console.Error.WriteLine("Não foi possível montar args do objdiff legado (modelo/alvo ausentes).");
+                        Environment.ExitCode = 2;
+                    }
+                    else
+                    {
+                        ObjectsTextOpsDiff.Execute(diffArgs, ObjectsTextOpsDiff.DiffMode.Both);
+                    }
+                }
                 else
                 {
                     Console.Error.WriteLine($"Comando orquestrado não suportado: {commandName}");
@@ -348,6 +382,39 @@ namespace Obj.OperCli
             }
 
             return (exitCode, stdoutCapture.ToString(), stderrCapture.ToString());
+        }
+
+        private static string[] BuildLegacyObjDiffArgs(string[] args, string forcedDoc)
+        {
+            var inputs = new List<string>();
+            for (var i = 0; i < args.Length; i++)
+            {
+                var arg = (args[i] ?? "").Trim();
+                if (arg.Equals("--inputs", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    AddInputTokens(args[++i], inputs);
+                    continue;
+                }
+
+                if (arg.StartsWith("--inputs=", StringComparison.OrdinalIgnoreCase))
+                {
+                    var split = arg.Split('=', 2);
+                    AddInputTokens(split.Length == 2 ? split[1] : "", inputs);
+                    continue;
+                }
+            }
+
+            if (inputs.Count < 2)
+                return Array.Empty<string>();
+
+            var model = inputs[0];
+            var target = inputs[1];
+            return new[]
+            {
+                "--inputs", $"{model},{target}",
+                "--op", "Tj,TJ",
+                "--doc", forcedDoc
+            };
         }
 
         private static string SanitizeFileToken(string? raw)
@@ -925,7 +992,8 @@ namespace Obj.OperCli
             Console.WriteLine("  operpdf textopsalign-requerimento --inputs :D20 --inputs :Q200");
             Console.WriteLine("  operpdf textopsvar-despacho --inputs :D20 --inputs :Q200");
             Console.WriteLine("  operpdf textopsfixed-despacho --inputs :D20 --inputs :Q200");
-            Console.WriteLine("  operpdf textopsrun-despacho run 1-8 --inputs @MODEL --inputs :Q22");
+            Console.WriteLine("  operpdf textopsrun-despacho run 1-8 --inputs @M-DESP --inputs :Q22");
+            Console.WriteLine("  operpdf textopsrun-despacho run 1-8 --inputs @M-DESP --inputs :Q22 --with-objdiff");
             Console.WriteLine("  operpdf build-anchor-model-despacho --model reference/models/tjpb_despacho_model.pdf --out reference/models/tjpb_despacho_anchor_model.pdf");
             Console.WriteLine("  operpdf build-merged-page --input models/nossos/despacho_p1-2.pdf --page-a 1 --page-b 2 --layout vertical");
             Console.WriteLine("  operpdf build-align-exe");
