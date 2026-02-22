@@ -530,6 +530,301 @@ namespace Obj.Commands
                 Console.WriteLine("Arquivos das etapas salvos em: " + outputDir);
         }
 
+        private sealed class AnchorBridgeRange
+        {
+            public int StartOp { get; set; }
+            public int EndOp { get; set; }
+        }
+
+        private sealed class AnchorBridgeAnchor
+        {
+            public int AStartOp { get; set; }
+            public int AEndOp { get; set; }
+            public int BStartOp { get; set; }
+            public int BEndOp { get; set; }
+            public double Score { get; set; }
+            public string Kind { get; set; } = "";
+        }
+
+        private sealed class AnchorBridgeSnapshot
+        {
+            public string PdfA { get; set; } = "";
+            public string PdfB { get; set; } = "";
+            public int PageA { get; set; }
+            public int PageB { get; set; }
+            public int ObjA { get; set; }
+            public int ObjB { get; set; }
+            public AnchorBridgeRange RangeA { get; set; } = new AnchorBridgeRange();
+            public AnchorBridgeRange RangeB { get; set; } = new AnchorBridgeRange();
+            public int PairCount { get; set; }
+            public int FixedCount { get; set; }
+            public int VariableCount { get; set; }
+            public int GapCount { get; set; }
+            public int AnchorCount { get; set; }
+            public List<AnchorBridgeAnchor> Anchors { get; set; } = new List<AnchorBridgeAnchor>();
+            public string UpdatedUtc { get; set; } = "";
+        }
+
+        private static string ResolveAnchorBridgeFilePath()
+        {
+            var raw = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_ANCHOR_BRIDGE");
+            if (string.IsNullOrWhiteSpace(raw))
+                return "";
+
+            try
+            {
+                return Path.GetFullPath(raw.Trim());
+            }
+            catch
+            {
+                return raw.Trim();
+            }
+        }
+
+        private static bool TryReadAnchorBridgeSnapshot(string path, out AnchorBridgeSnapshot? snapshot)
+        {
+            snapshot = null;
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                return false;
+
+            try
+            {
+                var json = File.ReadAllText(path, Encoding.UTF8);
+                if (string.IsNullOrWhiteSpace(json))
+                    return false;
+                snapshot = JsonSerializer.Deserialize<AnchorBridgeSnapshot>(json);
+                return snapshot != null;
+            }
+            catch
+            {
+                snapshot = null;
+                return false;
+            }
+        }
+
+        private static bool TryWriteAnchorBridgeSnapshot(string path, ObjectsTextOpsDiff.AlignDebugReport report)
+        {
+            if (string.IsNullOrWhiteSpace(path) || report == null)
+                return false;
+
+            try
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path) ?? ".");
+                var anchors = report.Anchors
+                    .Where(a => a.A != null && a.B != null && a.A.StartOp > 0 && a.A.EndOp >= a.A.StartOp && a.B.StartOp > 0 && a.B.EndOp >= a.B.StartOp)
+                    .Select(a => new AnchorBridgeAnchor
+                    {
+                        AStartOp = a.A!.StartOp,
+                        AEndOp = a.A.EndOp,
+                        BStartOp = a.B!.StartOp,
+                        BEndOp = a.B.EndOp,
+                        Score = a.Score,
+                        Kind = a.Kind ?? "anchor"
+                    })
+                    .GroupBy(a => $"{a.AStartOp}-{a.AEndOp}|{a.BStartOp}-{a.BEndOp}", StringComparer.OrdinalIgnoreCase)
+                    .Select(g => g.OrderByDescending(x => x.Score).First())
+                    .OrderBy(a => a.AStartOp)
+                    .ThenBy(a => a.BStartOp)
+                    .ToList();
+
+                var snapshot = new AnchorBridgeSnapshot
+                {
+                    PdfA = report.PdfA ?? "",
+                    PdfB = report.PdfB ?? "",
+                    PageA = report.PageA,
+                    PageB = report.PageB,
+                    ObjA = report.ObjA,
+                    ObjB = report.ObjB,
+                    RangeA = new AnchorBridgeRange
+                    {
+                        StartOp = report.RangeA?.StartOp ?? 0,
+                        EndOp = report.RangeA?.EndOp ?? 0
+                    },
+                    RangeB = new AnchorBridgeRange
+                    {
+                        StartOp = report.RangeB?.StartOp ?? 0,
+                        EndOp = report.RangeB?.EndOp ?? 0
+                    },
+                    PairCount = report.Alignments.Count,
+                    FixedCount = report.FixedPairs.Count,
+                    VariableCount = report.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase)),
+                    GapCount = report.Alignments.Count(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase)),
+                    AnchorCount = anchors.Count,
+                    Anchors = anchors,
+                    UpdatedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)
+                };
+
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                };
+                var json = JsonSerializer.Serialize(snapshot, options);
+                File.WriteAllText(path, json, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsValidRange(AnchorBridgeRange? range)
+            => range != null && range.StartOp > 0 && range.EndOp >= range.StartOp;
+
+        private static bool IsValidRange(ObjectsTextOpsDiff.AlignDebugRange? range)
+            => range != null && range.HasValue && range.StartOp > 0 && range.EndOp >= range.StartOp;
+
+        private static bool IsSameAnchorBridgeTarget(ObjectsTextOpsDiff.AlignDebugReport report, AnchorBridgeSnapshot snapshot)
+        {
+            if (!string.Equals(Path.GetFileName(report.PdfA ?? ""), Path.GetFileName(snapshot.PdfA ?? ""), StringComparison.OrdinalIgnoreCase))
+                return false;
+            if (!string.Equals(Path.GetFileName(report.PdfB ?? ""), Path.GetFileName(snapshot.PdfB ?? ""), StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (snapshot.PageA > 0 && report.PageA > 0 && snapshot.PageA != report.PageA)
+                return false;
+            if (snapshot.PageB > 0 && report.PageB > 0 && snapshot.PageB != report.PageB)
+                return false;
+            if (snapshot.ObjA > 0 && report.ObjA > 0 && snapshot.ObjA != report.ObjA)
+                return false;
+            if (snapshot.ObjB > 0 && report.ObjB > 0 && snapshot.ObjB != report.ObjB)
+                return false;
+
+            return true;
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugRange MergeRanges(
+            ObjectsTextOpsDiff.AlignDebugRange current,
+            AnchorBridgeRange? fromSnapshot)
+        {
+            var merged = CloneAlignDebugRange(current ?? new ObjectsTextOpsDiff.AlignDebugRange());
+            if (!IsValidRange(fromSnapshot))
+                return merged;
+            if (!IsValidRange(current))
+            {
+                merged.StartOp = fromSnapshot!.StartOp;
+                merged.EndOp = fromSnapshot.EndOp;
+                merged.HasValue = true;
+                return merged;
+            }
+
+            merged.StartOp = Math.Min(current!.StartOp, fromSnapshot!.StartOp);
+            merged.EndOp = Math.Max(current.EndOp, fromSnapshot.EndOp);
+            merged.HasValue = merged.StartOp > 0 && merged.EndOp >= merged.StartOp;
+            return merged;
+        }
+
+        private static int OverlapSize(int aStart, int aEnd, int bStart, int bEnd)
+        {
+            var start = Math.Max(aStart, bStart);
+            var end = Math.Min(aEnd, bEnd);
+            return end >= start ? (end - start + 1) : 0;
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugBlock? FindBestBlockByRange(
+            List<ObjectsTextOpsDiff.AlignDebugBlock> blocks,
+            int startOp,
+            int endOp)
+        {
+            if (blocks == null || blocks.Count == 0 || startOp <= 0 || endOp < startOp)
+                return null;
+
+            return blocks
+                .Where(b => b != null && b.StartOp > 0 && b.EndOp >= b.StartOp)
+                .Select(b => new
+                {
+                    Block = b,
+                    Overlap = OverlapSize(b.StartOp, b.EndOp, startOp, endOp),
+                    Distance = Math.Abs(b.StartOp - startOp) + Math.Abs(b.EndOp - endOp)
+                })
+                .OrderByDescending(x => x.Overlap)
+                .ThenBy(x => x.Distance)
+                .Select(x => x.Block)
+                .FirstOrDefault();
+        }
+
+        private static int MergeAnchorsFromBridgeSnapshot(ObjectsTextOpsDiff.AlignDebugReport report, AnchorBridgeSnapshot snapshot)
+        {
+            if (report == null || snapshot?.Anchors == null || snapshot.Anchors.Count == 0)
+                return 0;
+
+            var existing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var anchor in report.Anchors)
+            {
+                if (anchor?.A == null || anchor.B == null)
+                    continue;
+                existing.Add($"{anchor.A.StartOp}-{anchor.A.EndOp}|{anchor.B.StartOp}-{anchor.B.EndOp}");
+            }
+
+            var added = 0;
+            foreach (var anchor in snapshot.Anchors)
+            {
+                if (anchor == null)
+                    continue;
+                if (anchor.AStartOp <= 0 || anchor.AEndOp < anchor.AStartOp || anchor.BStartOp <= 0 || anchor.BEndOp < anchor.BStartOp)
+                    continue;
+                var key = $"{anchor.AStartOp}-{anchor.AEndOp}|{anchor.BStartOp}-{anchor.BEndOp}";
+                if (existing.Contains(key))
+                    continue;
+
+                var blockA = FindBestBlockByRange(report.BlocksA, anchor.AStartOp, anchor.AEndOp);
+                var blockB = FindBestBlockByRange(report.BlocksB, anchor.BStartOp, anchor.BEndOp);
+                if (blockA == null || blockB == null)
+                    continue;
+
+                report.Anchors.Add(new ObjectsTextOpsDiff.AlignDebugPair
+                {
+                    AIndex = blockA.Index,
+                    BIndex = blockB.Index,
+                    Score = anchor.Score,
+                    Kind = string.IsNullOrWhiteSpace(anchor.Kind) ? "anchor_bridge" : anchor.Kind,
+                    A = CloneAlignDebugBlock(blockA),
+                    B = CloneAlignDebugBlock(blockB)
+                });
+                existing.Add(key);
+                added++;
+            }
+
+            if (added > 0)
+            {
+                report.Anchors = report.Anchors
+                    .OrderBy(a => a.A?.StartOp ?? int.MaxValue)
+                    .ThenBy(a => a.B?.StartOp ?? int.MaxValue)
+                    .ToList();
+            }
+            return added;
+        }
+
+        private static bool TryApplyAnchorBridgeSnapshot(
+            ObjectsTextOpsDiff.AlignDebugReport report,
+            AnchorBridgeSnapshot snapshot,
+            out int mergedAnchorCount)
+        {
+            mergedAnchorCount = 0;
+            if (report == null || snapshot == null)
+                return false;
+            if (!IsSameAnchorBridgeTarget(report, snapshot))
+                return false;
+
+            var beforeRangeA = BuildOpRange(report.RangeA);
+            var beforeRangeB = BuildOpRange(report.RangeB);
+            var beforeAnchors = report.Anchors.Count;
+
+            report.RangeA = MergeRanges(report.RangeA, snapshot.RangeA);
+            report.RangeB = MergeRanges(report.RangeB, snapshot.RangeB);
+            mergedAnchorCount = MergeAnchorsFromBridgeSnapshot(report, snapshot);
+
+            var afterRangeA = BuildOpRange(report.RangeA);
+            var afterRangeB = BuildOpRange(report.RangeB);
+            var afterAnchors = report.Anchors.Count;
+
+            return mergedAnchorCount > 0 ||
+                   !string.Equals(beforeRangeA, afterRangeA, StringComparison.OrdinalIgnoreCase) ||
+                   !string.Equals(beforeRangeB, afterRangeB, StringComparison.OrdinalIgnoreCase) ||
+                   afterAnchors != beforeAnchors;
+        }
+
         private static string ShortText(string? text, int max = 140)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -1823,7 +2118,22 @@ namespace Obj.Commands
                 }
                 report.RoleA = roleA;
                 report.RoleB = roleB;
+                var anchorBridgeFile = ResolveAnchorBridgeFilePath();
+                var anchorBridgeLoaded = false;
+                var anchorBridgeApplied = false;
+                var anchorBridgeLoadedAnchors = 0;
+                var anchorBridgeLoadedAnchorTotal = 0;
+                if (outputMode != OutputMode.All &&
+                    !string.IsNullOrWhiteSpace(anchorBridgeFile) &&
+                    TryReadAnchorBridgeSnapshot(anchorBridgeFile, out var anchorBridgeSnapshot) &&
+                    anchorBridgeSnapshot != null)
+                {
+                    anchorBridgeLoaded = true;
+                    anchorBridgeLoadedAnchorTotal = anchorBridgeSnapshot.Anchors?.Count ?? 0;
+                    anchorBridgeApplied = TryApplyAnchorBridgeSnapshot(report, anchorBridgeSnapshot, out anchorBridgeLoadedAnchors);
+                }
                 var processingReport = CloneAlignDebugReport(report);
+                var anchorBridgeWritten = !string.IsNullOrWhiteSpace(anchorBridgeFile) && TryWriteAnchorBridgeSnapshot(anchorBridgeFile, processingReport);
                 var rawPairsCount = processingReport.Alignments.Count;
                 var rawFixedCount = processingReport.FixedPairs.Count;
                 var rawVariableCount = processingReport.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
@@ -1857,6 +2167,15 @@ namespace Obj.Commands
                     step2Payload["variable_raw"] = rawVariableCount;
                     step2Payload["gaps_raw"] = rawGapCount;
                 }
+                if (!string.IsNullOrWhiteSpace(anchorBridgeFile))
+                {
+                    step2Payload["anchor_bridge_file"] = anchorBridgeFile;
+                    step2Payload["anchor_bridge_written"] = anchorBridgeWritten;
+                    step2Payload["anchor_bridge_loaded"] = anchorBridgeLoaded;
+                    step2Payload["anchor_bridge_applied"] = anchorBridgeApplied;
+                    step2Payload["anchor_bridge_loaded_anchors"] = anchorBridgeLoadedAnchors;
+                    step2Payload["anchor_bridge_snapshot_anchors"] = anchorBridgeLoadedAnchorTotal;
+                }
                 if (helper != null)
                 {
                     step2Payload["helper_hits_a"] = helper.HitsA;
@@ -1888,6 +2207,14 @@ namespace Obj.Commands
                         stepItems.Add(("fixed_raw", rawFixedCount.ToString(CultureInfo.InvariantCulture)));
                         stepItems.Add(("variable_raw", rawVariableCount.ToString(CultureInfo.InvariantCulture)));
                         stepItems.Add(("gaps_raw", rawGapCount.ToString(CultureInfo.InvariantCulture)));
+                    }
+                    if (!string.IsNullOrWhiteSpace(anchorBridgeFile))
+                    {
+                        stepItems.Add(("anchor_bridge_loaded", anchorBridgeLoaded ? "true" : "false"));
+                        stepItems.Add(("anchor_bridge_applied", anchorBridgeApplied ? "true" : "false"));
+                        stepItems.Add(("anchor_bridge_loaded_anchors", anchorBridgeLoadedAnchors.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("anchor_bridge_snapshot_anchors", anchorBridgeLoadedAnchorTotal.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("anchor_bridge_written", anchorBridgeWritten ? "true" : "false"));
                     }
                     if (helper != null)
                     {

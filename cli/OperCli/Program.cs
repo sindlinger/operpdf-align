@@ -210,6 +210,7 @@ namespace Obj.OperCli
             var sessionId = DateTime.UtcNow.ToString("yyyyMMddTHHmmssfff", CultureInfo.InvariantCulture) + $"__{docLabel}";
             var sessionDir = Path.Combine(ioDir, sessionId);
             Directory.CreateDirectory(sessionDir);
+            var anchorBridgePath = Path.Combine(sessionDir, "anchors.latest.json");
 
             var jsonOptions = new JsonSerializerOptions
             {
@@ -236,6 +237,7 @@ namespace Obj.OperCli
                 ["doc"] = forcedDoc,
                 ["model_alias"] = typedModelAlias,
                 ["with_legacy_objdiff"] = withLegacyObjDiff,
+                ["anchor_bridge_file"] = anchorBridgePath,
                 ["created_utc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
                 ["args"] = normalizedArgs,
                 ["steps"] = new List<Dictionary<string, object>>()
@@ -254,6 +256,7 @@ namespace Obj.OperCli
                     ["module"] = step.ModuleName,
                     ["forced_doc"] = forcedDoc,
                     ["typed_model_alias"] = typedModelAlias,
+                    ["anchor_bridge_file"] = anchorBridgePath,
                     ["args"] = normalizedArgs,
                     ["started_utc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)
                 };
@@ -263,7 +266,7 @@ namespace Obj.OperCli
 
                 Console.WriteLine($"[RUN] step {stepNumber}/{steps.Count} -> {step.CommandName}");
                 var stopwatch = Stopwatch.StartNew();
-                var (exitCode, stdout, stderr) = ExecuteOrchestratedStep(step.CommandName, normalizedArgs, forcedDoc);
+                var (exitCode, stdout, stderr) = ExecuteOrchestratedStep(step.CommandName, normalizedArgs, forcedDoc, anchorBridgePath, sessionDir, stepNumber);
                 stopwatch.Stop();
 
                 var stdoutPath = Path.Combine(sessionDir, $"{stepNumber:D2}_{SanitizeFileToken(step.CommandName)}__stdout.log");
@@ -321,7 +324,13 @@ namespace Obj.OperCli
             return hasFailure ? 1 : 0;
         }
 
-        private static (int ExitCode, string Stdout, string Stderr) ExecuteOrchestratedStep(string commandName, string[] args, string forcedDoc)
+        private static (int ExitCode, string Stdout, string Stderr) ExecuteOrchestratedStep(
+            string commandName,
+            string[] args,
+            string forcedDoc,
+            string anchorBridgePath,
+            string sessionDir,
+            int stepNumber)
         {
             var stdoutCapture = new StringWriter(CultureInfo.InvariantCulture);
             var stderrCapture = new StringWriter(CultureInfo.InvariantCulture);
@@ -334,8 +343,17 @@ namespace Obj.OperCli
             Console.SetError(teeErr);
 
             var exitCode = 0;
+            var prevAnchorBridge = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_ANCHOR_BRIDGE");
+            var prevRunSessionDir = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN_SESSION_DIR");
+            var prevRunStep = Environment.GetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN_STEP");
             try
             {
+                if (!string.IsNullOrWhiteSpace(anchorBridgePath))
+                    Environment.SetEnvironmentVariable("OBJ_TEXTOPSALIGN_ANCHOR_BRIDGE", anchorBridgePath);
+                if (!string.IsNullOrWhiteSpace(sessionDir))
+                    Environment.SetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN_SESSION_DIR", sessionDir);
+                Environment.SetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN_STEP", stepNumber.ToString(CultureInfo.InvariantCulture));
+
                 Environment.ExitCode = 0;
                 if (commandName.StartsWith("textopsalign-", StringComparison.OrdinalIgnoreCase))
                 {
@@ -377,6 +395,9 @@ namespace Obj.OperCli
             }
             finally
             {
+                Environment.SetEnvironmentVariable("OBJ_TEXTOPSALIGN_ANCHOR_BRIDGE", prevAnchorBridge);
+                Environment.SetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN_SESSION_DIR", prevRunSessionDir);
+                Environment.SetEnvironmentVariable("OBJ_TEXTOPSALIGN_RUN_STEP", prevRunStep);
                 Console.SetOut(originalOut);
                 Console.SetError(originalErr);
             }
