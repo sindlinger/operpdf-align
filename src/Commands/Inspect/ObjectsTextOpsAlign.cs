@@ -1823,8 +1823,13 @@ namespace Obj.Commands
                 }
                 report.RoleA = roleA;
                 report.RoleB = roleB;
-                var hadVariableBeforeMode = report.Alignments.Any(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
-                var hadGapBeforeMode = report.Alignments.Any(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
+                var processingReport = CloneAlignDebugReport(report);
+                var rawPairsCount = processingReport.Alignments.Count;
+                var rawFixedCount = processingReport.FixedPairs.Count;
+                var rawVariableCount = processingReport.Alignments.Count(p => string.Equals(p.Kind, "variable", StringComparison.OrdinalIgnoreCase));
+                var rawGapCount = processingReport.Alignments.Count(p => p.Kind.StartsWith("gap", StringComparison.OrdinalIgnoreCase));
+                var hadVariableBeforeMode = rawVariableCount > 0;
+                var hadGapBeforeMode = rawGapCount > 0;
                 ApplyOutputModeToReport(report, outputMode);
 
                 ObjectsTextOpsDiff.AlignDebugReport? backReport = null;
@@ -1845,6 +1850,13 @@ namespace Obj.Commands
                     ["range_a"] = rangeA,
                     ["range_b"] = rangeB
                 };
+                if (outputMode != OutputMode.All)
+                {
+                    step2Payload["pairs_raw"] = rawPairsCount;
+                    step2Payload["fixed_raw"] = rawFixedCount;
+                    step2Payload["variable_raw"] = rawVariableCount;
+                    step2Payload["gaps_raw"] = rawGapCount;
+                }
                 if (helper != null)
                 {
                     step2Payload["helper_hits_a"] = helper.HitsA;
@@ -1870,6 +1882,13 @@ namespace Obj.Commands
                         ("range_a", rangeA),
                         ("range_b", rangeB)
                     };
+                    if (outputMode != OutputMode.All)
+                    {
+                        stepItems.Add(("pairs_raw", rawPairsCount.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("fixed_raw", rawFixedCount.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("variable_raw", rawVariableCount.ToString(CultureInfo.InvariantCulture)));
+                        stepItems.Add(("gaps_raw", rawGapCount.ToString(CultureInfo.InvariantCulture)));
+                    }
                     if (helper != null)
                     {
                         stepItems.Add(("helper_hits_a", helper.HitsA.ToString(CultureInfo.InvariantCulture)));
@@ -1903,8 +1922,9 @@ namespace Obj.Commands
                 {
                     if (!ReturnUtils.IsEnabled())
                         PrintStage("iniciando o modo de extração");
+                    var reportForExtraction = outputMode == OutputMode.All ? report : processingReport;
                     report.Extraction = BuildExtractionPayload(
-                        report,
+                        reportForExtraction,
                         backReport,
                         aPath,
                         bPath,
@@ -2416,6 +2436,81 @@ namespace Obj.Commands
 
             report.RangeA = rangeA;
             report.RangeB = rangeB;
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugReport CloneAlignDebugReport(ObjectsTextOpsDiff.AlignDebugReport source)
+        {
+            return new ObjectsTextOpsDiff.AlignDebugReport
+            {
+                Label = source.Label,
+                PdfA = source.PdfA,
+                PdfB = source.PdfB,
+                RoleA = source.RoleA,
+                RoleB = source.RoleB,
+                PageA = source.PageA,
+                PageB = source.PageB,
+                ObjA = source.ObjA,
+                ObjB = source.ObjB,
+                Backoff = source.Backoff,
+                MinSim = source.MinSim,
+                Band = source.Band,
+                MinLenRatio = source.MinLenRatio,
+                LenPenalty = source.LenPenalty,
+                AnchorMinSim = source.AnchorMinSim,
+                AnchorMinLenRatio = source.AnchorMinLenRatio,
+                GapPenalty = source.GapPenalty,
+                Anchors = source.Anchors.Select(CloneAlignDebugPair).ToList(),
+                HelperDiagnostics = source.HelperDiagnostics,
+                BlocksA = source.BlocksA.Select(CloneAlignDebugBlock).ToList(),
+                BlocksB = source.BlocksB.Select(CloneAlignDebugBlock).ToList(),
+                Alignments = source.Alignments.Select(CloneAlignDebugPair).ToList(),
+                VariableBlocksA = source.VariableBlocksA.Select(CloneAlignDebugBlock).ToList(),
+                VariableBlocksB = source.VariableBlocksB.Select(CloneAlignDebugBlock).ToList(),
+                FixedPairs = source.FixedPairs.Select(CloneAlignDebugPair).ToList(),
+                RangeA = CloneAlignDebugRange(source.RangeA),
+                RangeB = CloneAlignDebugRange(source.RangeB),
+                Extraction = source.Extraction,
+                PipelineStages = source.PipelineStages,
+                ReturnInfo = source.ReturnInfo,
+                ReturnView = source.ReturnView
+            };
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugPair CloneAlignDebugPair(ObjectsTextOpsDiff.AlignDebugPair source)
+        {
+            return new ObjectsTextOpsDiff.AlignDebugPair
+            {
+                AIndex = source.AIndex,
+                BIndex = source.BIndex,
+                Score = source.Score,
+                Kind = source.Kind,
+                A = source.A == null ? null : CloneAlignDebugBlock(source.A),
+                B = source.B == null ? null : CloneAlignDebugBlock(source.B)
+            };
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugBlock CloneAlignDebugBlock(ObjectsTextOpsDiff.AlignDebugBlock source)
+        {
+            return new ObjectsTextOpsDiff.AlignDebugBlock
+            {
+                Index = source.Index,
+                StartOp = source.StartOp,
+                EndOp = source.EndOp,
+                Text = source.Text,
+                Pattern = source.Pattern,
+                MaxTokenLen = source.MaxTokenLen,
+                OpsLabel = source.OpsLabel
+            };
+        }
+
+        private static ObjectsTextOpsDiff.AlignDebugRange CloneAlignDebugRange(ObjectsTextOpsDiff.AlignDebugRange source)
+        {
+            return new ObjectsTextOpsDiff.AlignDebugRange
+            {
+                StartOp = source.StartOp,
+                EndOp = source.EndOp,
+                HasValue = source.HasValue
+            };
         }
 
         private static string BuildOpRange(ObjectsTextOpsDiff.AlignDebugRange range)
