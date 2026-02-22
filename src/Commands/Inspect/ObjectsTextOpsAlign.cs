@@ -1574,6 +1574,12 @@ namespace Obj.Commands
 
                 foreach (var modelPath in modelCandidates)
                 {
+                    if (AreSameFilePath(modelPath, targetPath))
+                    {
+                        trialRows.Add($"{Path.GetFileName(modelPath)} ignorado: mesmo arquivo do alvo");
+                        continue;
+                    }
+
                     ResolveSelection(modelPath, pageAUser, objAUser, pageA, objA, out var modelPage, out var modelObj, out var modelSource);
                     if (modelPage <= 0 || modelObj <= 0)
                         continue;
@@ -1674,14 +1680,29 @@ namespace Obj.Commands
 
                 if (AreSameFilePath(aPath, bPath))
                 {
-                    Console.WriteLine($"Aviso: comparação A==B ignorada ({Path.GetFileName(bPath)}).");
-                    continue;
+                    Console.WriteLine($"Erro: modelo e alvo resolvidos para o mesmo PDF ({Path.GetFileName(bPath)}).");
+                    Console.WriteLine("Abortado por segurança. Use um PDF de alvo diferente do PDF de modelo.");
+                    Environment.ExitCode = 2;
+                    LastExitCode = 2;
+                    return;
                 }
 
                 int localPageA = pageA;
                 int localObjA = objA;
                 ResolveSelection(bPath, pageBUser, objBUser, pageB, objB, out var localPageB, out var localObjB, out var sourceB);
                 var roleB = DetectInputRole(bPath);
+                var hasExactlyOneTemplateAndOneTarget =
+                    (IsTemplateRole(roleA) && IsTargetRole(roleB)) ||
+                    (IsTargetRole(roleA) && IsTemplateRole(roleB));
+                if (!hasExactlyOneTemplateAndOneTarget)
+                {
+                    Console.WriteLine($"Erro: entradas ambíguas para alinhamento (role_a={roleA}, role_b={roleB}).");
+                    Console.WriteLine("É obrigatório informar exatamente 1 PDF de modelo e 1 PDF alvo.");
+                    Console.WriteLine("Use aliases tipados (@M-DESP/@M-CER/@M-REQ) para modelo e :Q/:D/etc. para o alvo.");
+                    Environment.ExitCode = 2;
+                    LastExitCode = 2;
+                    return;
+                }
                 var targetIsA = IsTargetRole(roleA) && IsTemplateRole(roleB);
                 var modelPdfPath = targetIsA ? bPath : aPath;
                 var targetPdfPath = targetIsA ? aPath : bPath;

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using Obj.Commands;
 using Obj.DocDetector;
 using Obj.Utils;
@@ -134,6 +136,27 @@ namespace Obj.OperCli
                 return ResolveProcessExitCode();
             }
 
+            if (string.Equals(mode, "textopsrun-despacho", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(mode, "run-despacho", StringComparison.OrdinalIgnoreCase))
+            {
+                PrintCodePreviewIfNeeded("textopsrun", args);
+                return ExecuteOrchestratedRun(rest, "despacho", "@M-DESP", "despacho");
+            }
+
+            if (string.Equals(mode, "textopsrun-certidao", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(mode, "run-certidao", StringComparison.OrdinalIgnoreCase))
+            {
+                PrintCodePreviewIfNeeded("textopsrun", args);
+                return ExecuteOrchestratedRun(rest, "certidao_conselho", "@M-CER", "certidao");
+            }
+
+            if (string.Equals(mode, "textopsrun-requerimento", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(mode, "run-requerimento", StringComparison.OrdinalIgnoreCase))
+            {
+                PrintCodePreviewIfNeeded("textopsrun", args);
+                return ExecuteOrchestratedRun(rest, "requerimento_honorarios", "@M-REQ", "requerimento");
+            }
+
             if (string.Equals(mode, "build-anchor-model-despacho", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(mode, "anchor-model-despacho", StringComparison.OrdinalIgnoreCase))
             {
@@ -158,6 +181,241 @@ namespace Obj.OperCli
             if (ObjectsTextOpsAlign.LastExitCode != 0)
                 return ObjectsTextOpsAlign.LastExitCode;
             return Environment.ExitCode != 0 ? Environment.ExitCode : 0;
+        }
+
+        private static int ExecuteOrchestratedRun(string[] rest, string forcedDoc, string typedModelAlias, string docLabel)
+        {
+            var normalizedArgs = ForceDocAndTypedModel(rest, forcedDoc, typedModelAlias);
+            var runDir = Path.Combine(Directory.GetCurrentDirectory(), "run");
+            var ioDir = Path.Combine(runDir, "io");
+            Directory.CreateDirectory(runDir);
+            Directory.CreateDirectory(ioDir);
+
+            var sessionId = DateTime.UtcNow.ToString("yyyyMMddTHHmmssfff", CultureInfo.InvariantCulture) + $"__{docLabel}";
+            var sessionDir = Path.Combine(ioDir, sessionId);
+            Directory.CreateDirectory(sessionDir);
+
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            Console.WriteLine($"[RUN] sessão: {sessionId}");
+            Console.WriteLine($"[RUN] logs: {sessionDir}");
+
+            var steps = new[]
+            {
+                new OrchestratedStep("textopsalign-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=All)"),
+                new OrchestratedStep("textopsvar-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=VariablesOnly)"),
+                new OrchestratedStep("textopsfixed-" + docLabel, "Obj.Commands.ObjectsTextOpsAlign(OutputMode=FixedOnly)")
+            };
+
+            var manifest = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["session_id"] = sessionId,
+                ["doc"] = forcedDoc,
+                ["model_alias"] = typedModelAlias,
+                ["created_utc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
+                ["args"] = normalizedArgs,
+                ["steps"] = new List<Dictionary<string, object>>()
+            };
+            var manifestSteps = (List<Dictionary<string, object>>)manifest["steps"];
+
+            var hasFailure = false;
+            for (var i = 0; i < steps.Length; i++)
+            {
+                var step = steps[i];
+                var stepNumber = i + 1;
+                var request = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["sequence"] = stepNumber,
+                    ["command"] = step.CommandName,
+                    ["module"] = step.ModuleName,
+                    ["forced_doc"] = forcedDoc,
+                    ["typed_model_alias"] = typedModelAlias,
+                    ["args"] = normalizedArgs,
+                    ["started_utc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture)
+                };
+
+                var requestPath = Path.Combine(sessionDir, $"{stepNumber:D2}_{SanitizeFileToken(step.CommandName)}__request.json");
+                File.WriteAllText(requestPath, JsonSerializer.Serialize(request, jsonOptions), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+
+                Console.WriteLine($"[RUN] step {stepNumber}/3 -> {step.CommandName}");
+                var stopwatch = Stopwatch.StartNew();
+                var (exitCode, stdout, stderr) = ExecuteOrchestratedStep(step.CommandName, normalizedArgs);
+                stopwatch.Stop();
+
+                var stdoutPath = Path.Combine(sessionDir, $"{stepNumber:D2}_{SanitizeFileToken(step.CommandName)}__stdout.log");
+                var stderrPath = Path.Combine(sessionDir, $"{stepNumber:D2}_{SanitizeFileToken(step.CommandName)}__stderr.log");
+                File.WriteAllText(stdoutPath, stdout, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+                File.WriteAllText(stderrPath, stderr, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+
+                var response = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["sequence"] = stepNumber,
+                    ["command"] = step.CommandName,
+                    ["module"] = step.ModuleName,
+                    ["exit_code"] = exitCode,
+                    ["duration_ms"] = stopwatch.ElapsedMilliseconds,
+                    ["finished_utc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
+                    ["stdout_path"] = stdoutPath,
+                    ["stderr_path"] = stderrPath,
+                    ["stdout_len"] = stdout.Length,
+                    ["stderr_len"] = stderr.Length
+                };
+
+                var responsePath = Path.Combine(sessionDir, $"{stepNumber:D2}_{SanitizeFileToken(step.CommandName)}__response.json");
+                File.WriteAllText(responsePath, JsonSerializer.Serialize(response, jsonOptions), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+
+                manifestSteps.Add(new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["sequence"] = stepNumber,
+                    ["command"] = step.CommandName,
+                    ["module"] = step.ModuleName,
+                    ["request_path"] = requestPath,
+                    ["response_path"] = responsePath,
+                    ["stdout_path"] = stdoutPath,
+                    ["stderr_path"] = stderrPath,
+                    ["exit_code"] = exitCode
+                });
+
+                if (exitCode != 0)
+                {
+                    hasFailure = true;
+                    Console.WriteLine($"[RUN] falha em {step.CommandName} (exit={exitCode}).");
+                    break;
+                }
+            }
+
+            manifest["status"] = hasFailure ? "fail" : "ok";
+            manifest["finished_utc"] = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture);
+            var manifestPath = Path.Combine(sessionDir, "manifest.json");
+            File.WriteAllText(manifestPath, JsonSerializer.Serialize(manifest, jsonOptions), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+
+            var latestPath = Path.Combine(ioDir, "latest_session.txt");
+            File.WriteAllText(latestPath, sessionDir, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            Console.WriteLine($"[RUN] manifest: {manifestPath}");
+
+            Environment.ExitCode = hasFailure ? 1 : 0;
+            return hasFailure ? 1 : 0;
+        }
+
+        private static (int ExitCode, string Stdout, string Stderr) ExecuteOrchestratedStep(string commandName, string[] args)
+        {
+            var stdoutCapture = new StringWriter(CultureInfo.InvariantCulture);
+            var stderrCapture = new StringWriter(CultureInfo.InvariantCulture);
+            var originalOut = Console.Out;
+            var originalErr = Console.Error;
+            using var teeOut = new TeeTextWriter(originalOut, stdoutCapture);
+            using var teeErr = new TeeTextWriter(originalErr, stderrCapture);
+
+            Console.SetOut(teeOut);
+            Console.SetError(teeErr);
+
+            var exitCode = 0;
+            try
+            {
+                Environment.ExitCode = 0;
+                if (commandName.StartsWith("textopsalign-", StringComparison.OrdinalIgnoreCase))
+                {
+                    ObjectsTextOpsAlign.Execute(args);
+                }
+                else if (commandName.StartsWith("textopsvar-", StringComparison.OrdinalIgnoreCase))
+                {
+                    ObjectsTextOpsAlign.ExecuteWithMode(args, ObjectsTextOpsAlign.OutputMode.VariablesOnly);
+                }
+                else if (commandName.StartsWith("textopsfixed-", StringComparison.OrdinalIgnoreCase))
+                {
+                    ObjectsTextOpsAlign.ExecuteWithMode(args, ObjectsTextOpsAlign.OutputMode.FixedOnly);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Comando orquestrado não suportado: {commandName}");
+                    Environment.ExitCode = 1;
+                }
+
+                exitCode = ResolveProcessExitCode();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Erro ao executar etapa orquestrada {commandName}: {ex}");
+                exitCode = 1;
+            }
+            finally
+            {
+                Console.SetOut(originalOut);
+                Console.SetError(originalErr);
+            }
+
+            return (exitCode, stdoutCapture.ToString(), stderrCapture.ToString());
+        }
+
+        private static string SanitizeFileToken(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return "item";
+
+            var sb = new StringBuilder(raw.Length);
+            foreach (var c in raw!)
+            {
+                if (char.IsLetterOrDigit(c) || c == '-' || c == '_' || c == '.')
+                    sb.Append(c);
+                else
+                    sb.Append('_');
+            }
+
+            var text = sb.ToString().Trim('_');
+            return string.IsNullOrWhiteSpace(text) ? "item" : text;
+        }
+
+        private readonly struct OrchestratedStep
+        {
+            public OrchestratedStep(string commandName, string moduleName)
+            {
+                CommandName = commandName;
+                ModuleName = moduleName;
+            }
+
+            public string CommandName { get; }
+            public string ModuleName { get; }
+        }
+
+        private sealed class TeeTextWriter : TextWriter
+        {
+            private readonly TextWriter _left;
+            private readonly TextWriter _right;
+
+            public TeeTextWriter(TextWriter left, TextWriter right)
+            {
+                _left = left;
+                _right = right;
+            }
+
+            public override Encoding Encoding => _left.Encoding;
+
+            public override void Write(char value)
+            {
+                _left.Write(value);
+                _right.Write(value);
+            }
+
+            public override void Write(string? value)
+            {
+                _left.Write(value);
+                _right.Write(value);
+            }
+
+            public override void WriteLine(string? value)
+            {
+                _left.WriteLine(value);
+                _right.WriteLine(value);
+            }
+
+            public override void Flush()
+            {
+                _left.Flush();
+                _right.Flush();
+            }
         }
 
         private static bool IsBuildAlignExeMode(string mode)
@@ -648,6 +906,9 @@ namespace Obj.OperCli
             Console.WriteLine("  textopsfixed-despacho      fixos despacho");
             Console.WriteLine("  textopsfixed-certidao      fixos certidão");
             Console.WriteLine("  textopsfixed-requerimento  fixos requerimento");
+            Console.WriteLine("  textopsrun-despacho        orquestra align/var/fixed (despacho) + trilha IO em run/io");
+            Console.WriteLine("  textopsrun-certidao        orquestra align/var/fixed (certidão) + trilha IO em run/io");
+            Console.WriteLine("  textopsrun-requerimento    orquestra align/var/fixed (requerimento) + trilha IO em run/io");
             Console.WriteLine("  build-anchor-model-despacho  gera PDF de âncoras do modelo de despacho");
             Console.WriteLine("  build-merged-page          gera PDF com duas páginas combinadas em uma página grande");
             Console.WriteLine("  build-align-exe            publica e atualiza align.exe na raiz");
@@ -664,6 +925,7 @@ namespace Obj.OperCli
             Console.WriteLine("  operpdf textopsalign-requerimento --inputs :D20 --inputs :Q200");
             Console.WriteLine("  operpdf textopsvar-despacho --inputs :D20 --inputs :Q200");
             Console.WriteLine("  operpdf textopsfixed-despacho --inputs :D20 --inputs :Q200");
+            Console.WriteLine("  operpdf textopsrun-despacho run 1-8 --inputs @MODEL --inputs :Q22");
             Console.WriteLine("  operpdf build-anchor-model-despacho --model reference/models/tjpb_despacho_model.pdf --out reference/models/tjpb_despacho_anchor_model.pdf");
             Console.WriteLine("  operpdf build-merged-page --input models/nossos/despacho_p1-2.pdf --page-a 1 --page-b 2 --layout vertical");
             Console.WriteLine("  operpdf build-align-exe");
